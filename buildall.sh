@@ -1,0 +1,27 @@
+#!/bin/bash
+echo "2015 day1"
+./build.sh 2015 day1
+echo "2017 1ms"
+./build.sh 2017 1ms
+echo "2017 2ms"
+./build.sh 2017 2ms
+echo "2017 3ms"
+./build.sh 2017 3ms
+echo "2017 4ms"
+./build.sh 2017 4ms
+echo "2017 5ms"
+./build.sh 2017 5ms
+echo "2017 6ms"
+./build.sh 2017 6ms
+echo "2017 7ms"
+./build.sh 2017 7ms
+echo "2017 8ms"
+./build.sh 2017 8ms
+echo "2017 9ms"
+./build.sh 2017 9ms
+echo "2017 10ms"
+./build.sh 2017 10ms
+echo "2017 11ms"
+./build.sh 2017 11ms
+echo "2017 12ms"
+./build.sh 2017 12ms
