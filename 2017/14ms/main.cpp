@@ -74,9 +74,7 @@ int label_cc(const std::vector< std::vector<int> >& usage, std::vector< std::vec
     cx=cy=0;
 
     while(true) {
-        //std::cout << "Currently working on " << cx << " " << cy << std::endl;
         if ( (usage[cx][cy]==1) && (cc[cx][cy]==0) ) {  //forground, not labeled
-            //std::cout << "   ==> foreground, not labeled" << std::endl;
             cc[cx][cy] = currentlabel;
             q.push(std::make_pair(cx,cy));
 
@@ -84,13 +82,10 @@ int label_cc(const std::vector< std::vector<int> >& usage, std::vector< std::vec
             while (q.size()>0) {
                 std::pair<int,int> coord = q.front(); q.pop();
 
-                //std::cout << "      ==> popped: " << coord.first << " " << coord.second << std::endl;
-
                 int nx, ny;
                 // top neighbour
                 nx = coord.first; ny = coord.second-1;
                 if ( (nx>=0) && (nx<usage.size()) && (ny>=0) && (ny<usage.size()) ) {
-                    //std::cout << "             ----------> t " << nx <<  " " << ny <<  " " << usage[nx][ny] <<" " << cc[nx][ny] << std::endl;
                     if ( (usage[nx][ny]==1) && (cc[nx][ny]==0) )  { //foreground not labeled
                         cc[nx][ny] = currentlabel;
                         q.push(std::make_pair(nx,ny));
@@ -99,7 +94,6 @@ int label_cc(const std::vector< std::vector<int> >& usage, std::vector< std::vec
                 // left neighbour
                 nx = coord.first-1; ny = coord.second;
                 if ( (nx>=0) && (nx<usage.size()) && (ny>=0) && (ny<usage.size()) ) {
-                    //std::cout << "             ----------> l " << nx <<  " " << ny <<  " " << usage[nx][ny] <<" " << cc[nx][ny] << std::endl;
                     if ( (usage[nx][ny]==1) && (cc[nx][ny]==0) )  { //foreground not labeled
                         cc[nx][ny] = currentlabel;
                         q.push(std::make_pair(nx,ny));
@@ -108,7 +102,6 @@ int label_cc(const std::vector< std::vector<int> >& usage, std::vector< std::vec
                 // right neighbour
                 nx = coord.first+1; ny = coord.second;
                 if ( (nx>=0) && (nx<usage.size()) && (ny>=0) && (ny<usage.size()) ) {
-                    //std::cout << "             ----------> r " << nx <<  " " << ny <<  " " << usage[nx][ny] <<" " << cc[nx][ny] << std::endl;
                     if ( (usage[nx][ny]==1) && (cc[nx][ny]==0) )  { //foreground not labeled
                         cc[nx][ny] = currentlabel;
                         q.push(std::make_pair(nx,ny));
@@ -117,7 +110,6 @@ int label_cc(const std::vector< std::vector<int> >& usage, std::vector< std::vec
                 // bottom neighbour
                 nx = coord.first; ny = coord.second+1;
                 if ( (nx>=0) && (nx<usage.size()) && (ny>=0) && (ny<usage.size()) ) {
-                    //std::cout << "             ----------> b " << nx <<  " " << ny <<  " " << usage[nx][ny] <<" " << cc[nx][ny] << std::endl;
                     if ( (usage[nx][ny]==1) && (cc[nx][ny]==0) )  { //foreground not labeled
                         cc[nx][ny] = currentlabel;
                         q.push(std::make_pair(nx,ny));
@@ -181,11 +173,6 @@ int main() {
     for (auto& r:cc) for (auto& c:r) c=0; 
 
     std::cout << "Part 2: " << label_cc(usage,cc) << std::endl;
-    return 0;
-    std::cout << "---------------------------------------------------------------------------------------------------------------------" << std::endl;
-    for (auto& r:usage) { for (auto& c:r) std::cout << c << "\t"; std::cout << std::endl; }; 
-    std::cout << "---------------------------------------------------------------------------------------------------------------------" << std::endl;
-    for (auto& r:cc) { for (auto& c:r) std::cout << c << "\t"; std::cout << std::endl; }; 
-    std::cout << "---------------------------------------------------------------------------------------------------------------------" << std::endl;
-    
+
+    return 0;    
 }
