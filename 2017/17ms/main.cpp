@@ -33,4 +33,17 @@ int main() {
     }
 
     std::cout << "Part 1: " << *(current+1) << std::endl;
+
+    int bufsize = 1;
+    int cp = 0;
+    int iv = -1;
+    int np = 0;
+    for (int i=0;i<50000000;++i) {
+        int ip = 1+(cp+input)%bufsize;
+        if (ip==(1+np)) iv = i+1;
+        if (ip<=(0+np)) ++np;
+        cp = ip;
+        ++bufsize;
+    }
+    std::cout << "Part 2: " << iv << std::endl;
 }
