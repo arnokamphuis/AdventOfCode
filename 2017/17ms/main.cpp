@@ -32,7 +32,7 @@ int main() {
     std::cout << "Part 1: " << *(current+1) << std::endl;
 
 
-    // Part two is too complicated to fulled expand. So only track the 0 position and the value after it
+    // Part two is too complicated to fully expand. So only track the 0 position and the value after it
     int bufsize = 1; // size of the circular buffer
     int cp = 0;      // current position for insert
     int iv = -1;     // last inserted value after 0
