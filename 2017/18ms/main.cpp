@@ -2,110 +2,193 @@
 #include <sstream>
 #include <vector>
 #include <map>
+#include <queue>
 #include <set>
 #include <algorithm>
 #include <climits>  
 #include <string>
 #include <utility>
 
-typedef std::vector< std::pair< std::string, std::pair<char,std::string> > > instruction_type;
+typedef std::vector<std::string> instruction_type;
+typedef int64_t memory_type;
 
-bool move(instruction_type::iterator& ci, instruction_type& instructions, int steps) {
-    if (steps==0) return true;
-    else if (steps<0) {
-        if (ci==instructions.begin()) return false;
-        else move(--ci,instructions,steps+1);
-    } else {
-        ++ci;
-        if (ci==instructions.end()) return false;
-        else move(ci,instructions,steps-1);        
+
+class program {
+    public:
+    memory_type id;
+    int send_counter;
+    instruction_type instructions;
+    instruction_type::iterator ci;
+    std::queue<memory_type> messages;
+    memory_type* registers;
+    std::map<char,int> reg_index;
+    program* other;
+    bool waiting;
+
+    program(memory_type pn) : id(pn), send_counter(0) {
     }
-}
 
-int perform_instructions(instruction_type& instructions, 
-    int* registers, std::map< char, int > reg_index) {
+    void print_registers() {
+        for (auto r: reg_index) {
+            std::cout << "|" << r.first << "=" << registers[r.second] << "|";
+        }
+        std::cout << std::endl;
+    }
 
-        int sound_played = -1;
-        instruction_type::iterator ci = instructions.begin();
+    void init() {
+        waiting = false;
+        ci = instructions.begin();
+        registers = new memory_type[reg_index.size()];
+        int count=0;
+        for (auto& ri: reg_index) {
+            ri.second = count;
+            registers[ri.second] = 0;
+            ++count;
+        }
+        registers[reg_index['p']] = id;
 
-        std::string instr, val_str;
+        //std::cout << "After init!" << std::endl;
+        //print_registers();
+    }
+
+    void add_instruction(std::string inst) {
+        instructions.push_back(inst);
+        std::istringstream ss(inst);
+        std::string tmp, reg_str;
+        ss >> tmp >> reg_str >> tmp;
+        while (reg_str[0]==' ') reg_str.erase(reg_str.begin());
+        int tmp_a = reg_str[0]-'a';
+        int s = reg_index.size();
+        if ( (0 <= tmp_a) and (tmp_a <=26) ) reg_index[reg_str[0]]=s;
+    }
+
+    bool jump(int steps) {
+        if (steps == 0) return true;
+        if (steps < 0) {
+            if (ci!=instructions.begin()) {
+                --ci;
+                return jump(steps+1);
+            } else return false;
+        } else {
+            ++ci;
+            if (ci!=instructions.begin()) {
+                return jump(steps-1);
+            } else return false;
+        }
+    }
+
+    bool execute_instruction() {
+        std::string current_instruction = *ci;
+
+        //std::cout << id << "-" << *ci << std::endl;
+        //print_registers();
+
+        bool jumped = false;
+        waiting = false;
+
+
+        std::string inst, param0, param1;
+        std::istringstream ss(current_instruction);
+        ss >> inst >> param0 >> param1;
+
+        while (param0[0]==' ') param0.erase(param0.begin());
+        while (param1[0]==' ') param1.erase(param1.begin());
+
+        int reg_value, value;
         char reg;
-        int val;
 
-        while (true) {
-            instr   = ci->first;
-            reg     = ci->second.first;
-            val_str = ci->second.second;
-            bool jumped = false;
+        //std::cout <<"INSTRUCTION: |" << inst << "|" << std::endl;
 
-            if ( !((instr.compare("snd")==0) or (instr.compare("rcv")==0)) ) {
-                int tmp = (val_str[0]-'a');
-                std::cout << "--------------------|" << val_str[0] << "| " <<  tmp << std::endl;
-                if (  (0<=tmp) && (tmp<=26) ) val = registers[reg_index[val_str[0]]];
-                else val = std::stoi(val_str);
-            }
+        if (  ! ( (inst.compare("snd")==0) or (inst.compare("rcv")==0) or (inst.compare("jgz")==0) ) ) {
+            reg = param0[0];
+            reg_value = registers[reg_index[reg]];
+            int tmp_a = param1[0]-'a';
+            if ( (0 <= tmp_a) and (tmp_a <=26) ) value = registers[reg_index[param1[0]]];
+            else value = std::stoi(param1);
 
-            int* regist = &(registers[reg_index[reg]]);
-            int inst_val = *regist;
+            if (inst.compare("set")==0) registers[reg_index[reg]] = value;
+            if (inst.compare("add")==0) registers[reg_index[reg]] += value;
+            if (inst.compare("mul")==0) registers[reg_index[reg]] *= value;
+            if (inst.compare("mod")==0) registers[reg_index[reg]] = registers[reg_index[reg]]  % value;
+        } else if (inst.compare("jgz")==0) {
 
-            std::cout << "Executing instruction: " << instr << " " << reg << " " << val << " (" << inst_val <<  ")" << std::endl;
+            int check_value;
+            int tmp_a = param0[0]-'a';
+            if ( (0 <= tmp_a) and (tmp_a <=26) ) check_value = registers[reg_index[param0[0]]];
+            else check_value = std::stoi(param0);
 
-            if (instr.compare("set")==0) *regist = val;
-            if (instr.compare("add")==0) *regist += val;
-            if (instr.compare("mul")==0) *regist *= val;
-            if (instr.compare("mod")==0) *regist = *regist % val;
+            tmp_a = param1[0]-'a';
+            if ( (0 <= tmp_a) and (tmp_a <=26) ) value = registers[reg_index[param1[0]]];
+            else value = std::stoi(param1);
 
-            if (instr.compare("snd")==0) { sound_played = val;
-                std::cout << "PLAY" << val << std::endl;
-            }
-
-            if (instr.compare("rcv")==0)  {
-                if (val!=0) return sound_played;
-            } // TODO
-
-            if (instr.compare("jgz")==0)  {
-                int steps = val;
-                if (inst_val>0) {
-                    std::cout << "JUMP" << std::endl;
-                    if (!move(ci, instructions, steps )) {
-                        return -1; 
-                    } else { jumped = true; }
+            //std::cout << "  do i jump? " << check_value << "\t steps to jump: " << std::endl;
+            if (check_value > 0) {
+                if (jump(value)) {
+                    jumped = true;
+                } else {
+                    waiting = false;
+                    return false;
                 }
             }
-
-            if (!jumped) ++ci;
-
-            std::cout << "=======================================" << std::endl;
-            for (auto r: reg_index) {
-                std::cout << r.first << "\t" << registers[r.second] << std::endl;
+        } else if (inst.compare("rcv")==0) {
+            //std::cout << "RECEIVE: " << id << ":" << messages.size() << std::endl;
+            if (messages.size()>0) {
+                reg = param0[0];
+                registers[reg_index[reg]] = messages.front(); messages.pop();
+            } else {
+                waiting = true;
+                return false;
             }
-            std::cout << "=======================================" << std::endl;
-        }        
+        } else if (inst.compare("snd")==0) {
+            int tmp_a = param0[0]-'a';
+            if ( (0 <= tmp_a) and (tmp_a <=26) ) value = registers[reg_index[param0[0]]];
+            else value = std::stoi(param0);
+            send(value);
+        }
+        
+        //print_registers();
+        //std::cout << "============================================================" << std::endl;
+
+        if (!jumped) ++ci;
+        return true;
     }
 
+    void send(memory_type value) { 
+        //std::cout << "SEND: " << id << ":" << value << std::endl;
+        other->messages.push(value); 
+        ++send_counter; 
+    }
+    bool can_continue() { return messages.size()>0; } 
+    bool is_waiting() { return waiting; } 
+};
 
 int main() {
+    program p0(0), p1(1);
+    p0.other = &p1; p1.other = &p0;
 
-    std::set< char > registers_found;
-    std::map< char, int > reg_index;
-    instruction_type instructions;
     std::string line;
     while (getline(std::cin,line)) {
-        std::istringstream ss(line);
-        std::string instr, reg, val;
-        ss >> instr >> reg >> val;
-        while(val[0]==' ') val.erase(val.begin());
-        instructions.push_back( std::make_pair(instr, std::make_pair(reg[0],val)) );
-        registers_found.insert(reg[0]);
-    }
-    int regsize = registers_found.size();
-    int *registers = new int[regsize];
-    int c=0;
-    for (auto r: registers_found) { 
-        reg_index[r] = c;
-        registers[c++]=0;
+        p0.add_instruction(line);
+        p1.add_instruction(line);
     }
 
+    p0.init();
+    p1.init();
 
-    std::cout << "Part 1: " << perform_instructions(instructions, registers, reg_index) << std::endl;
+    while (true) {
+        while (p0.execute_instruction()) {}
+        if (!p0.is_waiting()) { 
+            std::cout << "Process 0 is finished" << std::endl;
+        }
+        while (p1.execute_instruction()) {}
+        if (!p1.is_waiting()) { 
+            std::cout << "Process 1 is finished" << std::endl;
+        }
+
+        if (  (p0.is_waiting() and !p0.can_continue()) and (p1.is_waiting() and !p1.can_continue()) ) {
+            std::cout << "DEADLOCK" << std::endl;
+            std::cout << "Send-counter of p1: " << p1.send_counter << std::endl;
+            break;
+        }
+    }
 }
