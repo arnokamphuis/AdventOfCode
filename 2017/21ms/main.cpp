@@ -59,12 +59,12 @@ class tile {
     }
 
     bool check(const std::string& desc) {
-        if (!check_normal(desc)) return false;
-        if (!check_lr(desc)) return false;
-        if (!check_fr(desc)) return false;
-        if (!check_rr(desc)) return false;
-        if (!check_flipped(desc)) return false;
-        return true;
+        if (check_normal(desc)) return true;
+        if (check_lr(desc)) return true;
+        if (check_fr(desc)) return true;
+        if (check_rr(desc)) return true;
+        if (check_flipped(desc)) return true;
+        return false;
     }
 
     void change_into(const std::string& desc) {
@@ -78,7 +78,8 @@ class tile {
     }
 
 public:
-    tile(int s, const std::string& desc) : size(s), leds(desc) {
+    tile(int s, const std::string& desc) : size(s) {
+        update_leds(desc);
     }
 
     void evolve(const std::map<std::string, std::string>& rules) {
@@ -97,4 +98,11 @@ public:
 
 int main() {
     tile* first = new tile(3, ".#./..#/###");
+
+    for (int i=0;i<3;++i) {
+        for (int j=0;j<3;++j) {
+            std::cout << first->led(i,j);
+        }
+        std::cout << std::endl;
+    }
 }
