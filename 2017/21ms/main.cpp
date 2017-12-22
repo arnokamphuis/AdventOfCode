@@ -19,82 +19,108 @@ void find_and_replace_all(std::string & data, std::string toSearch, std::string 
 	}
 }
 
+
+
+class tilestorage {
+    private:
+    public:
+        int size;
+        char storage[3][3];
+
+        tilestorage() { size = -1; }
+
+        tilestorage(const std::string& s) {
+            std::string init_s = s;
+            //std::cout << "tilestorage(): " << s << std::endl;
+            find_and_replace_all(init_s,"/","");
+            int ssize = init_s.size();
+            size = std::sqrt(ssize);
+            int i = 0, x, y;
+            for (auto c: init_s) {  
+                x = i % size;
+                y = i / size;
+                storage[x][y] = c;
+                ++i;
+            }
+        }
+
+        tilestorage rotate_left() {
+            tilestorage ts;
+            ts.size = size;
+            for (int i=0; i<size; ++i) for (int j=0; j<size; ++j) ts.storage[j][size-1-i] = storage[i][j];
+            return ts;
+        }
+        
+        tilestorage rotate_right() {
+            tilestorage ts;
+            ts.size = size;
+            for (int i=0; i<size; ++i) for (int j=0; j<size; ++j) ts.storage[size-1-j][i] = storage[i][j];
+            return ts;            
+        }
+
+        tilestorage rotate_full() {
+            tilestorage ts;
+            ts.size = size;
+            for (int i=0; i<size; ++i) for (int j=0; j<size; ++j) ts.storage[size-1-j][size-1-i] = storage[i][j];
+            return ts;            
+        }
+
+        tilestorage flip() {
+            tilestorage ts;
+            ts.size = size;
+            for (int i=0; i<size; ++i) for (int j=0; j<size; ++j) ts.storage[i][size-1-j] = storage[i][j];
+            return ts;            
+        }
+
+        tilestorage flip_rotate_left() {
+            tilestorage ts;
+            ts.size = size;
+            for (int i=0; i<size; ++i) for (int j=0; j<size; ++j) ts.storage[j][i] = storage[i][j];
+            return ts;
+        }
+        
+        tilestorage flip_rotate_right() {
+            tilestorage ts;
+            ts.size = size;
+            for (int i=0; i<size; ++i) for (int j=0; j<size; ++j) ts.storage[size-1-j][size-1-i] = storage[i][j];
+            return ts;
+        }
+        
+        tilestorage flip_rotate_full() {
+            tilestorage ts;
+            ts.size = size;
+            for (int i=0; i<size; ++i) for (int j=0; j<size; ++j) ts.storage[size-1-i][j] = storage[i][j];
+            return ts;
+        }
+
+        std::string get_string() {
+            std::string res = "";
+            for (int i=0; i<size; ++i) {
+                for (int j=0; j<size; ++j)
+                    res += storage[i][j];
+                if (i!=(size-1))
+                    res += '/';
+            }
+            //std::cout << "get_string(): " << res << std::endl;
+            return res;
+        }
+};
+
 class tile {
     int size;
     std::string leds;
 
-    bool check_flippedh(const std::string& desc) {
-        for (int i=0; i<size; ++i) {
-            int fi = size-1-i;
-            for (int j=0; j<size; ++j) {
-                if (leds[j*size+fi]!=desc[j*size+i]) return false;
-            }
-        }
-        return true;
-    }
-
-    bool check_flippedv(const std::string& desc) {
-        for (int i=0; i<size; ++i) {
-            for (int j=0; j<size; ++j) {
-                int fj = size-1-j;
-                if (leds[fj*size+i]!=desc[j*size+i]) return false;
-            }
-        }
-        return true;
-    }
-
-    bool check_normal(const std::string& desc) {
-        //std::cout << "tile::check_normal() " << leds << "|" << desc << std::endl;
-        for (int i=0; i<size; ++i) {
-            for (int j=0; j<size; ++j) {
-                if (leds[j*size+i]!=desc[j*size+i]) return false;
-            }
-        }
-        return true;
-    }
-
-    bool check_lr(const std::string& desc) {
-        for (int i=0; i<size; ++i) {
-            int fi = size-1-i;
-            for (int j=0; j<size; ++j) {
-                int fj = size-1-j;
-                if (leds[fi*size+j]!=desc[j*size+i]) return false;
-            }
-        }
-        return true;        
-    }
-
-    bool check_rr(const std::string& desc) {
-        for (int i=0; i<size; ++i) {
-            int fi = size-1-i;
-            for (int j=0; j<size; ++j) {
-                int fj = size-1-j;
-                if (leds[i*size+fj]!=desc[j*size+i]) return false;
-            }
-        }
-        return true;        
-    }
-
-    bool check_fr(const std::string& desc) {
-        for (int i=0; i<size; ++i) {
-            int fi = size-1-i;
-            for (int j=0; j<size; ++j) {
-                int fj = size-1-j;
-                if (leds[fj*size+fi]!=desc[j*size+i]) return false;
-            }
-        }
-        return true;        
-    }
-
     bool check(const std::string& desc) {
-        std::string d = desc;
-        find_and_replace_all(d,"/","");
-        if (check_normal(d)) return true;
-        if (check_lr(d)) return true;
-        if (check_fr(d)) return true;
-        if (check_rr(d)) return true;
-        //if (check_flippedv(d)) return true;
-        if (check_flippedh(d)) return true;
+        //std::cout << "CHECK: " << leds << "\t" << desc << std::endl;
+        tilestorage ts(desc);
+        if (leds.compare(ts.get_string())==0) return true;
+        if (leds.compare(ts.rotate_left().get_string())==0) return true;
+        if (leds.compare(ts.rotate_right().get_string())==0) return true;
+        if (leds.compare(ts.rotate_full().get_string())==0) return true;
+        if (leds.compare(ts.flip().get_string())==0) return true;
+        if (leds.compare(ts.flip_rotate_left().get_string())==0) return true;
+        if (leds.compare(ts.flip_rotate_right().get_string())==0) return true;
+        if (leds.compare(ts.flip_rotate_full().get_string())==0) return true;
         return false;
     }
 
@@ -105,8 +131,9 @@ class tile {
     }
 
     void update_leds(const std::string& desc) {
-        leds = "";
-        for (auto c: desc) if (c!='/') leds += c;
+        leds = desc;
+        //leds = "";
+        //for (auto c: desc) if (c!='/') leds += c;
         //std::cout << "tile::update_leds(): leds " << leds << std::endl;
     }
 
@@ -139,7 +166,9 @@ public:
     }
 
     char led(int i, int j) {
-        return leds[i+size*j];
+        std::string tmp = leds;
+        find_and_replace_all(tmp,"/","");
+        return tmp[i+size*j];
     }
 
 };
@@ -268,9 +297,9 @@ int main() {
         g->add_rule(line.substr(0,p), line.substr(p+4));
     }
 
-    // std::cout << "==============================================" << std::endl;
-    // g->print();
-    // std::cout << "==============================================" << std::endl;
+    std::cout << "==============================================" << std::endl;
+    g->print();
+    std::cout << "==============================================" << std::endl;
 
 
     int run1 = 5;
