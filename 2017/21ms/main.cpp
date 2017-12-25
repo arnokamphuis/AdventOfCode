@@ -4,6 +4,9 @@
 #include <iostream>
 #include <cmath>
 
+int ops[10];
+bool complex = true;
+
 void find_and_replace_all(std::string & data, std::string toSearch, std::string replaceStr)
 {
 	// Get the first occurrence
@@ -45,6 +48,7 @@ class tilestorage {
         }
 
         tilestorage rotate_left() {
+            ops[1]++;
             tilestorage ts;
             ts.size = size;
             for (int i=0; i<size; ++i) for (int j=0; j<size; ++j) ts.storage[j][size-1-i] = storage[i][j];
@@ -52,6 +56,7 @@ class tilestorage {
         }
         
         tilestorage rotate_right() {
+            ops[2]++;
             tilestorage ts;
             ts.size = size;
             for (int i=0; i<size; ++i) for (int j=0; j<size; ++j) ts.storage[size-1-j][i] = storage[i][j];
@@ -59,6 +64,7 @@ class tilestorage {
         }
 
         tilestorage rotate_full() {
+            ops[3]++;
             tilestorage ts;
             ts.size = size;
             for (int i=0; i<size; ++i) for (int j=0; j<size; ++j) ts.storage[size-1-j][size-1-i] = storage[i][j];
@@ -66,13 +72,23 @@ class tilestorage {
         }
 
         tilestorage flip() {
+            ops[4]++;
             tilestorage ts;
             ts.size = size;
             for (int i=0; i<size; ++i) for (int j=0; j<size; ++j) ts.storage[i][size-1-j] = storage[i][j];
             return ts;            
         }
 
+        tilestorage flip_vertical() {
+            ops[5]++;
+            tilestorage ts;
+            ts.size = size;
+            for (int i=0; i<size; ++i) for (int j=0; j<size; ++j) ts.storage[size-1-i][j] = storage[i][j];
+            return ts;            
+        }
+
         tilestorage flip_rotate_left() {
+            ops[6]++;
             tilestorage ts;
             ts.size = size;
             for (int i=0; i<size; ++i) for (int j=0; j<size; ++j) ts.storage[j][i] = storage[i][j];
@@ -80,6 +96,7 @@ class tilestorage {
         }
         
         tilestorage flip_rotate_right() {
+            ops[7]++;
             tilestorage ts;
             ts.size = size;
             for (int i=0; i<size; ++i) for (int j=0; j<size; ++j) ts.storage[size-1-j][size-1-i] = storage[i][j];
@@ -87,6 +104,7 @@ class tilestorage {
         }
         
         tilestorage flip_rotate_full() {
+            ops[8]++;
             tilestorage ts;
             ts.size = size;
             for (int i=0; i<size; ++i) for (int j=0; j<size; ++j) ts.storage[size-1-i][j] = storage[i][j];
@@ -114,13 +132,17 @@ class tile {
         //std::cout << "CHECK: " << leds << "\t" << desc << std::endl;
         tilestorage ts(desc);
         if (leds.compare(ts.get_string())==0) return true;
-        if (leds.compare(ts.rotate_left().get_string())==0) return true;
-        if (leds.compare(ts.rotate_right().get_string())==0) return true;
-        if (leds.compare(ts.rotate_full().get_string())==0) return true;
-        if (leds.compare(ts.flip().get_string())==0) return true;
-        if (leds.compare(ts.flip_rotate_left().get_string())==0) return true;
-        if (leds.compare(ts.flip_rotate_right().get_string())==0) return true;
-        if (leds.compare(ts.flip_rotate_full().get_string())==0) return true;
+
+        if (complex) {
+            if (leds.compare(ts.rotate_left().get_string())==0) return true;
+            if (leds.compare(ts.rotate_right().get_string())==0) return true;
+            if (leds.compare(ts.rotate_full().get_string())==0) return true;
+            if (leds.compare(ts.flip().get_string())==0) return true;
+            if (leds.compare(ts.flip_rotate_left().get_string())==0) return true;
+            if (leds.compare(ts.flip_rotate_right().get_string())==0) return true;
+            if (leds.compare(ts.flip_rotate_full().get_string())==0) return true;
+            if (leds.compare(ts.flip_vertical().get_string())==0) return true;
+        }
         return false;
     }
 
@@ -288,6 +310,7 @@ public:
 };
 
 int main() {
+    for (int i=0;i<9;++i) ops[i]=0;
 
     grid* g = new grid();
 
@@ -321,5 +344,8 @@ int main() {
     }
 
     std::cout << "Part 2: " << g->get_turned_on() << std::endl;
+
+    for (int i=0;i<9;++i) 
+        std::cout << i << "\t" << ops[i] << std::endl;
 
 }

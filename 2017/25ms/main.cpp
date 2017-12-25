@@ -17,7 +17,7 @@ class tape {
         cp = position.begin(); 
     }
 
-    int move(int direction) {
+    void move(int direction) {
         if (direction<0) {
             if (cp==position.begin()) { position.insert(position.begin(),0); cp = position.begin(); }
             else --cp;
@@ -34,7 +34,7 @@ class tape {
         return *cp; 
     }
 
-    int set(int v) {
+    void set(int v) {
         *cp = v;
     }
     
@@ -127,5 +127,5 @@ int main() {
     }
 
     std::cout << "Part 1: " << t->checksum() << std::endl;
-
+    return 0;
 }
