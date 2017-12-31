@@ -12,7 +12,7 @@ addons:
       - gcc-7
       - g++-7
       - cmake
-script:
+before_script:
   # Link gcc-7 and g++-7 to their standard commands
   - ln -s /usr/bin/gcc-7 /usr/local/bin/gcc
   - ln -s /usr/bin/g++-7 /usr/local/bin/g++
@@ -22,3 +22,6 @@ script:
   # Check versions of gcc, g++ and cmake
   - gcc -v && g++ -v && cmake --version
   # Run your build commands next
+  - cmake
+
+script: make
