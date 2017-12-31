@@ -9,6 +9,9 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 if(MSVC)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /std:c++17")
+else(MSVC)
+SET(CMAKE_C_COMPILER gcc.exe)
+SET(CMAKE_CXX_COMPILER g++.exe)
 endif(MSVC)
 
 #--------------------------------------------------------------------------------------------------
@@ -22,3 +25,11 @@ set_target_properties( 2ms PROPERTIES RUNTIME_OUTPUT_DIRECTORY 2017/2ms/ )
 #--------------------------------------------------------------------------------------------------
 add_executable(3ms 2017/3ms/main.cpp)
 set_target_properties( 3ms PROPERTIES RUNTIME_OUTPUT_DIRECTORY 2017/3ms/ )
+
+#--------------------------------------------------------------------------------------------------
+add_executable(4ms 2017/4ms/main.cpp)
+set_target_properties( 4ms PROPERTIES RUNTIME_OUTPUT_DIRECTORY 2017/4ms/ )
+
+#--------------------------------------------------------------------------------------------------
+add_executable(5ms 2017/5ms/main.cpp)
+set_target_properties( 5ms PROPERTIES RUNTIME_OUTPUT_DIRECTORY 2017/5ms/ )
