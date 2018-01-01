@@ -12,6 +12,10 @@ addons:
       - gcc-7
       - g++-7
       - cmake
+  sonarcloud:
+    organization: "arnokamphuis-github" # the key of the org you chose at step #3
+    token:
+      secure: "oo2aWD9HbK0Q4VeprQMca5zGrhCQfeT/8uhyKNZhCc3kd3r/PiLDQBu2Mw0Vnzao3X0WHlKQLqWztYaQ9+u4kuykbPztyRn10tZJSRsj54lAP8wX3CjEICeKs77B1tSUDos2f3UVQz+tsPa+CwMz7vk49Ui56SJCttXId/6FHd0GHOVmbdz0z/f1skNLG/cLQfdaNt4WgqRQHhWjT4q2h+8INFspiPPQgS0/PNhH5KtCOS50gBIQWb/KGBRgL9do4z2wy+IBgF+7hINkv/99xY6lDFZ/+5Lq6YP3MipUm+LZh9UYPzj/dzf4R0wiCaP4UpsaxUjZOO9WEfWdGPYbVRsMl0qO8j5o4VQloYFLFqaGOp351mCIfS4vdcHgKhV/55gxy7azVTrvaAWZ7mMm5hABVmBjRIAZPm0cm+s8bEQLOjZF8y54Z3m9jcdWjxACxozeTjFXdygaCfAxaMONx0i/qJEGQc8Z8HqWiMtp2dIaomMTJ+ogQzFYvztYjDci2FG0zkhzuhri/n7F8uUSsHa98k3meNG6VaQFYQ8R9exCgkLsqCREuwgzkjpZv+CuiAf5rx25Y7FuoPkIdD4kvMQwKOkBbRqmQVrmSVt31cLfXCQLfG8h4hC2JACYGyI9sHoS87+HmU1Bz0XEaZ1eSo2JTgo9o3+r50y3ZfFWy/8=" # encrypted value of your token
 before_script:
   # Link gcc-7 and g++-7 to their standard commands
   - sudo ln -s /usr/bin/gcc-7 /usr/local/bin/gcc
@@ -21,4 +25,6 @@ before_script:
   # Run your build commands next
   - cmake -G "Unix Makefiles"
 
-script: cmake --build .
+script: 
+  - cmake --build .
+  - sonar-scanner
