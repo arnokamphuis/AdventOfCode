@@ -19,6 +19,6 @@ before_script:
   # Check versions of gcc, g++ and cmake
   - gcc -v && g++ -v && cmake --version
   # Run your build commands next
-  - cmake -G "Unix Makefiles" .
+  - cmake -G "Unix Makefiles"
 
 script: cmake --build .
