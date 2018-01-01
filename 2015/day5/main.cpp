@@ -1,6 +1,7 @@
 #include <string>
 #include <iostream>
 #include <algorithm>
+#include <vector>
 
 bool checkdoubleskip(std::string str) {
     bool correct = false;
