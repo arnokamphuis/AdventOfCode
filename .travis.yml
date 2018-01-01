@@ -24,6 +24,7 @@ before_script:
   - gcc -v && g++ -v && cmake --version
   # Run your build commands next
   - cmake -G "Unix Makefiles"
+  - ./tools/build-wrapper-3-11-linux-x86-64/build-wrapper-linux-x86-64 --out-dir aoc_output make clean all
 
 script: 
   - cmake --build .
