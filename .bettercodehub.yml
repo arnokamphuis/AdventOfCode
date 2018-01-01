@@ -1,0 +1,6 @@
+exclude:
+- /2017/10ms/main_2.cpp
+- /2017/21ms/rewrite.cpp
+component_depth: 1
+languages:
+- cpp
