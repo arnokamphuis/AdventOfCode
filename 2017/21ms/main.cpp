@@ -32,13 +32,14 @@ class tilestorage {
 
         tilestorage() { size = -1; }
 
-        tilestorage(const std::string& s) {
+        explicit tilestorage(const std::string& s) {
             std::string init_s = s;
-            //std::cout << "tilestorage(): " << s << std::endl;
             find_and_replace_all(init_s,"/","");
             int ssize = init_s.size();
             size = std::sqrt(ssize);
-            int i = 0, x, y;
+            int i = 0;
+            int x = 0;
+            int y = 0;
             for (auto c: init_s) {  
                 x = i % size;
                 y = i / size;
@@ -119,7 +120,6 @@ class tilestorage {
                 if (i!=(size-1))
                     res += '/';
             }
-            //std::cout << "get_string(): " << res << std::endl;
             return res;
         }
 };
@@ -129,7 +129,6 @@ class tile {
     std::string leds;
 
     bool check(const std::string& desc) {
-        //std::cout << "CHECK: " << leds << "\t" << desc << std::endl;
         tilestorage ts(desc);
         if (leds.compare(ts.get_string())==0) return true;
 
@@ -148,15 +147,11 @@ class tile {
 
     void change_into(const std::string& desc) {
         ++size;
-        //std::cout << leds << " change into: " << desc << std::endl;
         update_leds(desc);
     }
 
     void update_leds(const std::string& desc) {
         leds = desc;
-        //leds = "";
-        //for (auto c: desc) if (c!='/') leds += c;
-        //std::cout << "tile::update_leds(): leds " << leds << std::endl;
     }
 
 public:
@@ -168,18 +163,14 @@ public:
 
     void evolve(const std::map<std::string, std::string>& rules) {
         bool changed = false;
-        //std::cout << "tile::evolve() " << size << "\t" << leds << std::endl;
         for (auto r: rules) {
             std::string from = r.first;
             find_and_replace_all(from, "/", "");
             int s = std::sqrt(from.size());
-            if(s == size) {
-                //std::cout << "tile::evolve() : " << r.first << " -> " << r.second << std::endl;
-                if (check(r.first)) {
-                    change_into(r.second);
-                    changed = true;
-                    break;
-                }
+            if( (s == size) && (check(r.first)) ) {
+                change_into(r.second);
+                changed = true;
+                break;
             }
         }
         if (!changed) 
@@ -232,7 +223,6 @@ public:
     void create_tiles() {
         int tile_size = ( (size%2==0) ? 2: 3);
         int tilecount = size/tile_size;
-        //std::cout << "create_tiles(): tilecount: " << tilecount << std::endl;
         for (int tc_x=0; tc_x<tilecount; ++tc_x) {
             std::vector< tile* > tile_line;
             for (int tc_y=0; tc_y<tilecount; ++tc_y) {
@@ -255,7 +245,6 @@ public:
     }
 
     void update_tiles() {
-        //std::cout << "grid::update_tiles()" <<std::endl;
         for (auto tl: tiles)
             for (auto t: tl)
                 t->evolve(rules);
@@ -297,7 +286,8 @@ public:
     }
 
     int get_turned_on() {
-        int count=0, oc=0;
+        int count=0;
+        int oc=0;
         for (auto lc: leds)
             for (auto c: lc) 
                 if (c=='#') ++count; else ++oc;
@@ -320,32 +310,21 @@ int main() {
         g->add_rule(line.substr(0,p), line.substr(p+4));
     }
 
-    std::cout << "==============================================" << std::endl;
-    g->print();
-    std::cout << "==============================================" << std::endl;
-
-
     int run1 = 5;
     int run2 = 18;
     for (int i=0; i<run1; ++i) { 
         g->update();
-        // std::cout << "==============================================" << std::endl;
-        // g->print();
-        // std::cout << "==============================================" << std::endl;
     }
 
     std::cout << "Part 1: " << g->get_turned_on() << std::endl;
 
     for (int i=0; i<(run2-run1); ++i) { 
         g->update();
-        // std::cout << "==============================================" << std::endl;
-        // g->print();
-        // std::cout << "==============================================" << std::endl;
     }
 
     std::cout << "Part 2: " << g->get_turned_on() << std::endl;
 
-    for (int i=0;i<9;++i) 
-        std::cout << i << "\t" << ops[i] << std::endl;
+    delete g;
 
+    return 0;
 }

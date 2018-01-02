@@ -5,7 +5,7 @@
 typedef std::vector<std::vector<char> > maze_type;
 
 class maze {
-protected:
+private:
     int step_counter;
     int cx, cy, dx, dy;
     maze_type m;
@@ -35,17 +35,13 @@ public:
         step_counter=0;
     }
 
-    void print() {
-        for (auto l: m) { for (auto c: l) std::cout << c; std::cout << std::endl; }
-    }
-
     void determine_direction() {
         if ( dx==0 ) {
-            if ((cx-1)>=0) if (m[cy][cx-1]!=' ')          { dx=-1; dy=0; }
-            if ((cx+1)<m[0].size()) if (m[cy][cx+1]!=' ') { dx= 1; dy=0; }
+            if ( ((cx-1)>=0) && (m[cy][cx-1]!=' ') )          { dx=-1; dy=0; }
+            if ( ((cx+1)<m[0].size()) && (m[cy][cx+1]!=' ') ) { dx= 1; dy=0; }
         } else {
-            if ((cy-1)>=0) if (m[cy-1][cx]!=' ')       { dx=0; dy=-1; }
-            if ((cy+1)<m.size()) if (m[cy+1][cx]!=' ') { dx=0; dy= 1; }
+            if ( ((cy-1)>=0) && (m[cy-1][cx]!=' ') )       { dx=0; dy=-1; }
+            if ( ((cy+1)<m.size()) && (m[cy+1][cx]!=' ') ) { dx=0; dy= 1; }
         }
         cx+=dx; cy+=dy;
         ++step_counter;
@@ -54,14 +50,12 @@ public:
     std::vector<char> walk() {
         std::vector<char> res;
         while (m[cy][cx]!=' ') {
-            while ( (m[cy][cx]!=' ') and (m[cy][cx]!='+') ) {
+            while ( (m[cy][cx]!=' ') && (m[cy][cx]!='+') ) {
                 char c = m[cy][cx];
-                //std::cout << c;
-                if ( (c!='|') and (c!='-')) res.push_back(c);
+                if ( (c!='|') && (c!='-')) res.push_back(c);
                 cx+=dx;
                 cy+=dy;
                 ++step_counter;
-                //std::cout << "(" << cx << "," << cy << ")";
             }
             if (m[cy][cx]==' ') break;
             determine_direction();
@@ -79,8 +73,6 @@ int main() {
 
     themaze->init();
 
-    //themaze->print();
-
     std::vector<char> res = themaze->walk();
 
     std::cout << "Part 1: ";
@@ -88,4 +80,8 @@ int main() {
     std::cout << std::endl;
 
     std::cout << "Part 2: " << themaze->getsteps() << std::endl;
+
+    delete themaze;
+    
+    return 0;
 }
