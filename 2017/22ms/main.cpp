@@ -108,6 +108,12 @@ int main() {
         for (int i=0; i<10000000; ++i) {
             g->burst();
         }
+        std::cout << "Part 2: " << g->get_infected() << '\n';
+
+        delete g;
+    } else {
+        std::cout << "Input invalid: no part 2 executed" << '\n';
     }
-    std::cout << "Part 2: " << g->get_infected() << '\n';
+
+    return 0;
 }
