@@ -5,4 +5,4 @@
 
 std::string knot_hash(std::string line);
 
-#endif __KNOT_H__
+#endif // __KNOT_H__

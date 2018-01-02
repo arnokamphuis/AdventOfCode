@@ -6,10 +6,12 @@ enable_language(CXX)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+include_directories(${PROJECT_SOURCE_DIR}/general)
+
 # adding a project
 project (AoC-2017)
 
-set(TARGETS2017 1ms 2ms 3ms 4ms 5ms 6ms 7ms 8ms 9ms 10ms 11ms 12ms 13ms 14ms 15ms 16ms 17ms 18ms 19ms 20ms 21ms 22ms 23ms 24ms 25ms)
+set(TARGETS2017 1ms 2ms 3ms 4ms 5ms 6ms 7ms 8ms 9ms 11ms 12ms 13ms 14ms 15ms 16ms 17ms 18ms 19ms 20ms 21ms 22ms 23ms 24ms 25ms)
 FOREACH(t ${TARGETS2017})
     add_executable(${t} ${PROJECT_SOURCE_DIR}/2017/${t}/main.cpp)
     set_target_properties( ${t} PROPERTIES RUNTIME_OUTPUT_DIRECTORY 2017/${t}/ )
@@ -21,5 +23,10 @@ FOREACH(t ${TARGETS2015})
     set_target_properties( ${t} PROPERTIES RUNTIME_OUTPUT_DIRECTORY 2015/${t}/ )
 ENDFOREACH(t)
 
-add_executable(day4 ${PROJECT_SOURCE_DIR}/2015/day4/main.cpp ${PROJECT_SOURCE_DIR}/2015/day4/md5.cpp)
+add_executable(day4 ${PROJECT_SOURCE_DIR}/2015/day4/main.cpp ${PROJECT_SOURCE_DIR}/general/md5.cpp)
 set_target_properties( day4 PROPERTIES RUNTIME_OUTPUT_DIRECTORY 2015/day4/ )
+target_include_directories( day4 PUBLIC ${PROJECT_SOURCE_DIR}/general )
+
+add_executable(10ms ${PROJECT_SOURCE_DIR}/2017/10ms/main.cpp ${PROJECT_SOURCE_DIR}/general/knot.cpp)
+set_target_properties( 10ms PROPERTIES RUNTIME_OUTPUT_DIRECTORY 2017/10ms/ )
+target_include_directories( 10ms PUBLIC ${PROJECT_SOURCE_DIR}/general )
