@@ -16,7 +16,6 @@ private:
     void step() { 
         cx += dx; 
         cy += dy; 
-        //std::cout << "Stepping: " << dx << "," << dy << std::endl;
         if ( (cx<0) or (cy<0) or (cx==size) or (cy==size) ) increase_size();
     }
 
@@ -79,7 +78,7 @@ public:
                 else if (c=='c') std::cout << ".";
                 else std::cout << c;
             }
-            std::cout << std::endl;
+            std::cout << '\n';
         }
     }
 
@@ -105,10 +104,10 @@ int main() {
         ++cy;
     }
 
-    for (int i=0; i<10000000; ++i) {
-    //for (int i=0; i<1; ++i) {
-        g->burst();
-
+    if (g!=nullptr) {
+        for (int i=0; i<10000000; ++i) {
+            g->burst();
+        }
     }
-    std::cout << "Part 2: " << g->get_infected() << std::endl;
+    std::cout << "Part 2: " << g->get_infected() << '\n';
 }

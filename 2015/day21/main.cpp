@@ -240,4 +240,10 @@ int main() {
 
     std::cout << "Part 1: " << mingold << std::endl;
     std::cout << "Part 2: " << mostgold << std::endl;
+
+    delete boss;
+    delete me;
+    delete inventory;
+
+    return 0;
 }

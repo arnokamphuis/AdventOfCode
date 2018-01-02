@@ -95,7 +95,8 @@ public:
 
 
     unsigned short int getvalue() {
-        unsigned short int lval, rval;
+        unsigned short int lval = 0;
+        unsigned short int rval = 0;
         if (isvalue) return value;
         else {
             if (l != nullptr) lval = l->getvalue();
