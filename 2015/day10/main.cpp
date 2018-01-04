@@ -1,6 +1,10 @@
 #include <string>
 #include <iostream>
 
+#include "logger.h"
+
+logger log(std::cout, std::cerr);
+
 std::string lookandsay(std::string input) {
     std::string output = "";
     
@@ -29,10 +33,11 @@ int main() {
     std::string input = original_input;
     for (int i=0;i<40;i++)
         input = lookandsay(input);
-    std::cout << "Part 1: " << input.size() << std::endl;
+
+    log.log("Part 1: "); log.log(input.size()); log.log('\n');
 
     input = original_input;
     for (int i=0;i<50;i++)
         input = lookandsay(input);
-    std::cout << "Part 2: " << input.size() << std::endl;
+    log.log("Part 2: "); log.log(input.size()); log.log('\n');
 }

@@ -1,6 +1,10 @@
 #include <iostream>
 #include <string>
 
+#include "logger.h"
+
+logger log(std::cout, std::cerr);
+
 std::string inc(const std::string& str) {
     std::string output = str;
     int ci=str.size()-1;
@@ -37,7 +41,7 @@ bool check_vowels(const std::string& str) {
 bool check_doubles(const std::string& str) {
     int double_counter = 0;
     for (int i=2;i<8;++i)
-        if ( ((str[i] - str[i-1])==0) ) { ++double_counter; ++i; }
+        if ( (str[i] - str[i-1])==0 ) { ++double_counter; ++i; }
     return (double_counter==2);
 }
 
@@ -52,8 +56,10 @@ int main() {
     for (int i=0;i<2;++i) {
         while(!check(output))
             output = inc(output);
-        std::cout << "Part " << (i+1) << ": " << output << std::endl;
+
+        log.log("Part "); log.log(i+1); log.log(": "); log.log(output); log.log('\n');
         output = inc(output);
     }
 
+    return 0;
 }
