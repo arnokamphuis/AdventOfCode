@@ -4,13 +4,14 @@
 #include <map>
 #include <vector>
 #include <climits>
+#include "logger.h"
 
 class aunt {
 public:
     int number;
     std::map<std::string,int> possessions;
 
-    aunt(std::string description) {
+    explicit aunt(std::string description) {
         std::string line = description;
         for (int i=0;i<4;i++) line.erase(line.begin());
         int colon = line.find(":");
@@ -74,6 +75,6 @@ int main() {
         aunts[sue->number] = sue;
 
         if (sue->check(list,comp))
-            std::cout << "Answer: " << sue->number << std::endl;
+            logger::get(logtype::logINFO) << "Answer: " << sue->number << std::endl;
     }
 }

@@ -4,6 +4,16 @@
 
 bool error_lights = true;
 
+void do_error_lights(std::vector< std::vector< bool > >& lights) {
+    if (error_lights) {
+        int size = lights.size();
+        lights[0][0] = true;
+        lights[size-1][0] = true;
+        lights[0][size-1] = true;
+        lights[size-1][size-1] = true;
+    }
+}
+
 void update(std::vector< std::vector< bool > >& lights, const std::vector< std::vector< bool > >& prev_lights) {
     int size = lights.size();
 
@@ -13,25 +23,24 @@ void update(std::vector< std::vector< bool > >& lights, const std::vector< std::
             int nl_on=0;
             for (int tx=-1;tx<2;++tx) {
                 for (int ty=-1;ty<2;++ty) {
-                    if ( (0<=x+tx) and ((x+tx)<size) and (0<=(y+ty)) and ((y+ty)<size) and !((tx==0) and (ty==0)) ) {
+                    bool leftcorrect   = (0 <= x+tx);
+                    bool rightcorrect  = ((x+tx) < size);
+                    bool topcorrect    = (0 <= (y+ty));
+                    bool bottomcorrect = ((y+ty)<size);
+                    bool notcenter     = !( (tx==0) && (ty==0) );
+
+                    if ( notcenter && leftcorrect && rightcorrect && topcorrect && bottomcorrect ) {
                         if (prev_lights[x+tx][y+ty])
                             ++nl_on;
                     }
                 }
             }
 
-            if (prev_lights[x][y]) { // light is on
-                if ( ! (nl_on==2 or nl_on==3) ) lights[x][y]=false; 
-            } else {  // light is off
-                if (nl_on==3) lights[x][y]=true;
-            }
+            bool prev_lightsXY = prev_lights[x][y];
+
+            if (  prev_lightsXY && ! (nl_on==2 || nl_on==3) ) lights[x][y]=false;
+            if ( !prev_lightsXY && nl_on==3 ) lights[x][y]=true;
         }
-    }
-    if (error_lights) {
-        lights[0][0] = true;
-        lights[size-1][0] = true;
-        lights[0][size-1] = true;
-        lights[size-1][size-1] = true;
     }
 }
 
@@ -68,6 +77,7 @@ int main() {
     
     for (int step=0;step<100;++step) {
         update(lights, prev_lights);
+        do_error_lights(lights);
         prev_lights = lights;
         //print(lights);
         //std::cout <<"=======================================" << std::endl;
