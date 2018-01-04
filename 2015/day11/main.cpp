@@ -1,9 +1,6 @@
 #include <iostream>
 #include <string>
-
 #include "logger.h"
-
-logger log(std::cout, std::cerr);
 
 std::string inc(const std::string& str) {
     std::string output = str;
@@ -57,7 +54,7 @@ int main() {
         while(!check(output))
             output = inc(output);
 
-        log.log("Part "); log.log(i+1); log.log(": "); log.log(output); log.log('\n');
+        logger::get(logtype::logINFO) << "Part " << (i+1) << ": " << output << '\n';
         output = inc(output);
     }
 

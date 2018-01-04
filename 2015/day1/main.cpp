@@ -1,10 +1,7 @@
 #include <string>
 #include <iostream>
 #include <sstream>
-
 #include "logger.h"
-
-logger log(std::cout, std::cerr);
 
 int main() {
     int position = -1;
@@ -20,8 +17,8 @@ int main() {
         if ( (floor<0) && (position<0) ) position=count;
     }
 
-    log.log("Part 1: "); log.log(floor); log.log('\n');
-    log.log("Part 2: "); log.log(position); log.log('\n');
+    logger::get(logtype::logINFO) << "Part 1: " << floor << '\n';
+    logger::get(logtype::logINFO) << "Part 2: " << position << '\n';
 
     return 0;
 }
