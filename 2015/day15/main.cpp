@@ -4,6 +4,7 @@
 #include <map>
 #include <vector>
 #include <climits>
+#include "logger.h"
 
 void generate_combination(int size, int sum, std::vector<int> combination, std::vector<std::vector<int> >& allcombs) {
     if (size-combination.size()==0) {
