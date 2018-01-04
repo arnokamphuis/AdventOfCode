@@ -2,8 +2,11 @@
 #include <iostream>
 #include <sstream>
 
-int main() {
+#include "logger.h"
 
+logger log(std::cout, std::cerr);
+
+int main() {
     int position = -1;
     std::string line;
     getline(std::cin, line);
@@ -17,6 +20,8 @@ int main() {
         if ( (floor<0) && (position<0) ) position=count;
     }
 
-    std::cout << "Part 1: " << floor << std::endl;
-    std::cout << "Part 2: " << position << std::endl;
+    log.log("Part 1: "); log.log(floor); log.log('\n');
+    log.log("Part 2: "); log.log(position); log.log('\n');
+
+    return 0;
 }
