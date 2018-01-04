@@ -2,12 +2,13 @@
 #include <string>
 #include <vector>
 #include <stack>
+#include "logger.h"
 
 enum class state { number, other };
 
 class group {
 public:
-    group() : isarray(false), str("      "), level(0) {}
+    group() : isarray(false), level(0), str("      ") {}
 
     bool isarray;
     int level;
@@ -18,20 +19,20 @@ public:
     void print(int indent) {
         std::string ind = "";
         for (int i=0;i<level*5;++i) ind += " ";
-        logger::log(logtype::logINFO) << ind << (isarray?"array":"group") << std::endl;
-        logger::log(logtype::logINFO) << ind << "------------------------------------" << std::endl;
-        logger::log(logtype::logINFO) << ind << str << std::endl;
-        logger::log(logtype::logINFO) << ind << "------------------------------------" << std::endl;
-        logger::log(logtype::logINFO) << ind << "found red? : " << (str.find("\"red\"" ) != std::string::npos) << std::endl;
-        logger::log(logtype::logINFO) << ind << "children: " << children.size() << std::endl;
-        for (auto n: numbers) logger::log(logtype::logINFO) << ind << n << std::endl;
+        logger::get(logtype::logINFO) << ind << (isarray?"array":"group") << std::endl;
+        logger::get(logtype::logINFO) << ind << "------------------------------------" << std::endl;
+        logger::get(logtype::logINFO) << ind << str << std::endl;
+        logger::get(logtype::logINFO) << ind << "------------------------------------" << std::endl;
+        logger::get(logtype::logINFO) << ind << "found red? : " << (str.find("\"red\"" ) != std::string::npos) << std::endl;
+        logger::get(logtype::logINFO) << ind << "children: " << children.size() << std::endl;
+        for (auto n: numbers) logger::get(logtype::logINFO) << ind << n << std::endl;
         for (auto g: children) g->print(indent+5);
     }
 
     int calculate() {
         int sum = 0;
         bool foundred = (str.find("\"red\"")!=std::string::npos);
-        if ( isarray or ( (!isarray) and (!foundred) ) ) {
+        if ( isarray || ( (!isarray) && (!foundred) ) ) {
             for (auto n: numbers) sum+=n;
             for (auto g: children) sum+=g->calculate();    
         }
@@ -68,41 +69,34 @@ int main() {
 
         current_group->str += c;
 
-        switch (s) {
+        if (s == state::number) {
+            int value = c-'0';
+            if ( (0 <= value) && ( value <= 9 ) ) {
+                nrstr += std::to_string(value);
+            } else {
+                number = std::stoi(nrstr);
+                if (!positive) number *= -1;
+                current_group->numbers.push_back(number);
 
-            case state::number: {
-                int value = c-'0';
-                if ( (0 <= value) and ( value <= 9 ) ) {
-                    nrstr += std::to_string(value);
-                } else {
-                    number = std::stoi(nrstr);
-                    if (!positive) number *= -1;
-                    current_group->numbers.push_back(number);
-
-                    nrstr = "";
-                    positive = true;
-                    s = state::other;
-                }
+                nrstr = "";
+                positive = true;
+                s = state::other;
             }
-            break;
-
-            case state::other: {
-                int value = c-'0';
-                if ( (0<=value) && (value<=9) ) {
-                    nrstr = std::to_string(c-'0');
-                    s = state::number;
-                } else if (c=='-') {
-                    positive = false;
-                    s = state::number;
-                    nrstr = "";
-                } else  { 
-                    positive = true;
-                }
+        } else if (s == state::other) {
+            int value = c-'0';
+            if ( (0<=value) && (value<=9) ) {
+                nrstr = std::to_string(c-'0');
+                s = state::number;
+            } else if (c=='-') {
+                positive = false;
+                s = state::number;
+                nrstr = "";
+            } else  { 
+                positive = true;
             }
-            break;
         }
 
-        if ( (c=='}') or (c==']') ) {
+        if ( (c=='}') || (c==']') ) {
             groups.pop(); current_group = groups.top(); 
         }
 
