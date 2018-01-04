@@ -181,7 +181,7 @@ int main() {
 
   while (part1.execute_instruction()) {
   }
-  nlogger::get(logtype::logINFO) << "Part 1: " << part1.mul_counter << '\n';
+  logger::get(logtype::logINFO) << "Part 1: " << part1.mul_counter << '\n';
 
   while (part2.execute_instruction()) {
   }
