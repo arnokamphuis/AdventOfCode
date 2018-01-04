@@ -18,13 +18,13 @@ public:
     void print(int indent) {
         std::string ind = "";
         for (int i=0;i<level*5;++i) ind += " ";
-        std::cout << ind << (isarray?"array":"group") << std::endl;
-        std::cout << ind << "------------------------------------" << std::endl;
-        std::cout << ind << str << std::endl;
-        std::cout << ind << "------------------------------------" << std::endl;
-        std::cout << ind << "found red? : " << (str.find("\"red\"" ) != std::string::npos) << std::endl;
-        std::cout << ind << "children: " << children.size() << std::endl;
-        for (auto n: numbers) std::cout << ind << n << std::endl;
+        logger::log(logtype::logINFO) << ind << (isarray?"array":"group") << std::endl;
+        logger::log(logtype::logINFO) << ind << "------------------------------------" << std::endl;
+        logger::log(logtype::logINFO) << ind << str << std::endl;
+        logger::log(logtype::logINFO) << ind << "------------------------------------" << std::endl;
+        logger::log(logtype::logINFO) << ind << "found red? : " << (str.find("\"red\"" ) != std::string::npos) << std::endl;
+        logger::log(logtype::logINFO) << ind << "children: " << children.size() << std::endl;
+        for (auto n: numbers) logger::log(logtype::logINFO) << ind << n << std::endl;
         for (auto g: children) g->print(indent+5);
     }
 
@@ -108,5 +108,5 @@ int main() {
 
     }
 
-    std::cout << "Part 2: " << root->calculate() << std::endl;
+    logger::get(logtype::logINFO) << "Part 2: " << root->calculate() << std::endl;
 }
