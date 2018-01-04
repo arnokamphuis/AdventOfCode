@@ -3,13 +3,18 @@
 #include <string>
 #include <map>
 #include <climits>
+#include "logger.h"
 
 class reindeer {
-protected:
-    int ctime, stars, cdist;
-    int speed, duration, resttime;
+private:
+    int curtime;
+    int stars;
+    int cdist;
+    int speed;
+    int duration;
+    int resttime;
 public:
-    reindeer(int s, int d, int r) : speed(s), duration(d), resttime(r), ctime(0), stars(0) {}
+    reindeer(int s, int d, int r) : curtime(0), stars(0), cdist(0), speed(s), duration(d), resttime(r) {}
 
     int calculate_distance(int time) {
         int intervaltime = duration+resttime;
@@ -21,8 +26,8 @@ public:
     }
 
     int step() {
-        ++ctime;
-        return cdist = calculate_distance(ctime);
+        ++curtime;
+        return cdist = calculate_distance(curtime);
     }
 
     void addstar() { ++stars; }
@@ -43,7 +48,8 @@ int simulate(int time, std::map<std::string,reindeer*> reindeers ) {
             if (r.second->getdistance()==maxdist) r.second->addstar();
     }
 
-    int s, maxstars = INT_MIN;
+    int s;
+    int maxstars = INT_MIN;
     for (auto r: reindeers) 
         if ( (s = r.second->getstars() ) > maxstars ) maxstars = s;
     return maxstars;
@@ -51,8 +57,12 @@ int simulate(int time, std::map<std::string,reindeer*> reindeers ) {
 
 int main() {
     std::map<std::string,reindeer*> reindeers;
-    std::string line, name, temp;
-    int s, d, r;
+    std::string line;
+    std::string name;
+    std::string temp;
+    int s;
+    int d;
+    int r;
     while (getline(std::cin,line)) {
         std::istringstream ss(line);
         ss >> name >> temp >> temp >> s >> temp >> temp >> d >> temp >> temp >> temp >> temp >> temp >> temp >> r;
@@ -66,8 +76,8 @@ int main() {
         if (d>maxdist) maxdist=d;
     }
 
-    std::cout << "Part 1: " << maxdist << std::endl;
-    std::cout << "Part 2: " << simulate(t, reindeers) << std::endl;
-    ;
+    logger::get(logtype::logINFO) << "Part 1: " << maxdist << std::endl;
+    logger::get(logtype::logINFO) << "Part 2: " << simulate(t, reindeers) << std::endl;
 
+    return 0;
 }

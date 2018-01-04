@@ -57,7 +57,7 @@ int main() {
 
     while ((c=getchar())!=EOF) {
 
-        if ( (c=='{') or (c=='[') ) {
+        if ( (c=='{') || (c=='[') ) {
             group* ng = new group;
             ng->level = current_group->level+1;
             ng->isarray = (c=='[');

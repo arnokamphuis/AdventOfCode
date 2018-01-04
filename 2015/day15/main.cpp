@@ -6,16 +6,13 @@
 #include <climits>
 
 void generate_combination(int size, int sum, std::vector<int> combination, std::vector<std::vector<int> >& allcombs) {
-//    std::cout <<"generate" << combination.size() << std::endl;
     if (size-combination.size()==0) {
-//        std::cout << "combination found: "; for (auto c: combination) std::cout << "_" << c; std::cout << std::endl;
         allcombs.push_back(combination);
         return;
     }
     for (int s=sum; s>=0; --s) {
         std::vector<int> newcomb = combination;
         newcomb.push_back(s);
-        //for (int j=0;j<combination.size();j++) std::cout << " "; std::cout << "going into recursion " << size << std::endl;
         generate_combination(size,sum-s,newcomb,allcombs);
     }
 }
@@ -50,7 +47,10 @@ int main() {
     std::string line;
     while (getline(std::cin, line)) {
         std::istringstream ss(line);
-        std::string name, rest, tmp, propname;
+        std::string name;
+        std::string rest;
+        std::string tmp;
+        std::string propname;
         int propval;
         getline(ss, name, ':');
         ingredients[name] = 0;
@@ -66,7 +66,6 @@ int main() {
         }
     }
 
-    int ic = ingredients.size()-1;
     ingredients.begin()->second = 100;
 
     int maxscore = INT_MIN;
@@ -89,5 +88,5 @@ int main() {
         }
     }
 
-    std::cout << "Part 2: " << maxscore << std::endl;
+    logger::get(logtype::logINFO) << "Part 2: " << maxscore << std::endl;
 }

@@ -7,6 +7,7 @@
 #include <string>
 #include <utility>
 #include <climits>
+#include "logger.h"
 
 int main() {
     std::string line;
@@ -14,7 +15,10 @@ int main() {
     std::map< std::pair<std::string,std::string>, int> happinessgains;
 
     while (getline(std::cin,line)) {
-        std::string from, to, temp, gain;
+        std::string from = "";
+        std::string to = "";
+        std::string temp = "";
+        std::string gain = "";
         int value;
         std::istringstream ss(line);
         ss >> from >> temp >> gain >> value >> temp >> temp >> temp >> temp >> temp >> temp >> to;
@@ -52,5 +56,5 @@ int main() {
         if (happiness > maxhappiness) maxhappiness = happiness;
     } while(std::next_permutation(seating.begin(), seating.end()));
     
-    std::cout << "Part 2: " << maxhappiness << std::endl;
+    logger::get(logtype::logINFO) << "Part 2: " << maxhappiness << std::endl;
 }
