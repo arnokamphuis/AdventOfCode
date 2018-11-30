@@ -34,7 +34,7 @@ int main() {
 
   int steps = execute(orig_arr, 0, list.size(), 0);
 
-  orig_arr = null_ptr;
-  delete[list.size()] arr;
+  orig_arr = nullptr;
+  delete[] arr;
   std::cout << "Answer: " << steps << std::endl;
 }
