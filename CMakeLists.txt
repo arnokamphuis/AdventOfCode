@@ -10,7 +10,14 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=gnu++17")
 include_directories(${PROJECT_SOURCE_DIR}/general)
 
 # adding a project
-project (AoC-2017)
+project (AoC)
+
+set(TARGETS2018 )
+FOREACH(t ${TARGETS2018})
+    add_executable(${t} ${PROJECT_SOURCE_DIR}/2018/${t}/main.cpp ${PROJECT_SOURCE_DIR}/general/logger.cpp)
+    set_target_properties( ${t} PROPERTIES RUNTIME_OUTPUT_DIRECTORY 2018/${t}/ )
+    target_include_directories( ${t} PUBLIC ${PROJECT_SOURCE_DIR}/general )
+ENDFOREACH(t)
 
 set(TARGETS2017 1ms 2ms 3ms 4ms 5ms 6ms 7ms 8ms 9ms 11ms 12ms 13ms 15ms 16ms 17ms 18ms 19ms 20ms 21ms 22ms 23ms 24ms 25ms)
 FOREACH(t ${TARGETS2017})
