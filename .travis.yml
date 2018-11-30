@@ -24,8 +24,8 @@ before_script:
   - gcc -v && g++ -v && cmake --version
   # Run your build commands next
   - cmake -G "Unix Makefiles"
-  - sudo chmod ugo+x ./tools/build-wrapper-3-11-linux-x86-64/build-wrapper-linux-x86-64
-  - ./tools/build-wrapper-3-11-linux-x86-64/build-wrapper-linux-x86-64 --out-dir aoc_output make clean all
+  - sudo chmod ugo+x ./tools/build-wrapper-linux-x86-64/build-wrapper-linux-x86-64
+  - ./tools/build-wrapper-linux-x86-64/build-wrapper-linux-x86-64 --out-dir aoc_output make clean all
 
 script: 
   - cmake --build .
