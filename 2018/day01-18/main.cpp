@@ -1,5 +1,6 @@
 #include <algorithm>
 #include <iostream>
+#include <set>
 #include <stdio.h>
 #include <stdlib.h>
 #include <vector>
@@ -7,35 +8,34 @@
 #include "logger.h"
 
 int main() {
-  int total = 0;
-  int in = 0;
+  int64_t total = 0;
+  int64_t in = 0;
 
-  std::vector<int> input;
-  std::vector<int> frequencies;
+  std::vector<int64_t> input;
+  std::set<int64_t> frequencies;
 
   while (!std::cin.eof()) {
     std::cin >> in;
     input.push_back(in);
   }
 
-  for (auto i : input)
-    total += i;
+  // for (auto i : input)
+  //   total += i;
 
-  logger::get(logtype::logINFO) << "Part 1: " << total << "\n";
+  // logger::get(logtype::logINFO) << "Part 1: " << total << "\n";
 
-  int freq = 0;
+  int64_t freq = 0;
+  frequencies.insert(0);
   int i = 0;
   int size = input.size();
+
   while (true) {
     in = input[i];
     ++i;
     freq += in;
-    if (frequencies.size() > 0) {
-      auto found = std::find(frequencies.begin(), frequencies.end(), freq);
-      if (freq == *found)
-        break;
-    }
-    frequencies.push_back(freq);
+    auto elem = frequencies.insert(freq);
+    if (elem.second == false)
+      break;
     if (i == size)
       i = 0;
   }
