@@ -7,7 +7,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=gnu++17")
 #set(CMAKE_CXX_STANDARD 17)
 #set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-add_compile_options("-Wall" "-Wextra" "-Werror" "$<$<CONFIG:RELEASE>:-Ofast>")
+add_compile_options("$<$<CONFIG:RELEASE>:-Ofast>")
 
 include_directories(${PROJECT_SOURCE_DIR}/general)
 
