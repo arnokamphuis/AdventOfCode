@@ -12,7 +12,7 @@ include_directories(${PROJECT_SOURCE_DIR}/general)
 # adding a project
 project (AoC)
 
-set(TARGETS2018 )
+set(TARGETS2018 day01-18)
 FOREACH(t ${TARGETS2018})
     add_executable(${t} ${PROJECT_SOURCE_DIR}/2018/${t}/main.cpp ${PROJECT_SOURCE_DIR}/general/logger.cpp)
     set_target_properties( ${t} PROPERTIES RUNTIME_OUTPUT_DIRECTORY 2018/${t}/ )
