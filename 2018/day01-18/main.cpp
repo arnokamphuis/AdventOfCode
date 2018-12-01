@@ -6,10 +6,12 @@
 #include <vector>
 
 #include "logger.h"
+// #include "basetimer.h"
 
 int main() {
-  int64_t total = 0;
   int64_t in = 0;
+
+  // BaseTimer timer;
 
   std::vector<int64_t> input;
   std::set<int64_t> frequencies;
@@ -19,26 +21,31 @@ int main() {
     input.push_back(in);
   }
 
-  // for (auto i : input)
-  //   total += i;
+  int64_t total = 0;
+  for (auto i : input)
+    total += i;
 
-  // logger::get(logtype::logINFO) << "Part 1: " << total << "\n";
+  logger::get(logtype::logINFO) << "Part 1: " << total << "\n";
 
-  int64_t freq = 0;
-  frequencies.insert(0);
   int i = 0;
   int size = input.size();
+    int64_t freq = 0;
 
-  while (true) {
-    in = input[i];
-    ++i;
-    freq += in;
-    auto elem = frequencies.insert(freq);
-    if (elem.second == false)
-      break;
-    if (i == size)
-      i = 0;
-  }
+  // int runs=100;
+  // timer.start();
+  // for (int run = 0; run<runs; ++run) {
+    freq = 0;
+    frequencies.clear();
+    frequencies.insert(freq);
+    while (true) {
+      freq += input[i++];
+      if (!frequencies.insert(freq).second)
+        break;
+      i = (i==size?0:i);
+    }
+  // }
+  // timer.stop();
+  // std::cout << "timer: " << timer.elapsedMilliSeconds()/(float)runs << "\n";
 
   logger::get(logtype::logINFO) << "Part 2: " << freq << "\n";
 
