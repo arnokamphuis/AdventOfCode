@@ -1,4 +1,3 @@
-#include <algorithm>
 #include <iostream>
 #include <map>
 #include <set>
@@ -6,8 +5,8 @@
 #include <stdlib.h>
 #include <vector>
 
+//#include "basetimer.h"
 #include "logger.h"
-// #include "basetimer.h"
 
 std::map<char, int64_t> make_histogram(std::string id) {
   std::map<char, int64_t> res;
@@ -23,7 +22,10 @@ bool check(std::map<char, int64_t> hist, int64_t count) {
   return false;
 }
 
-int64_t compare(std::string s1, std::string s2) {
+int64_t difference(std::string s1, std::string s2) {
+  if (s1.compare(s2) == 0)
+    return 0;
+
   int l = s1.length();
   int64_t c = 0;
   for (int i = 0; i < l; ++i)
@@ -44,9 +46,10 @@ std::string remove_duplicates(std::string s1, std::string s2) {
 int main() {
   std::vector<std::string> input;
 
-  int64_t count2, count3;
-  count2 = 0;
-  count3 = 0;
+  int64_t count2 = 0;
+  int64_t count3 = 0;
+
+  // Part 1 + store the input
   std::string line;
   while (getline(std::cin, line)) {
     input.push_back(line);
@@ -56,18 +59,20 @@ int main() {
   }
   logger::get(logtype::logINFO) << "Part 1: " << count2 * count3 << "\n";
 
+  // Part 2
   std::string c1, c2;
   for (auto s1 : input) {
     for (auto s2 : input) {
-      if (s1.compare(s2) != 0) {
-        if (compare(s1, s2) == 1) {
-          c1 = s1;
-          c2 = s2;
-        }
+      if (difference(s1, s2) == 1) {
+        c1 = s1;
+        c2 = s2;
       }
     }
   }
+
   std::string result = remove_duplicates(c1, c2);
+
   logger::get(logtype::logINFO) << "Part 2: " << result << "\n";
+
   return 0;
 }
