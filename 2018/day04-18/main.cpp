@@ -1,12 +1,10 @@
+#include "logger.h"
 #include <iostream>
 #include <map>
 #include <set>
 #include <stdio.h>
 #include <stdlib.h>
 #include <vector>
-
-//#include "basetimer.h"
-#include "logger.h"
 
 class guard {
   int64_t sleeping[60];
@@ -62,11 +60,8 @@ int main() {
   for (auto in : input) {
     auto firstbrace = in.find('[');
     auto lastbrace = in.find(']');
-
     std::string datetime = in.substr(firstbrace + 1, lastbrace - 1);
-
     std::string action = in.substr(lastbrace + 2, in.length());
-
     actions[datetime] = action;
   }
 
