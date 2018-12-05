@@ -22,7 +22,7 @@ FOREACH(t ${TARGETSINFI2018})
     target_include_directories( ${t} PUBLIC ${PROJECT_SOURCE_DIR}/general )
 ENDFOREACH(t)
 
-set(TARGETS2018 day01-18 day02-18 day03-18 day04-18)
+set(TARGETS2018 day01-18 day02-18 day03-18 day04-18 day05-18)
 FOREACH(t ${TARGETS2018})
     # add_executable(${t} ${PROJECT_SOURCE_DIR}/2018/${t}/main.cpp ${PROJECT_SOURCE_DIR}/general/logger.cpp ${PROJECT_SOURCE_DIR}/general/basetimer.cpp)
     add_executable(${t} ${PROJECT_SOURCE_DIR}/2018/${t}/main.cpp ${PROJECT_SOURCE_DIR}/general/logger.cpp)
