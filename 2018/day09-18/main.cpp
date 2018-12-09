@@ -9,6 +9,8 @@
 #include <stdlib.h>
 #include <vector>
 
+// #include "basetimer.h"
+
 class marblecircle {
   std::list<uint64_t>::iterator current;
   std::list<uint64_t> marbles;
@@ -36,17 +38,15 @@ public:
           current = marbles.end();
         --current;
       }
-      score += m;
-      score += (*current);
+      score += m + (*current);
       current = marbles.erase(current);
     } else {
       for (int i = 0; i < 2; ++i) {
-        current++;
         if (current == marbles.end())
           current = marbles.begin();
+        current++;
       }
-      marbles.insert(current, m);
-      current--;
+      current = marbles.insert(current, m);
     }
 
     if (marbles.size() == marbles.max_size())
@@ -101,9 +101,21 @@ int main() {
   marbles = std::atoi(line.substr(worth + 6, points - worth - 6).c_str());
 
   game g1(players, marbles);
-  logger::get(logtype::logINFO) << "Part 1: " << g1.run() << '\n';
+  // BaseTimer t1;
+  // t1.start();
+  int64_t r1 = g1.run();
+  // t1.stop();
+  logger::get(logtype::logINFO) << "Part 1: " << r1 /*<< " in "
+                                << t1.elapsedMilliSeconds() << " ms"*/
+                                << '\n';
 
   game g2(players, 100 * marbles);
-  logger::get(logtype::logINFO) << "Part 2: " << g2.run() << '\n';
+  // BaseTimer t2;
+  // t2.start();
+  int64_t r2 = g2.run();
+  // t2.stop();
+  logger::get(logtype::logINFO) << "Part 2: " << r2 /*<< " in "
+                                << t2.elapsedMilliSeconds() << " ms"*/
+                                << '\n';
   return 0;
 }
