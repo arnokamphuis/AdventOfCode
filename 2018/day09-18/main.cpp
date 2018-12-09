@@ -1,5 +1,6 @@
 #include "logger.h"
 #include <algorithm>
+#include <chrono>
 #include <iostream>
 #include <list>
 #include <map>
@@ -8,8 +9,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <vector>
-
-// #include "basetimer.h"
 
 class marblecircle {
   std::list<uint64_t>::iterator current;
@@ -101,21 +100,24 @@ int main() {
   marbles = std::atoi(line.substr(worth + 6, points - worth - 6).c_str());
 
   game g1(players, marbles);
-  // BaseTimer t1;
-  // t1.start();
+
+  auto start1 = std::chrono::high_resolution_clock::now();
   int64_t r1 = g1.run();
-  // t1.stop();
-  logger::get(logtype::logINFO) << "Part 1: " << r1 /*<< " in "
-                                << t1.elapsedMilliSeconds() << " ms"*/
-                                << '\n';
+  auto end1 = std::chrono::high_resolution_clock::now();
+  logger::get(logtype::logINFO)
+      << "Part 1: " << r1 << " in "
+      << std::chrono::duration_cast<std::chrono::milliseconds>(end1 - start1)
+             .count()
+      << " ms" << '\n';
 
   game g2(players, 100 * marbles);
-  // BaseTimer t2;
-  // t2.start();
+  auto start2 = std::chrono::high_resolution_clock::now();
   int64_t r2 = g2.run();
-  // t2.stop();
-  logger::get(logtype::logINFO) << "Part 2: " << r2 /*<< " in "
-                                << t2.elapsedMilliSeconds() << " ms"*/
-                                << '\n';
+  auto end2 = std::chrono::high_resolution_clock::now();
+  logger::get(logtype::logINFO)
+      << "Part 2: " << r2 << " in "
+      << std::chrono::duration_cast<std::chrono::milliseconds>(end2 - start2)
+             .count()
+      << " ms" << '\n';
   return 0;
 }
