@@ -21,7 +21,9 @@ class map {
   int max_y;
 
 public:
-  addparticle(int x, int y, int vx, int vy) {
+  int size() { return cur.size(); }
+
+  void addparticle(int x, int y, int vx, int vy) {
     pos.push_back(std::make_pair(x, y));
     vel.push_back(std::make_pair(vx, vy));
     cur.push_back(std::make_pair(x, y));
@@ -38,28 +40,44 @@ public:
     min_x = std::numeric_limits<int>::max();
     max_x = std::numeric_limits<int>::min();
     min_y = min_x;
-    max_y = max_y;
+    max_y = max_x;
 
     for (auto c : cur) {
       if (min_x > c.first)
         min_x = c.first;
       if (max_x < c.first)
         max_x = c.first;
-      if (min_y > c.first)
-        min_y = c.first;
-      if (max_y < c.first)
-        max_y = c.first;
+      if (min_y > c.second)
+        min_y = c.second;
+      if (max_y < c.second)
+        max_y = c.second;
     }
+    return ((max_y - min_y) + (max_x - min_x));
+  }
 
-    return (max_y - min_y + max_x - min_x);
+  int calc_dist(int t) {
+    int total = 0;
+    for (auto c1 : cur) {
+      int min_d = std::numeric_limits<int>::max();
+      for (auto c2 : cur) {
+        if (c1 != c2) {
+          int d = std::max(std::abs(c1.first - c2.first),
+                           std::abs(c1.second - c2.second));
+          if (d < min_d)
+            min_d = d;
+        }
+      }
+      total += min_d;
+    }
+    return total;
   }
 
   void print(int t) {
-    int w = max_x - min_x;
-    int h = max_y - min_y;
     update(t);
     calcbounds(t);
 
+    int w = max_x - min_x;
+    int h = max_y - min_y;
     std::vector<std::vector<char>> drawing;
     for (int x = 0; x <= h; ++x) {
       std::vector<char> tmp;
@@ -70,9 +88,7 @@ public:
     }
 
     for (auto c : cur) {
-      // std::cout << c.first - min_x << "\t" << c.second - min_y << "(" << h
-      //           << "\t" << w << "\n";
-      drawing[c.first - min_x][c.second - min_y] = '#';
+      drawing[c.second - min_y][c.first - min_x] = '#';
     }
 
     for (auto dx : drawing) {
@@ -109,20 +125,24 @@ int main() {
     m.addparticle(posx, posy, velx, vely);
   }
 
-  int prev_min = std::numeric_limits<int>::max();
-  int min;
+  auto start = std::chrono::high_resolution_clock::now();
   m.update(0);
-  min = m.calcbounds(0);
-  int t = 1;
-  while (min < prev_min) {
-    prev_min = min;
-    m.update(t);
-    min = m.calcbounds(t);
+  int min = m.calc_dist(0);
+  int t = 0;
+  while (min != m.size()) {
     ++t;
+    m.update(t);
+    min = m.calc_dist(t);
   }
-  --t;
-  std::cout << t << std::endl;
+  auto stop = std::chrono::high_resolution_clock::now();
+
+  logger::get(logtype::logINFO) << "Part 1: \n";
   m.print(t);
+  logger::get(logtype::logINFO)
+      << "\nin "
+      << std::chrono::duration_cast<std::chrono::milliseconds>(stop - start)
+             .count()
+      << " ms\nPart 2: " << t << "\n";
 
   return 0;
 }
