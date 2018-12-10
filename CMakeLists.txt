@@ -14,7 +14,7 @@ include_directories(${PROJECT_SOURCE_DIR}/general)
 # adding a project
 project (AoC)
 
-set(TARGETS2018 day01-18 day02-18 day03-18 day04-18 day05-18 day06-18 day07-18 day08-18 day09-18)
+set(TARGETS2018 day01-18 day02-18 day03-18 day04-18 day05-18 day06-18 day07-18 day08-18 day09-18 day10-18)
 FOREACH(t ${TARGETS2018})
     # add_executable(${t} ${PROJECT_SOURCE_DIR}/2018/${t}/main.cpp ${PROJECT_SOURCE_DIR}/general/logger.cpp ${PROJECT_SOURCE_DIR}/general/basetimer.cpp)
     add_executable(${t} ${PROJECT_SOURCE_DIR}/2018/${t}/main.cpp ${PROJECT_SOURCE_DIR}/general/logger.cpp)
