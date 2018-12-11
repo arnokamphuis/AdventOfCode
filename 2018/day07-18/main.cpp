@@ -110,6 +110,8 @@ void process_steps(std::map<char, task *> &candidates, std::string &order) {
       break;
     }
   }
+  if (ct == nullptr)
+    return;
   ct->done = true;
   order += ct->id;
   candidates.erase(ct->id);
