@@ -16,6 +16,7 @@ class cart {
   int posy;
   int direction;
   int nextchoice;
+  int id;
 
   void turnleft() {
     --direction;
@@ -30,7 +31,8 @@ class cart {
   }
 
 public:
-  cart(int x, int y, int d) : posx(x), posy(y), direction(d), nextchoice(-1) {}
+  cart(int x, int y, int d, int num)
+      : posx(x), posy(y), direction(d), id(num), nextchoice(-1) {}
 
   friend inline bool operator<(const cart &lhs, const cart &rhs) {
     if (lhs.posy < rhs.posy)
@@ -46,6 +48,7 @@ public:
 
   const int &x() const { return posx; }
   const int &y() const { return posy; }
+  const int &getid() const { return id; }
 
   void updatebyposition(char c) {
     if (c == '+')
@@ -112,21 +115,22 @@ public:
 
   void setrow(int r, std::string row) {
     for (int i = 0; i < row.length(); ++i) {
+      int id = carts.size() + 1;
       char c = row[i];
       if ((c == '<')) { // direction 3
-        cart car(i, r, 3);
+        cart car(i, r, 3, id);
         carts.push_back(car);
         cells[r][i] = '-';
       } else if (c == '^') { // direction 0
-        cart car(i, r, 0);
+        cart car(i, r, 0, id);
         carts.push_back(car);
         cells[r][i] = '|';
       } else if (c == '>') { // direction 1
-        cart car(i, r, 1);
+        cart car(i, r, 1, id);
         carts.push_back(car);
         cells[r][i] = '-';
       } else if (c == 'v') { // direction 2
-        cart car(i, r, 2);
+        cart car(i, r, 2, id);
         carts.push_back(car);
         cells[r][i] = '|';
       } else {
@@ -135,15 +139,19 @@ public:
     }
   }
 
-  bool update() {
+  bool update(bool inbetween = false) {
     sortcarts();
 
     for (auto &c : carts) {
       c.move();
       c.updatebyposition(cells[c.y()][c.x()]);
+      if (inbetween) {
+        if (!removecollisions())
+          break;
+      }
     }
 
-    return (collision() > -1);
+    return collision();
   }
 
   void print() {
@@ -161,26 +169,40 @@ public:
 
   const std::pair<int, int> &colpos() const { return collision_pos; }
 
-  int collision() {
-    sortcarts();
-    for (int i = 0; i < carts.size() - 1; ++i) {
-      if (carts[i] == carts[i + 1]) {
-        collision_pos.first = carts[i].x();
-        collision_pos.second = carts[i].y();
-        return i;
+  bool collision() {
+    for (int i = 0; i < carts.size(); ++i) {
+      for (int j = i + 1; j < carts.size(); ++j) {
+        if (carts[i] == carts[j]) {
+          collision_pos.first = carts[i].x();
+          collision_pos.second = carts[i].y();
+          return true;
+        }
       }
     }
-    return -1;
+    return false;
   }
 
   bool removecollisions() {
-    int i;
-    while ((i = collision()) > -1) {
-      cart car1 = *(carts.begin() + i + 1);
-      cart car2 = *(carts.begin() + i);
-      carts.erase(carts.begin() + i + 1);
-      carts.erase(carts.begin() + i);
+    std::set<int> toberemoved;
+
+    for (int i = 0; i < carts.size(); ++i) {
+      for (int j = i + 1; j < carts.size(); ++j) {
+        if (carts[i] == carts[j]) {
+          toberemoved.insert(carts[i].getid());
+          toberemoved.insert(carts[j].getid());
+        }
+      }
     }
+
+    for (auto tbr : toberemoved) {
+      for (int i = 0; i < carts.size(); ++i) {
+        if (tbr == carts[i].getid()) {
+          carts.erase(carts.begin() + i);
+          break;
+        }
+      }
+    }
+
     if (carts.size() == 1) {
       collision_pos.first = carts[0].x();
       collision_pos.second = carts[0].y();
@@ -191,7 +213,7 @@ public:
 
   void run(bool withremoving) {
     while (true) {
-      bool res = update();
+      bool res = update(withremoving);
       if (withremoving) {
         if (!removecollisions())
           return;
