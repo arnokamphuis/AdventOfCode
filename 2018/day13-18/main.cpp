@@ -11,216 +11,284 @@
 #include <stdlib.h>
 #include <vector>
 
+enum dir { RIGHT = 0, UP = 1, LEFT = 2, DOWN = 3 };
+
 class cart {
-  int posx;
-  int posy;
-  int direction;
-  int nextchoice;
+  std::pair<int, int> position;
   int id;
-
-  void turnleft() {
-    --direction;
-    if (direction < 0)
-      direction = 3;
-  }
-
-  void turnright() {
-    ++direction;
-    if (direction > 3)
-      direction = 0;
-  }
+  int nextchoice;
+  dir direction;
 
 public:
-  cart(int x, int y, int d, int num)
-      : posx(x), posy(y), direction(d), id(num), nextchoice(-1) {}
+  cart(int x, int y, int id, char c) : nextchoice(-1), id(id) {
+    position = std::make_pair(y, x);
+    id = id;
+    switch (c) {
+    case '^':
+      direction = UP;
+      break;
+    case 'v':
+      direction = DOWN;
+      break;
+    case '<':
+      direction = LEFT;
+      break;
+    case '>':
+      direction = RIGHT;
+      break;
+    }
+  }
+
+  const dir &getdirection() const { return direction; }
 
   friend inline bool operator<(const cart &lhs, const cart &rhs) {
-    if (lhs.posy < rhs.posy)
+    if (lhs.position.first < rhs.position.first)
       return true;
-    if ((lhs.posy == rhs.posy) && (lhs.posx < rhs.posx))
+    if ((lhs.position.first == rhs.position.first) &&
+        (lhs.position.second < rhs.position.second))
+      return true;
+    return false;
+  }
+  friend inline bool operator>(const cart &lhs, const cart &rhs) {
+    if (lhs.position.first > rhs.position.first)
+      return true;
+    if ((lhs.position.first == rhs.position.first) &&
+        (lhs.position.second > rhs.position.second))
       return true;
     return false;
   }
 
-  friend inline bool operator==(const cart &lhs, const cart &rhs) {
-    return ((lhs.posy == rhs.posy) && (lhs.posx == rhs.posx));
-  }
-
-  const int &x() const { return posx; }
-  const int &y() const { return posy; }
+  const int &x() const { return position.second; }
+  const int &y() const { return position.first; }
   const int &getid() const { return id; }
 
-  void updatebyposition(char c) {
-    if (c == '+')
-      changedirection();
-    if ((c == '\\') && ((direction == 0) || (direction == 2))) {
-      turnleft();
-      return;
-    }
-    if ((c == '\\') && ((direction == 1) || (direction == 3))) {
-      turnright();
-      return;
-    }
-
-    if ((c == '/') && ((direction == 0) || (direction == 2))) {
-      turnright();
-      return;
-    }
-    if ((c == '/') && ((direction == 1) || (direction == 3))) {
-      turnleft();
-      return;
-    }
-  }
-
   void move() {
-    if (direction == 0)
-      --posy;
-    if (direction == 1)
-      ++posx;
-    if (direction == 2)
-      ++posy;
-    if (direction == 3)
-      --posx;
+    switch (direction) {
+    case UP:
+      --position.first;
+      break;
+    case DOWN:
+      ++position.first;
+      break;
+    case LEFT:
+      --position.second;
+      break;
+    case RIGHT:
+      ++position.second;
+      break;
+    }
   }
 
-  void changedirection() {
-    if (nextchoice == -1)
-      turnleft();
-    if (nextchoice == 1)
-      turnright();
-    ++nextchoice;
-    if (nextchoice == 2)
-      nextchoice = -1;
+  void turnleft() {
+    if (direction == UP)
+      direction = LEFT;
+    else if (direction == LEFT)
+      direction = DOWN;
+    else if (direction == DOWN)
+      direction = RIGHT;
+    else if (direction == RIGHT)
+      direction = UP;
+  }
+
+  void turnright() {
+    if (direction == UP)
+      direction = RIGHT;
+    else if (direction == LEFT)
+      direction = UP;
+    else if (direction == DOWN)
+      direction = LEFT;
+    else if (direction == RIGHT)
+      direction = DOWN;
+  }
+
+  void update(const char &c) {
+    if (!((c == '-') || (c == '|'))) {
+      if (c == '/') {
+        switch (direction) {
+        case UP:
+        case DOWN:
+          turnright();
+          break;
+        case LEFT:
+        case RIGHT:
+          turnleft();
+          break;
+        }
+      } else if (c == '\\') {
+        switch (direction) {
+        case UP:
+        case DOWN:
+          turnleft();
+          break;
+        case LEFT:
+        case RIGHT:
+          turnright();
+          break;
+        }
+      } else if (c == '+') {
+        switch (nextchoice) {
+        case -1:
+          turnleft();
+          break;
+        case 0:
+          break;
+        case +1:
+          turnright();
+          break;
+        }
+        ++nextchoice;
+        if (nextchoice > 1)
+          nextchoice = -1;
+      }
+    }
   }
 };
 
 class map {
-  int width;
+  int weight;
   int height;
+
   std::vector<std::vector<char>> cells;
   std::vector<cart> carts;
-  std::pair<int, int> collision_pos;
+
+  std::pair<int, int> collision_position;
+
+public:
+  map(int w, int h) : weight(w), height(h) {}
+
+  void addline(const std::string &line) {
+    std::vector<char> row;
+    int x = 0;
+    int y = cells.size();
+    for (auto c : line) {
+      char n = c;
+      if ((n == '<') || (n == '>') || (n == '^') || (n == 'v')) {
+        cart nc(x, y, carts.size() + 1, c);
+        switch (nc.getdirection()) {
+        case UP:
+        case DOWN:
+          n = '|';
+          break;
+        case LEFT:
+        case RIGHT:
+          n = '-';
+          break;
+        }
+        carts.push_back(nc);
+      }
+      row.push_back(n);
+      ++x;
+    }
+    cells.push_back(row);
+  }
 
   void sortcarts() { std::sort(carts.begin(), carts.end(), std::less<>()); }
 
-public:
-  map(int w, int h) : width(w), height(h) {
-    for (int i = 0; i < h; ++i) {
-      std::vector<char> row;
-      for (int j = 0; j < w; ++j)
-        row.push_back(' ');
-      cells.push_back(row);
-    }
-  }
-
-  void setrow(int r, std::string row) {
-    for (int i = 0; i < row.length(); ++i) {
-      int id = carts.size() + 1;
-      char c = row[i];
-      if ((c == '<')) { // direction 3
-        cart car(i, r, 3, id);
-        carts.push_back(car);
-        cells[r][i] = '-';
-      } else if (c == '^') { // direction 0
-        cart car(i, r, 0, id);
-        carts.push_back(car);
-        cells[r][i] = '|';
-      } else if (c == '>') { // direction 1
-        cart car(i, r, 1, id);
-        carts.push_back(car);
-        cells[r][i] = '-';
-      } else if (c == 'v') { // direction 2
-        cart car(i, r, 2, id);
-        carts.push_back(car);
-        cells[r][i] = '|';
-      } else {
-        cells[r][i] = row[i];
-      }
-    }
-  }
-
-  bool update(bool inbetween = false) {
-    sortcarts();
-
-    for (auto &c : carts) {
-      c.move();
-      c.updatebyposition(cells[c.y()][c.x()]);
-      if (inbetween) {
-        if (!removecollisions())
-          break;
-      }
-    }
-
-    return collision();
-  }
-
-  void print() {
-    std::vector<std::vector<char>> printmap = cells;
-
+  void printcarts() {
     for (auto c : carts) {
-      printmap[c.y()][c.x()] = '*';
-    }
-    for (auto row : printmap) {
-      for (auto c : row)
-        std::cout << c;
-      std::cout << "\n";
+      std::cout << c.x() << ", " << c.y() << " -> " << c.getdirection()
+                << " => " << c.getid() << '\n';
     }
   }
 
-  const std::pair<int, int> &colpos() const { return collision_pos; }
-
-  bool collision() {
-    for (int i = 0; i < carts.size(); ++i) {
-      for (int j = i + 1; j < carts.size(); ++j) {
-        if (carts[i] == carts[j]) {
-          collision_pos.first = carts[i].x();
-          collision_pos.second = carts[i].y();
-          return true;
-        }
+  bool collision(const cart &c, std::pair<int, int> &p) {
+    for (auto &c2 : carts) {
+      if ((c.getid() != c2.getid()) && (c2.x() == c.x()) && (c2.y() == c.y())) {
+        collision_position.first = c.x();
+        collision_position.second = c.y();
+        p.first = c.getid();
+        p.second = c2.getid();
+        return true;
       }
     }
     return false;
   }
 
-  bool removecollisions() {
-    std::set<int> toberemoved;
-
+  void remove(int cid) {
     for (int i = 0; i < carts.size(); ++i) {
-      for (int j = i + 1; j < carts.size(); ++j) {
-        if (carts[i] == carts[j]) {
-          toberemoved.insert(carts[i].getid());
-          toberemoved.insert(carts[j].getid());
-        }
+      if (carts[i].getid() == cid) {
+        carts.erase(carts.begin() + i);
+        return;
       }
     }
+  }
 
-    for (auto tbr : toberemoved) {
+  void remove(const cart &c) {
+    std::vector<int> tbr;
+    tbr.push_back(c.getid());
+    for (auto &c2 : carts)
+      if ((c.getid() != c2.getid()) && (c2.x() == c.x()) && (c2.y() == c.y()))
+        tbr.push_back(c2.getid());
+
+    while (tbr.size() > 0) {
       for (int i = 0; i < carts.size(); ++i) {
-        if (tbr == carts[i].getid()) {
+        if (carts[i].getid() == tbr[0]) {
+          //          std::cout << "removing: " << tbr[0] << "\n";
           carts.erase(carts.begin() + i);
+          tbr.erase(tbr.begin());
           break;
         }
       }
     }
-
-    if (carts.size() == 1) {
-      collision_pos.first = carts[0].x();
-      collision_pos.second = carts[0].y();
-      return false;
-    } else
-      return true;
   }
 
-  void run(bool withremoving) {
-    while (true) {
-      bool res = update(withremoving);
-      if (withremoving) {
-        if (!removecollisions())
-          return;
+  const std::pair<int, int> &getcollisionposition() const {
+    return collision_position;
+  }
+
+  std::pair<int, int> lastposition() {
+    std::pair<int, int> ret;
+    ret.first = carts[0].x();
+    ret.second = carts[0].y();
+    return ret;
+  }
+
+  bool turn(bool removecarts) {
+    sortcarts();
+
+    std::set<int> tbr;
+
+    for (auto &c : carts) {
+      c.move();
+      std::pair<int, int> p;
+      if (collision(c, p)) {
+        tbr.insert(p.first);
+        tbr.insert(p.second);
       } else {
-        if (res)
-          return;
+        c.update(cells[c.y()][c.x()]);
       }
+    }
+
+    if (removecarts) {
+      for (auto cid : tbr) {
+        remove(cid);
+      }
+      return carts.size() > 1;
+    } else {
+      return tbr.size() == 0;
+    }
+  }
+
+  void printmap() {
+    std::vector<std::vector<char>> pm = cells;
+
+    for (auto c : carts) {
+      char ch = '*';
+      if (c.getdirection() == UP)
+        ch = '^';
+      if (c.getdirection() == DOWN)
+        ch = 'v';
+      if (c.getdirection() == LEFT)
+        ch = '<';
+      if (c.getdirection() == RIGHT)
+        ch = '>';
+      pm[c.y()][c.x()] = ch;
+    }
+
+    for (auto row : pm) {
+      for (auto c : row)
+        std::cout << c;
+      std::cout << "\n";
     }
   }
 };
@@ -238,18 +306,24 @@ int main() {
 
   map m1(width, height);
   map m2(width, height);
-  for (int r = 0; r < input.size(); ++r) {
-    m1.setrow(r, input[r]);
-    m2.setrow(r, input[r]);
+
+  for (auto in : input) {
+    m1.addline(in);
+    m2.addline(in);
   }
 
-  m1.run(false);
+  m1.sortcarts();
+  while (m1.turn(false)) {
+  }
+  std::pair<int, int> pos1 = m1.getcollisionposition();
   logger::get(logtype::logINFO)
-      << "Part 1: " << m1.colpos().first << "\t" << m1.colpos().second << "\n";
+      << "Part 1: " << pos1.first << "\t" << pos1.second << "\n";
 
-  m2.run(true);
+  m2.sortcarts();
+  while (m2.turn(true)) {
+  }
+  std::pair<int, int> pos2 = m2.lastposition();
   logger::get(logtype::logINFO)
-      << "Part 2: " << m2.colpos().first << "\t" << m2.colpos().second << "\n";
-
+      << "Part 2: " << pos2.first << "\t" << pos2.second << "\n";
   return 0;
 }
