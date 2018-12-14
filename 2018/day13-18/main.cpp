@@ -20,7 +20,7 @@ class cart {
   dir direction;
 
 public:
-  cart(int x, int y, int id, char c) : nextchoice(-1), id(id) {
+  cart(int x, int y, int nr, char c) : nextchoice(-1), id(nr) {
     position = std::make_pair(y, x);
     id = id;
     switch (c) {
