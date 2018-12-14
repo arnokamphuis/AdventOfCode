@@ -35,6 +35,8 @@ int main() {
   int pos1 = 0;
   int pos2 = 1;
 
+  auto start1 = std::chrono::high_resolution_clock::now();
+
   scores.push_back(3);
   scores.push_back(7);
   scores.push_back(1);
@@ -60,15 +62,21 @@ int main() {
     pos1 = pos1 % scores.size();
     pos2 = pos2 % scores.size();
   }
+  auto end1 = std::chrono::high_resolution_clock::now();
 
   std::string target = createstr(nextten);
-  logger::get(logtype::logINFO) << "Part 1: " << target << std::endl;
+  logger::get(logtype::logINFO)
+      << "Part 1: " << target << " in "
+      << std::chrono::duration_cast<std::chrono::milliseconds>(end1 - start1)
+             .count()
+      << " ms\n";
   target = "260321";
 
   scores.clear();
   pos1 = 0;
   pos2 = 1;
 
+  auto start2 = std::chrono::high_resolution_clock::now();
   scores.push_back(3);
   scores.push_back(7);
   scores.push_back(1);
@@ -100,9 +108,13 @@ int main() {
     pos1 = pos1 % scores.size();
     pos2 = pos2 % scores.size();
   }
+  auto end2 = std::chrono::high_resolution_clock::now();
 
   logger::get(logtype::logINFO)
-      << "Part 2: " << scores.size() - target.length() << std::endl;
+      << "Part 2: " << scores.size() - target.length() << " in "
+      << std::chrono::duration_cast<std::chrono::milliseconds>(end2 - start2)
+             .count()
+      << " ms\n";
 
   return 0;
 }
