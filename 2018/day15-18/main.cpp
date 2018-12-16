@@ -11,7 +11,7 @@
 #include <stdlib.h>
 #include <vector>
 
-enum gnometype { ELF, GOBLIN };
+enum gnometype { ELF = 1, GOBLIN = 2 };
 enum direction { RIGHT, UP, LEFT, DOWN, NONE };
 
 class gnome {
@@ -22,11 +22,14 @@ class gnome {
   int attackpower;
 
 public:
-  gnome(int x, int y, int nr, gnometype gt) : id(nr), t(gt) {
+  gnome(int x, int y, int nr, gnometype gt, int ap) : id(nr), t(gt) {
     position.first = x;
     position.second = y;
-    attackpower = 3;
     hitpoints = 200;
+    if (gt == ELF)
+      attackpower = ap;
+    else
+      attackpower = 3;
   }
 
   friend inline bool operator<(const gnome &lhs, const gnome &rhs) {
@@ -72,9 +75,13 @@ public:
 class map {
   int width;
   int height;
+  int attackpower;
+  gnometype winner;
   std::vector<gnome> gnomes;
   std::vector<std::vector<char>> cells;
   std::vector<std::vector<std::pair<int, int>>> ff;
+
+  int initialelfcounter;
 
   template <class T> void sort(std::vector<T> &vec) {
     std::sort(vec.begin(), vec.end(), std::less<>());
@@ -211,7 +218,7 @@ class map {
   }
 
 public:
-  map(int w, int h) : width(w), height(h) {
+  map(int w, int h, int ap) : width(w), height(h), attackpower(ap) {
     for (int y = 0; y < h; ++y) {
       std::vector<char> col;
       for (int x = 0; x < w; ++x) {
@@ -227,7 +234,8 @@ public:
     for (auto l : line) {
       cells[x][y] = l;
       if ((l == 'G') || (l == 'E')) {
-        gnome gn(x, y, gnomes.size() + 1, (l == 'G' ? GOBLIN : ELF));
+        gnome gn(x, y, gnomes.size() + 1, (l == 'G' ? GOBLIN : ELF),
+                 attackpower);
         gnomes.push_back(gn);
       }
       ++x;
@@ -297,6 +305,8 @@ public:
 
           int closestdistance = std::numeric_limits<int>::max();
 
+          // print(potentials, 'P');
+
           for (auto p : potentials)
             if (cff[p.first][p.second].first < closestdistance)
               closestdistance = cff[p.first][p.second].first;
@@ -305,6 +315,8 @@ public:
             for (auto p : potentials)
               if (cff[p.first][p.second].first == closestdistance)
                 targets.push_back(p);
+
+          // print(targets, 'T');
 
           if (targets.size() > 0) {
             sortpairpos(targets);
@@ -342,6 +354,8 @@ public:
 
             std::vector<std::pair<int, int>> step;
             step.push_back(std::make_pair(stepx, stepy));
+
+            // print(step, '@');
 
             cells[stepx][stepy] = cells[x][y];
             cells[x][y] = '.';
@@ -381,7 +395,8 @@ public:
 
             for (auto &og : gnomes)
               if (og.getid() == enemyid)
-                og.attacked(g);
+                if (og.attacked(g)) {
+                }
           }
         }
       }
@@ -395,6 +410,7 @@ public:
       }
     }
 
+    // print();
     return fullround;
   }
 
@@ -416,14 +432,33 @@ public:
 
   int battle() {
     int count = 0;
+    initialelfcounter = 0;
+    for (auto g : gnomes)
+      if (g.gettype() == ELF)
+        ++initialelfcounter;
     sort(gnomes);
 
     while (turn(count + 1)) {
       ++count;
     }
 
+    winner = gnomes[0].gettype();
+
+    // not counting the round in which combat ends
+    --count;
+
     return count * total_hitpoint();
   }
+
+  bool noelfkilled() {
+    int elfcounter = 0;
+    for (auto g : gnomes)
+      if (g.gettype() == ELF)
+        ++elfcounter;
+    return elfcounter == initialelfcounter;
+  }
+
+  gnometype getwinner() { return winner; }
 };
 
 int main() {
@@ -436,7 +471,7 @@ int main() {
   int w = line.length();
   int h = input.size();
 
-  map m(w, h);
+  map m(w, h, 3);
   int y = 0;
   for (auto line : input) {
     m.addline(y, line);
@@ -445,6 +480,22 @@ int main() {
 
   int battlescore = m.battle();
   logger::get(logtype::logINFO) << "Part 1: " << battlescore << "\n";
+
+  int bs;
+  bool nf = true;
+  for (int ap = 4; nf; ++ap) {
+    map nm(w, h, ap);
+    int y = 0;
+    for (auto line : input) {
+      nm.addline(y, line);
+      ++y;
+    }
+
+    bs = nm.battle();
+    if ((nm.getwinner() == ELF) && nm.noelfkilled())
+      break;
+  }
+  logger::get(logtype::logINFO) << "Part 2: " << bs << "\n";
 
   return 0;
 }
