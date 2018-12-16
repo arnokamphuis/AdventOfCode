@@ -40,19 +40,12 @@ public:
 
   bool attacked(gnome &og) {
     hitpoints -= og.getattackpower();
-    // std::cout << "gnome " << getid() << " is attacked by " << og.getid()
-    //           << "\n";
     return (hitpoints <= 0);
   }
 
   bool stillalive() { return hitpoints > 0; }
 
   int distance(const gnome &other) const {
-    // std::cout << "Calculating distance: " << id << " (" << position.first <<
-    // ","
-    //           << position.second << ") to ";
-    // std::cout << other.getid() << " (" << other.position.first << ","
-    //           << other.position.second << ")\n";
     return abs(position.first - other.position.first) +
            abs(position.second - other.position.second);
   }
@@ -128,8 +121,6 @@ class map {
     if (ff.size() == 0)
       initff();
 
-    // std::cout << "Doing floodfill from: " << pos.first << "\t" << pos.second
-    //           << "\n";
     std::priority_queue<std::pair<int, std::pair<int, int>>,
                         std::vector<std::pair<int, std::pair<int, int>>>,
                         std::greater<std::pair<int, std::pair<int, int>>>>
@@ -287,63 +278,40 @@ public:
 
   bool turn(int round) {
     bool fullround = true;
-    // std::cout << "Round " << round << " started: " << std::endl;
+
     sort(gnomes);
-    // std::cout << "Sorted gnomes" << std::endl;
-    int testid = -1;
+
     for (auto &g : gnomes) {
       if (g.stillalive()) {
 
-        // std::cout << "Checking whether other gnomes are alive..." <<
-        // g.getid()
-        //           << std::endl;
         if (!othergnomesalive(g))
           fullround = false;
 
-        // std::cout << "Checking if they are within range of " << g.getid()
-        //           << std::endl;
         if (!checkinrange(g)) {
 
           std::vector<std::pair<int, int>> targets;
           std::vector<std::pair<int, int>> potentials = inrange(g);
 
-          // std::cout << "POSITION g: " << g.x() << "\t" << g.y() << std::endl;
-
           std::vector<std::vector<std::pair<int, int>>> cff =
-              floodfill(std::make_pair(g.x(), g.y()), (g.getid() == testid));
+              floodfill(std::make_pair(g.x(), g.y()), false);
+
           int closestdistance = std::numeric_limits<int>::max();
 
-          if (g.getid() == testid)
-            print(potentials, 'P');
-
-          for (auto p : potentials) {
-            if (cff[p.first][p.second].first < closestdistance) {
+          for (auto p : potentials)
+            if (cff[p.first][p.second].first < closestdistance)
               closestdistance = cff[p.first][p.second].first;
-            }
-          }
 
-          if (closestdistance != std::numeric_limits<int>::max()) {
-            for (auto p : potentials) {
-              if (cff[p.first][p.second].first == closestdistance) {
+          if (closestdistance != std::numeric_limits<int>::max())
+            for (auto p : potentials)
+              if (cff[p.first][p.second].first == closestdistance)
                 targets.push_back(p);
-              }
-            }
-          }
-
-          if (g.getid() == testid) {
-            print(targets, '@');
-            std::cout << "Closest distance: " << closestdistance << std::endl;
-          }
 
           if (targets.size() > 0) {
             sortpairpos(targets);
-            if (g.getid() == testid)
-              printorder(targets);
 
             std::pair<int, int> target = targets[0];
             std::vector<std::vector<std::pair<int, int>>> firststeps =
-                floodfill(std::make_pair(target.first, target.second),
-                          (g.getid() == testid));
+                floodfill(std::make_pair(target.first, target.second), false);
 
             int mindist = std::numeric_limits<int>::max();
             int x = g.x();
@@ -375,40 +343,21 @@ public:
             std::vector<std::pair<int, int>> step;
             step.push_back(std::make_pair(stepx, stepy));
 
-            if (g.getid() == testid) {
-              print(step, '*');
-            }
-
             cells[stepx][stepy] = cells[x][y];
             cells[x][y] = '.';
             g.x() = stepx;
             g.y() = stepy;
-          } else {
-            // std::cout << "No targets found for gnome: " << g.getid() << " ("
-            //           << g.gettype() << ")\n";
-          }
-        } else {
-          if (g.getid() == testid) {
-            std::cout << "No need to move: " << g.getid() << " (" << g.gettype()
-                      << ")\n";
           }
         }
 
         if (checkinrange(g)) { // attack
-          if (g.getid() == testid) {
-            std::cout << "Attacking...\n";
-          }
 
           std::vector<gnome> enemies;
+
           for (auto &og : gnomes) {
             if ((og.getid() != g.getid()) && (og.gettype() != g.gettype()) &&
                 (g.distance(og) == 1) && og.stillalive())
               enemies.push_back(og);
-          }
-
-          if (g.getid() == testid) {
-            std::cout << "Potentially " << enemies.size()
-                      << " enemies nearby.\n";
           }
 
           if (enemies.size() > 0) {
@@ -416,9 +365,6 @@ public:
             for (auto og : enemies) {
               if (minhitpoints > og.gethitpoints())
                 minhitpoints = og.gethitpoints();
-            }
-            if (g.getid() == testid) {
-              std::cout << "minimum hit points: " << minhitpoints << "\n";
             }
 
             for (int i = 0; i < enemies.size(); ++i) {
@@ -428,72 +374,28 @@ public:
               }
             }
 
-            if (g.getid() == testid) {
-              std::cout << "selected number of enemies: " << enemies.size()
-                        << "\n";
-            }
-
             if (enemies.size() > 1)
               sort(enemies);
 
             int enemyid = enemies[0].getid();
 
-            if (g.getid() == testid) {
-              std::cout << "ID of enemy: " << enemyid << "\n";
-            }
-
-            bool died = false;
-            for (auto &og : gnomes) {
-              if (g.getid() == testid)
-                std::cout << og.getid() << ",";
-
-              if (og.getid() == enemyid) {
-                if (og.attacked(g)) {
-                  // std::cout << g.getid() << " killed " << og.getid() << "\t"
-                  //           << og.gethitpoints() << std::endl;
-                }
-              }
-            }
-          } else { // no attack possible, therefore end turn
+            for (auto &og : gnomes)
+              if (og.getid() == enemyid)
+                og.attacked(g);
           }
         }
       }
     }
 
-    // std::cout << "Round " << round << " finished. Cleaning up dead gnomes\n";
-
     for (int i = 0; i < gnomes.size(); ++i) {
       if (!gnomes[i].stillalive()) {
-        // std::cout << "Removing " << gnomes[i].getid() << "located at ("
-        //           << gnomes[i].x() << "," << gnomes[i].y() << "\n";
         cells[gnomes[i].x()][gnomes[i].y()] = '.';
         gnomes.erase(gnomes.begin() + i);
         --i;
       }
     }
-    // std::cout << "===============================================" <<
-    // std::endl; print(); std::cout <<
-    // "===============================================" << std::endl;
+
     return fullround;
-  }
-
-  int battle() {
-    int count = 0;
-    sort(gnomes);
-
-    while (turn(count + 1)) {
-      // std::cout << "done with turn: print...." << std::endl;
-      // print();
-      // printfitness();
-      // std::cout << "done with printing" << std::endl;
-      ++count;
-    }
-
-    // print();
-    // printfitness();
-    // std::cout << "Total rounds: " << count << "\n";
-
-    return count * total_hitpoint();
   }
 
   int total_hitpoint() {
@@ -506,14 +408,21 @@ public:
 
   void printfitness() {
     sort(gnomes);
-    std::cout
-        << "-------------------------------------------------------------\n";
     for (auto g : gnomes) {
       std::cout << (g.gettype() == 0 ? 'E' : 'G') << "-" << g.getid() << "("
                 << g.gethitpoints() << ")\n";
     }
-    std::cout
-        << "-------------------------------------------------------------\n";
+  }
+
+  int battle() {
+    int count = 0;
+    sort(gnomes);
+
+    while (turn(count + 1)) {
+      ++count;
+    }
+
+    return count * total_hitpoint();
   }
 };
 
