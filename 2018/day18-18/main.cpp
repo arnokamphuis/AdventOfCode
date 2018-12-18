@@ -26,7 +26,7 @@ public:
     if (field.size() == 0) {
       w = line.length();
       size = w * w;
-      field.resize(size, 0);
+      field.resize(size, OPEN);
     }
     for (int i = 0; i < w; ++i) {
       groundtype gt;
@@ -53,18 +53,35 @@ public:
 
     for (int x = 0; x < w; ++x) {
       for (int y = 0; y < w; ++y) {
-        index = x + y * w;
-        for (int i = 0; i < 3; ++i)
-          counter[i] = 0;
+        int index = x + y * w;
+        counter[OPEN] = 0;
+        counter[TREES] = 0;
+        counter[LUMBER] = 0;
         for (int s = -1; s < 2; ++s) {
           for (int t = -1; t < 2; ++t) {
-            int offindex = (x + s) + (y + t) * w;
-            if ((offindex >= 0) && (offindex < size)) {
-              // counter[]
+            if (!((s == 0) && (t == 0))) {
+              int offindex = (x + s) + (y + t) * w;
+              if ((offindex >= 0) && (offindex < size)) {
+                counter[field[offindex]] += 1;
+              }
             }
           }
         }
-        newfield[i] = field[i];
+
+        groundtype gt = field[index];
+
+        if (gt == OPEN) {
+          if (counter[TREES] >= 3)
+            newfield[index] = TREES;
+        } else if (gt == TREES) {
+          if (counter[LUMBER] >= 3)
+            newfield[index] = LUMBER;
+        } else if (gt == LUMBER) {
+          if ((counter[LUMBER] >= 1) && (counter[TREES] >= 1))
+            newfield[index] = LUMBER;
+          else
+            newfield[index] = OPEN;
+        }
       }
     }
 
@@ -81,6 +98,8 @@ int main() {
     m.addline(line);
     input.push_back(line);
   }
+
+  m.update();
 
   return 0;
 }
