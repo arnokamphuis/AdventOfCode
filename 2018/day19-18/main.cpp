@@ -4,6 +4,7 @@
 #include <iostream>
 #include <list>
 #include <map>
+#include <math.h>
 #include <numeric>
 #include <queue>
 #include <set>
@@ -12,19 +13,65 @@
 #include <stdlib.h>
 #include <vector>
 
+uint64_t divsum(uint64_t n) {
+  // Sum of divisors
+  uint64_t result = 0;
+
+  // find all divisors which divides 'num'
+  for (uint64_t i = 2; i <= std::sqrt(n); i++) {
+    // if 'i' is divisor of 'n'
+    if (n % i == 0) {
+      // if both divisors are same
+      // then add it once else add
+      // both
+      if (i == (n / i))
+        result += i;
+      else
+        result += (i + n / i);
+    }
+  }
+
+  // Add 1 and n to result as above loop
+  // considers proper divisors greater
+  // than 1.
+  return (result + n + 1);
+}
+
+template <typename T>
+std::vector<T> factorize(T num) { // works great for smooth numbers
+  std::vector<T> v;
+  if (num < 4) {
+    v.push_back(num);
+    return v;
+  }
+  T d{2};
+  while (num >= d * d) {
+    while (num % d == 0) { // remove all repeats of this divisor
+      v.push_back(d);
+      num /= d;
+    }
+    ++d;
+    if (d * d > num && num > 1) {
+      v.push_back(num);
+      return v;
+    }
+  }
+  return v;
+}
+
 class instruction {
 public:
   std::string opstr;
-  uint16_t A;
-  uint16_t B;
-  uint16_t C;
-  uint16_t ir;
-  uint16_t curreg[6];
-  uint16_t resreg[6];
-  uint16_t tmpreg[6];
+  uint64_t A;
+  uint64_t B;
+  uint64_t C;
+  uint64_t ir;
+  uint64_t curreg[6];
+  uint64_t resreg[6];
+  uint64_t tmpreg[6];
 
   instruction() {
-    for (uint16_t i = 0; i < 4; ++i)
+    for (uint64_t i = 0; i < 4; ++i)
       curreg[i] = 0;
   }
 
@@ -76,23 +123,23 @@ public:
     in >> opstr >> A >> B >> C;
   }
 
-  void loadcurregister(int16_t reg[6]) {
-    for (uint16_t i = 0; i < 6; ++i)
+  void loadcurregister(uint64_t reg[6]) {
+    for (uint64_t i = 0; i < 6; ++i)
       curreg[i] = reg[i];
   }
 
-  void getcurregister(int16_t reg[6]) {
-    for (uint16_t i = 0; i < 6; ++i)
+  void getcurregister(uint64_t reg[6]) {
+    for (uint64_t i = 0; i < 6; ++i)
       reg[i] = curreg[i];
   }
 
   void preexec() {
-    for (uint16_t i = 0; i < 6; ++i)
+    for (uint64_t i = 0; i < 6; ++i)
       tmpreg[i] = curreg[i];
   }
 
   void postexec() {
-    for (uint16_t i = 0; i < 6; ++i)
+    for (uint64_t i = 0; i < 6; ++i)
       curreg[i] = tmpreg[i];
   }
 
@@ -130,8 +177,8 @@ public:
 };
 
 class program {
-  int16_t reg[6];
-  int16_t ir;
+  uint64_t reg[6];
+  uint64_t ir;
   std::vector<instruction> instrs;
 
   void printreg() {
@@ -148,7 +195,7 @@ public:
     ir = 0;
   }
 
-  void reset(int16_t v) {
+  void reset(uint64_t v) {
     reg[0] = v;
     for (int i = 1; i < 6; ++i)
       reg[i] = 0;
@@ -156,9 +203,14 @@ public:
 
   void addinstruction(instruction i) { instrs.push_back(i); }
 
-  void run(int initial_ir, bool print = false) {
+  void run(int initial_ir, int maxruns = -1, bool print = false) {
     ir = initial_ir;
+    int runcounter = 0;
     while (true) {
+      if (maxruns > 0)
+        if (runcounter > maxruns)
+          break;
+      runcounter++;
       int pc = reg[ir];
       if ((pc < 0) || (pc >= instrs.size()))
         break;
@@ -174,10 +226,12 @@ public:
       ++reg[ir];
     }
     --reg[ir];
-    printreg();
+    // printreg();
   }
 
-  int16_t getreg0() const { return reg[0]; }
+  uint64_t getreg0() const { return reg[0]; }
+  uint64_t getreg2() const { return reg[2]; }
+  int getinstructioncount() const { return instrs.size(); }
 };
 
 int main() {
@@ -190,6 +244,7 @@ int main() {
 
   int ir = std::atoi(line.substr(4, 2).c_str());
 
+  int pc_stop = -1;
   while (getline(std::cin, line)) {
     instruction i;
     i.setinstruction(line);
@@ -201,8 +256,16 @@ int main() {
   logger::get(logtype::logINFO) << "Part 1: " << prog.getreg0() << "\n";
 
   prog.reset(1);
-  prog.run(ir, true);
-  logger::get(logtype::logINFO) << "Part 2: " << prog.getreg0() << "\n";
+  prog.run(ir, 1000000, false);
+  // std::vector<int64_t> factors = factorize<int64_t>(prog.getreg2());
+  // int64_t sum = 1;
+  // for (auto f : factors) {
+  //   sum *= f;
+  //   std::cout << f << std::endl;
+  // }
+  uint64_t sum = divsum(prog.getreg2());
+
+  logger::get(logtype::logINFO) << "Part 2: " << sum << "\n";
 
   return 0;
 }
