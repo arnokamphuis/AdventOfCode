@@ -21,7 +21,7 @@ enum damagetype {
   SLASHING = 4,
   ERROR = -1
 };
-enum faction { IMMUNESYSTEM, INFECTION };
+enum faction { IMMUNESYSTEM, INFECTION, NONE };
 enum defensetype { WEAK, IMMUNE };
 
 class group {
@@ -39,6 +39,23 @@ public:
   group(int nr, faction f, int s, int hp, int d, damagetype t, int i)
       : id(nr), side(f), size(s), hitpoints(hp), damage(d), dt(t),
         initiative(i) {}
+
+  group(const group &g) {
+    id = g.id;
+    side = g.side;
+    size = g.size;
+    hitpoints = g.hitpoints;
+    damage = g.damage;
+    dt = g.dt;
+    initiative = g.initiative;
+
+    for (auto d : g.defenses) {
+      for (auto dt : d.second) {
+        defenses[d.first].push_back(dt);
+      }
+    }
+    // std::cout << "Group copy constructor" << std::endl;
+  }
 
   friend std::ostream &operator<<(std::ostream &os, const group *g) {
     os << "Group " << g->id << std::endl;
@@ -73,6 +90,11 @@ public:
   int getinitiative() const { return initiative; }
   const int &getid() const { return id; }
 
+  void addboost(int boost) {
+    damage += boost;
+    // std::cout << "Damage is : " << damage << std::endl;
+  }
+
   void attack(group *target) { target->dodamage(dt, effectivepower()); }
 
   void dodamage(damagetype dt, int value) {
@@ -103,6 +125,7 @@ public:
 class armies {
   std::vector<group *> groups;
   std::map<faction, std::vector<group *>> factions;
+  faction winning;
 
   std::map<group *, group *> targets;
 
@@ -133,8 +156,15 @@ class armies {
     for (auto f : factions) {
       // std::cout << "Faction " << f.first << " has " << f.second.size()
       //           << " groups remaining. " << std::endl;
-      if (f.second.size() == 0)
+      if (f.second.size() == 0) {
+        if (f.first == IMMUNESYSTEM) {
+          winning = INFECTION;
+        } else {
+          winning = IMMUNESYSTEM;
+        }
+
         return true;
+      }
     }
     return false;
   }
@@ -223,7 +253,15 @@ class armies {
   }
 
 public:
-  armies() {}
+  armies() : winning(NONE) {}
+
+  armies(const armies &copy) : winning(NONE) {
+    for (auto g : copy.groups) {
+      group *ng = new group(*g);
+      groups.push_back(ng);
+      factions[ng->getfaction()].push_back(ng);
+    }
+  }
 
   int armysize() const { return groups.size(); }
 
@@ -233,6 +271,7 @@ public:
   }
 
   bool battle() {
+    int begin_as = unitsremaining();
     // std::cout << "Going to select targets" << std::endl;
     targetselection();
     // std::cout << "Going to attack targets" << std::endl;
@@ -241,7 +280,21 @@ public:
     cleanupgroups();
     // std::cout << "After battle there are " << groups.size()
     //           << " groups active. " << std::endl;
+    int end_as = unitsremaining();
+
+    if (begin_as == end_as)
+      return false;
+
     return !factionwon();
+  }
+
+  const faction &winningfaction() const { return winning; }
+
+  void addboost(int boost) {
+    for (auto g : factions[IMMUNESYSTEM]) {
+      // std::cout << "adding boost " << boost << std::endl;
+      g->addboost(boost);
+    }
   }
 
   int unitsremaining() const {
@@ -367,10 +420,51 @@ int main() {
     }
   }
 
+  armies startup(sickness);
+
   while (sickness.battle()) {
   }
 
   logger::get(logtype::logINFO)
       << "Part 1: " << sickness.unitsremaining() << std::endl;
+
+  int minboost = 0;
+  int maxboost = 1;
+
+  while (true) {
+
+    armies notsick(startup);
+    notsick.addboost(maxboost);
+
+    while (notsick.battle()) {
+    }
+
+    if (notsick.winningfaction() == IMMUNESYSTEM)
+      break;
+
+    maxboost *= 2;
+  }
+
+  while ((maxboost - minboost) != 1) {
+    int middle = (maxboost + minboost) / 2;
+
+    armies notsick(startup);
+    notsick.addboost(middle);
+    while (notsick.battle()) {
+    }
+    if (notsick.winningfaction() == IMMUNESYSTEM) {
+      maxboost = middle;
+    } else {
+      minboost = middle;
+    }
+  }
+
+  armies notsick(startup);
+  notsick.addboost(maxboost);
+  while (notsick.battle()) {
+  }
+  logger::get(logtype::logINFO)
+      << "Part 2: " << notsick.unitsremaining() << std::endl;
+
   return 0;
 }
