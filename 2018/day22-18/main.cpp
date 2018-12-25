@@ -83,6 +83,9 @@ class cave {
 
   int findpath() {
 
+    int maxx = 0;
+    int maxy = 0;
+
     std::vector<position> directions = {
         std::make_pair(0, -1), std::make_pair(+1, 0), std::make_pair(0, +1),
         std::make_pair(-1, 0)};
@@ -110,6 +113,11 @@ class cave {
     while ((map.find(tt) == map.end()) && (pq.size() != 0)) {
       current = pq.top();
       pq.pop();
+
+      if (current.first.first.first > maxx)
+        maxx = current.first.first.first;
+      if (current.first.first.second > maxy)
+        maxy = current.first.first.second;
 
       mappair next = current;
       postool &nextpt = next.first;
@@ -159,6 +167,7 @@ class cave {
         }
       }
     }
+    // std::cout << maxx << "," << maxy << std::endl;
     return map[tt];
   }
 
@@ -258,6 +267,11 @@ int main() {
   int depth = 3339;
   int x = 10;
   int y = 715;
+
+  // real esther
+  // int depth = 7305;
+  // int x = 13;
+  // int y = 734;
 
   // test
   // int depth = 510;

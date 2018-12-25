@@ -439,6 +439,11 @@ public:
     sort(gnomes);
 
     while (turn(count + 1)) {
+      std::cout << "==============================\n";
+      std::cout << "Turn: " << count + 1 << std::endl;
+      std::cout << "------------------------------\n";
+      print();
+      std::cout << "==============================\n";
       ++count;
     }
 
@@ -480,6 +485,7 @@ int main() {
 
   int battlescore = m.battle();
   logger::get(logtype::logINFO) << "Part 1: " << battlescore << "\n";
+  return 0;
 
   int bs;
   bool nf = true;

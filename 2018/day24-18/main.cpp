@@ -65,12 +65,12 @@ public:
     os << "  damagetype: " << g->dt << std::endl;
     os << "  damage: " << g->damage << std::endl;
     os << "  initiative: " << g->initiative << std::endl;
-
-    for (auto d : g->defenses) {
-      os << "     " << d.first << std::endl;
-      for (auto dt : d.second)
-        os << "       " << dt << std::endl;
-    }
+    /*
+        for (auto d : g->defenses) {
+          os << "     " << d.first << std::endl;
+          for (auto dt : d.second)
+            os << "       " << dt << std::endl;
+        }*/
     return os;
   }
 
@@ -271,6 +271,7 @@ public:
   }
 
   bool battle() {
+    // std::cout << "=====================================================\n";
     int begin_as = unitsremaining();
     // std::cout << "Going to select targets" << std::endl;
     targetselection();
@@ -280,6 +281,14 @@ public:
     cleanupgroups();
     // std::cout << "After battle there are " << groups.size()
     //           << " groups active. " << std::endl;
+
+    // for (auto g : groups) {
+    //   std::cout << "----------------\n";
+    //   std::cout << g << std::endl;
+    //   std::cout << "----------------\n";
+    // }
+
+    // std::cout << "=====================================================\n";
     int end_as = unitsremaining();
 
     if (begin_as == end_as)
