@@ -128,10 +128,7 @@ int main() {
     presize = constellations.size();
     constellations = merge_constellations(constellations, 3);
     postsize = constellations.size();
-    std::cout << postsize << "...";
   }
-  std::cout << std::endl;
-  //  print_constellations(constellations);
 
   logger::get(logtype::logINFO)
       << "Part 1: " << constellations.size() << std::endl;
