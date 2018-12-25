@@ -14,7 +14,7 @@ include_directories(${PROJECT_SOURCE_DIR}/general)
 # adding a project
 project (AoC)
 
-set(TARGETS2018 day01-18 day02-18 day03-18 day04-18 day05-18 day06-18 day07-18 day08-18 day09-18 day10-18 day11-18)
+set(TARGETS2018 day01-18 day02-18 day03-18 day04-18 day05-18 day06-18 day07-18 day08-18 day09-18 day10-18 day11-18 day12-18 day13-18 day14-18 day15-18 day16-18 day17-18 day18-18 day19-18 day20-18 day21-18 day22-18 day23-18 day24-18 day25-18)
 FOREACH(t ${TARGETS2018})
     # add_executable(${t} ${PROJECT_SOURCE_DIR}/2018/${t}/main.cpp ${PROJECT_SOURCE_DIR}/general/logger.cpp ${PROJECT_SOURCE_DIR}/general/basetimer.cpp)
     add_executable(${t} ${PROJECT_SOURCE_DIR}/2018/${t}/main.cpp ${PROJECT_SOURCE_DIR}/general/logger.cpp)
@@ -47,3 +47,7 @@ target_include_directories( 10ms PUBLIC ${PROJECT_SOURCE_DIR}/general )
 add_executable(14ms ${PROJECT_SOURCE_DIR}/2017/14ms/main.cpp ${PROJECT_SOURCE_DIR}/general/knot.cpp ${PROJECT_SOURCE_DIR}/general/logger.cpp)
 set_target_properties( 14ms PROPERTIES RUNTIME_OUTPUT_DIRECTORY 2017/14ms/ )
 target_include_directories( 14ms PUBLIC ${PROJECT_SOURCE_DIR}/general )
+
+add_executable(day15-18-new ${PROJECT_SOURCE_DIR}/2018/day15-18/main2.cpp ${PROJECT_SOURCE_DIR}/general/logger.cpp)
+set_target_properties( day15-18-new PROPERTIES RUNTIME_OUTPUT_DIRECTORY 2018/day15-18/ )
+target_include_directories( day15-18-new PUBLIC ${PROJECT_SOURCE_DIR}/general )
