@@ -47,7 +47,3 @@ target_include_directories( 10ms PUBLIC ${PROJECT_SOURCE_DIR}/general )
 add_executable(14ms ${PROJECT_SOURCE_DIR}/2017/14ms/main.cpp ${PROJECT_SOURCE_DIR}/general/knot.cpp ${PROJECT_SOURCE_DIR}/general/logger.cpp)
 set_target_properties( 14ms PROPERTIES RUNTIME_OUTPUT_DIRECTORY 2017/14ms/ )
 target_include_directories( 14ms PUBLIC ${PROJECT_SOURCE_DIR}/general )
-
-add_executable(day15-18-new ${PROJECT_SOURCE_DIR}/2018/day15-18/main2.cpp ${PROJECT_SOURCE_DIR}/general/logger.cpp)
-set_target_properties( day15-18-new PROPERTIES RUNTIME_OUTPUT_DIRECTORY 2018/day15-18/ )
-target_include_directories( day15-18-new PUBLIC ${PROJECT_SOURCE_DIR}/general )
