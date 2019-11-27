@@ -1,3 +1,3 @@
 cd $1
-cargo run
+cargo run --release
 cd ..

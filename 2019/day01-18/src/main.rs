@@ -2,6 +2,7 @@ use std::fs::File;
 use std::io::{self, BufRead};
 use std::path::Path;
 use std::collections::HashSet;
+use std::time::{Instant};
 
 fn main() {
     println!("Day 1, 2018");
@@ -12,6 +13,8 @@ fn main() {
     let mut current_freq: i64 = 0;
     let mut mutations = Vec::new();
 
+    let start = Instant::now();
+
     if let Ok(lines) = read_lines(input_file) {
         for line in lines {
             if let Ok(value) = line {
@@ -21,7 +24,9 @@ fn main() {
             }
         }
     }
-    println!("Part 1: {}", current_freq);
+
+    let after_part1 = Instant::now();
+    println!("Part 1: {}, in {:?}", current_freq, after_part1.duration_since(start));
 
     let mut frequencies = HashSet::new();
     current_freq = 0;
@@ -37,8 +42,9 @@ fn main() {
         }
         current += 1;
     }
+    let after_part2 = Instant::now();
 
-    println!("Part 2: {}", current_freq);
+    println!("Part 2: {}, in {:?}", current_freq, after_part2.duration_since(after_part1));
 
 }
 
