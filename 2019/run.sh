@@ -1,1 +1,3 @@
-cargo run --manifest-path $1/Cargo.toml
+cd $1
+cargo run
+cd ..
