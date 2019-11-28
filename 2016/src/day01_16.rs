@@ -3,6 +3,7 @@ use std::time::{Instant};
 
 use super::tools;
 
+#[allow(dead_code)]
 pub fn run() {
     println!("Day 1 of 2016");
 
