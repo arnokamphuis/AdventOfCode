@@ -1,9 +1,0 @@
-[package]
-name = "day01-19"
-version = "0.1.0"
-authors = ["Arno Kamphuis <arno.kamphuis@hu.nl>"]
-edition = "2018"
-
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
-
-[dependencies]

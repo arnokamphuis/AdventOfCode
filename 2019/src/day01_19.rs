@@ -1,6 +1,6 @@
 use std::time::{Instant};
 
-fn main() {
+pub fn run() {
     println!("Day 1 of 2019");
 
     let start1 = Instant::now();
