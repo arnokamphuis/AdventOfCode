@@ -8,3 +8,5 @@ edition = "2018"
 
 [dependencies]
 order-stat = "0.1"
+md5="0.1"
+hex="0.4.0"
