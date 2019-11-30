@@ -1,5 +1,5 @@
 use std::collections::HashMap;
-use std::time::{Instant};
+use std::time::Instant;
 
 use super::tools;
 
@@ -13,16 +13,15 @@ struct Bot {
 struct Bots {
     responsible_bot: usize,
     bots: HashMap<usize, Bot>,
-    output: Vec<(usize,u64)>
+    output: Vec<(usize, u64)>,
 }
 
 impl Bots {
-
     fn new() -> Bots {
         Bots {
             responsible_bot: std::usize::MAX,
             bots: HashMap::new(),
-            output: vec![]
+            output: vec![],
         }
     }
     fn add_bot(&mut self, b: Bot) {
@@ -48,16 +47,16 @@ impl Bots {
 
                 b.remove_chip(low);
                 if to_low < 0 {
-                    self.output.push((-to_low as usize -1, low));
+                    self.output.push((-to_low as usize - 1, low));
                 } else {
-                    mutations.push((to_low as usize -1, low));
+                    mutations.push((to_low as usize - 1, low));
                 }
 
                 b.remove_chip(high);
                 if to_high < 0 {
-                    self.output.push((-to_high as usize -1, high));
+                    self.output.push((-to_high as usize - 1, high));
                 } else {
-                    mutations.push((to_high as usize -1, high));
+                    mutations.push((to_high as usize - 1, high));
                 }
             }
         }
@@ -79,54 +78,54 @@ impl Bots {
         }
         mult
     }
-
 }
 
 impl Bot {
-  // Construct a bot
-  fn new(identifier: usize, ht: i64, lt: i64) -> Bot {
-    Bot {
-      id: identifier, high_to: ht, low_to: lt, chips: vec![]
+    // Construct a bot
+    fn new(identifier: usize, ht: i64, lt: i64) -> Bot {
+        Bot {
+            id: identifier,
+            high_to: ht,
+            low_to: lt,
+            chips: vec![],
+        }
     }
-  }
 
-  fn needs_processing(&self) -> bool {
-    self.chips.len()==2
-  }
-
-  // add chips
-  fn add_chip(&mut self, v: u64) {
-    self.chips.push(v);
-  }
-
-  fn remove_chip(&mut self, v: u64) {
-    self.chips.retain(|&x| x != v);
-  }
-
-  fn get_high(&self) -> u64 {
-    if self.chips.len()==0 {
-      println!("ERROR");
-      0
-    } else if self.chips.len()==1 {
-      self.chips[0]
-    } else {
-      std::cmp::max(self.chips[0], self.chips[1])
+    fn needs_processing(&self) -> bool {
+        self.chips.len() == 2
     }
-  }
 
-  fn get_low(&self) -> u64 {
-    if self.chips.len()==0 {
-      println!("ERROR");
-      0
-    } else if self.chips.len()==1 {
-      self.chips[0]
-    } else {
-      std::cmp::min(self.chips[0], self.chips[1])
+    // add chips
+    fn add_chip(&mut self, v: u64) {
+        self.chips.push(v);
     }
-  }
 
+    fn remove_chip(&mut self, v: u64) {
+        self.chips.retain(|&x| x != v);
+    }
+
+    fn get_high(&self) -> u64 {
+        if self.chips.len() == 0 {
+            println!("ERROR");
+            0
+        } else if self.chips.len() == 1 {
+            self.chips[0]
+        } else {
+            std::cmp::max(self.chips[0], self.chips[1])
+        }
+    }
+
+    fn get_low(&self) -> u64 {
+        if self.chips.len() == 0 {
+            println!("ERROR");
+            0
+        } else if self.chips.len() == 1 {
+            self.chips[0]
+        } else {
+            std::cmp::min(self.chips[0], self.chips[1])
+        }
+    }
 }
-
 
 #[allow(dead_code)]
 pub fn run() {
@@ -147,8 +146,8 @@ pub fn run() {
         }
     }
 
-    let mut bots : Bots = Bots::new();
-    let mut values : Vec<(usize, u64)> = vec![];
+    let mut bots: Bots = Bots::new();
+    let mut values: Vec<(usize, u64)> = vec![];
     for operation in &input {
         let mut tokens = operation.split_whitespace();
         let type_of_operation = tokens.next().unwrap();
@@ -159,7 +158,7 @@ pub fn run() {
                 tokens.next();
                 tokens.next();
                 let b = tokens.next().unwrap().parse::<usize>().unwrap();
-                values.push((b,v));
+                values.push((b, v));
             }
             "bot" => {
                 let b_id = tokens.next().unwrap().parse::<usize>().unwrap();
@@ -167,7 +166,7 @@ pub fn run() {
                 tokens.next(); // low
                 tokens.next(); // to
                 let mut target = tokens.next().unwrap(); // output or bot
-                let mut low_id = tokens.next().unwrap().parse::<i64>().unwrap()+1;
+                let mut low_id = tokens.next().unwrap().parse::<i64>().unwrap() + 1;
                 if target == "output" {
                     low_id = -low_id;
                 }
@@ -175,12 +174,12 @@ pub fn run() {
                 tokens.next(); // high
                 tokens.next(); // to
                 target = tokens.next().unwrap(); // output or bot
-                let mut high_id = tokens.next().unwrap().parse::<i64>().unwrap()+1;
+                let mut high_id = tokens.next().unwrap().parse::<i64>().unwrap() + 1;
                 if target == "output" {
                     high_id = -high_id;
                 }
                 // println!("Created bot {} with targets {}, {}", b_id, high_id, low_id);
-                let b = Bot::new(b_id, high_id,low_id);
+                let b = Bot::new(b_id, high_id, low_id);
                 bots.add_bot(b);
             }
             _ => {}
@@ -193,11 +192,15 @@ pub fn run() {
     while bots.process() {}
 
     let after1 = Instant::now();
-    println!("Part 1: {}, in {:?}", &bots.responsible_bot, after1.duration_since(start1));
+    println!(
+        "Part 1: {}, in {:?}",
+        &bots.responsible_bot,
+        after1.duration_since(start1)
+    );
 
     let start2 = Instant::now();
 
-    let mult = bots.multiply_outputs(vec![0,1,2,]);
+    let mult = bots.multiply_outputs(vec![0, 1, 2]);
 
     let after2 = Instant::now();
     println!("Part 2: {}, in {:?}", mult, after2.duration_since(start2));

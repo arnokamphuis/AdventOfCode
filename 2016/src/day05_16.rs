@@ -1,6 +1,6 @@
 // use std::collections::HashSet;
-use std::time::{Instant};
 use md5;
+use std::time::Instant;
 extern crate hex;
 // use super::tools;
 
@@ -10,7 +10,7 @@ pub fn run() {
 
     let door_id = "ffykfhsq";
     // let door_id = "abc";
-    
+
     let start1 = Instant::now();
 
     let mut code = String::from("");
@@ -57,7 +57,7 @@ pub fn run() {
                 }
             }
             number += 1;
-            if found {                
+            if found {
                 // println!("hash is {:?}", hex);
                 let pos = (hex.chars().nth(5).unwrap() as u8 - '0' as u8) as usize;
                 let val = hex.chars().nth(6).unwrap();
@@ -80,7 +80,3 @@ pub fn run() {
     let after2 = Instant::now();
     println!("Part 2: {}, in {:?}", code, after2.duration_since(start2));
 }
-
-
-
-

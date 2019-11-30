@@ -1,5 +1,5 @@
 use std::collections::HashMap;
-use std::time::{Instant};
+use std::time::Instant;
 
 use super::tools;
 
@@ -26,20 +26,20 @@ pub fn run() {
 
     let mut count = 0;
     for line in &input {
-        let len = line.len()-6;
+        let len = line.len() - 6;
         let checksum = &line[len..][..5];
-        let rooms = &line[..len-1];
-        let lastdash:usize = rooms.rfind('-').unwrap();
-        let sector_id = &rooms[lastdash+1..].parse::<i32>().unwrap();
+        let rooms = &line[..len - 1];
+        let lastdash: usize = rooms.rfind('-').unwrap();
+        let sector_id = &rooms[lastdash + 1..].parse::<i32>().unwrap();
         let realrooms = &rooms[..lastdash];
         let words = realrooms.split('-');
 
         let mut frequency: HashMap<char, u32> = HashMap::new();
-        for word in words { 
+        for word in words {
             for c in word.chars() {
                 *frequency.entry(c).or_insert(0) += 1;
             }
-        } 
+        }
         let mut count_vec: Vec<(&char, &u32)> = frequency.iter().collect();
         count_vec.sort_by(|b, a| b.0.cmp(a.0));
         count_vec.sort_by(|a, b| b.1.cmp(a.1));
@@ -51,7 +51,7 @@ pub fn run() {
             }
             if csum == String::from(checksum) {
                 count += sector_id;
-                therooms.push((*sector_id,realrooms));
+                therooms.push((*sector_id, realrooms));
                 // println!("freq: {:?}", csum);
             }
         }
@@ -70,8 +70,10 @@ pub fn run() {
         for rnc in roomname.chars() {
             let mut nc = ' ';
             if rnc != '-' {
-                
-                nc = std::char::from_u32( ((((rnc as u8) - ('a' as u8) + rotate as u8) % 26) + ('a' as u8)) as u32 ).unwrap();
+                nc = std::char::from_u32(
+                    ((((rnc as u8) - ('a' as u8) + rotate as u8) % 26) + ('a' as u8)) as u32,
+                )
+                .unwrap();
             }
             newname.push(nc);
         }
@@ -81,5 +83,9 @@ pub fn run() {
     }
 
     let after2 = Instant::now();
-    println!("Part 2: {}, in {:?}", northpolesector, after2.duration_since(start2));
+    println!(
+        "Part 2: {}, in {:?}",
+        northpolesector,
+        after2.duration_since(start2)
+    );
 }

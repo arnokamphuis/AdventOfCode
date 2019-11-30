@@ -1,4 +1,3 @@
-mod tools;
 mod day01_16;
 mod day02_16;
 mod day03_16;
@@ -9,6 +8,7 @@ mod day07_16;
 mod day08_16;
 mod day09_16;
 mod day10_16;
+mod tools;
 
 fn main() {
     // day01_16::run();

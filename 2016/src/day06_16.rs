@@ -1,5 +1,5 @@
 use std::collections::HashMap;
-use std::time::{Instant};
+use std::time::Instant;
 
 use super::tools;
 
@@ -54,5 +54,9 @@ pub fn run() {
     let start2 = Instant::now();
 
     let after2 = Instant::now();
-    println!("Part 2: {}, in {:?}", modcode, after2.duration_since(start2));
+    println!(
+        "Part 2: {}, in {:?}",
+        modcode,
+        after2.duration_since(start2)
+    );
 }

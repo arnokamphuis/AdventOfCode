@@ -1,5 +1,5 @@
 use std::collections::HashSet;
-use std::time::{Instant};
+use std::time::Instant;
 
 use super::tools;
 
@@ -13,10 +13,10 @@ pub fn run() {
     let start1 = Instant::now();
 
     let mut current_dir = 'n';
-    let mut prev_pos = (0,0);
-    let mut current_pos = (0,0);
+    let mut prev_pos = (0, 0);
+    let mut current_pos = (0, 0);
     let mut positions = HashSet::new();
-    let mut revisited = (0,0);
+    let mut revisited = (0, 0);
     let mut foundone: bool = false;
 
     positions.insert(current_pos);
@@ -24,36 +24,60 @@ pub fn run() {
     if let Ok(lines) = tools::read_lines(input_file) {
         for line in lines {
             if let Ok(value) = line {
-
                 for v in value.split(", ") {
                     let direction = v.chars().next().unwrap();
                     let delta = v[1..].parse::<i64>().unwrap();
                     match direction {
-                        'R' => {
-                            match current_dir {
-                                'n' => { current_dir = 'e'; current_pos.0 += delta; }
-                                'e' => { current_dir = 's'; current_pos.1 -= delta; }
-                                's' => { current_dir = 'w'; current_pos.0 -= delta; }
-                                'w' => { current_dir = 'n'; current_pos.1 += delta; }
-                                _ => { println!("ERROR"); }
+                        'R' => match current_dir {
+                            'n' => {
+                                current_dir = 'e';
+                                current_pos.0 += delta;
                             }
-                        }
-                        'L' => {
-                            match current_dir {
-                                'n' => { current_dir = 'w'; current_pos.0 -= delta; }
-                                'e' => { current_dir = 'n'; current_pos.1 += delta; }
-                                's' => { current_dir = 'e'; current_pos.0 += delta; }
-                                'w' => { current_dir = 's'; current_pos.1 -= delta; }
-                                _ => { println!("ERROR"); }
+                            'e' => {
+                                current_dir = 's';
+                                current_pos.1 -= delta;
                             }
-
+                            's' => {
+                                current_dir = 'w';
+                                current_pos.0 -= delta;
+                            }
+                            'w' => {
+                                current_dir = 'n';
+                                current_pos.1 += delta;
+                            }
+                            _ => {
+                                println!("ERROR");
+                            }
+                        },
+                        'L' => match current_dir {
+                            'n' => {
+                                current_dir = 'w';
+                                current_pos.0 -= delta;
+                            }
+                            'e' => {
+                                current_dir = 'n';
+                                current_pos.1 += delta;
+                            }
+                            's' => {
+                                current_dir = 'e';
+                                current_pos.0 += delta;
+                            }
+                            'w' => {
+                                current_dir = 's';
+                                current_pos.1 -= delta;
+                            }
+                            _ => {
+                                println!("ERROR");
+                            }
+                        },
+                        _ => {
+                            println!("ERROR IN DIRECTION");
                         }
-                        _ => { println!("ERROR IN DIRECTION");}
                     }
 
-                    let mut dvec = (0,0);
-                    dvec.0 = (current_pos.0 - prev_pos.0)/delta;
-                    dvec.1 = (current_pos.1 - prev_pos.1)/delta;
+                    let mut dvec = (0, 0);
+                    dvec.0 = (current_pos.0 - prev_pos.0) / delta;
+                    dvec.1 = (current_pos.1 - prev_pos.1) / delta;
                     for _i in 0..delta {
                         prev_pos.0 += dvec.0;
                         prev_pos.1 += dvec.1;
@@ -69,12 +93,19 @@ pub fn run() {
         }
     }
 
-
     let after1 = Instant::now();
-    println!("Part 1: {}, in {:?}", (current_pos.0.abs() + current_pos.1.abs()), after1.duration_since(start1));
+    println!(
+        "Part 1: {}, in {:?}",
+        (current_pos.0.abs() + current_pos.1.abs()),
+        after1.duration_since(start1)
+    );
 
     let start2 = Instant::now();
 
     let after2 = Instant::now();
-    println!("Part 2: {}, in {:?}",  (revisited.0.abs() + revisited.1.abs()), after2.duration_since(start2));
+    println!(
+        "Part 2: {}, in {:?}",
+        (revisited.0.abs() + revisited.1.abs()),
+        after2.duration_since(start2)
+    );
 }

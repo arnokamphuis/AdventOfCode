@@ -1,5 +1,4 @@
-use std::time::{Instant};
-extern crate queues;
+use std::time::Instant;
 
 use super::tools;
 
@@ -39,24 +38,27 @@ pub fn run() {
                 q.remove(0);
             }
             if q.len() == 4 {
-                if q[0]==q[3] && q[1]==q[2] && q[1]!=q[0] {
+                if q[0] == q[3] && q[1] == q[2] && q[1] != q[0] {
                     if mode {
                         valid = true;
                     } else {
                         valid = false;
                         break;
                     }
-
                 }
             }
         }
         if valid {
-            counter+=1;
+            counter += 1;
         }
     }
 
     let after1 = Instant::now();
-    println!("Part 1: {}, in {:?}", counter, after1.duration_since(start1));
+    println!(
+        "Part 1: {}, in {:?}",
+        counter,
+        after1.duration_since(start1)
+    );
 
     let start2 = Instant::now();
 
@@ -79,9 +81,9 @@ pub fn run() {
                 q.remove(0);
             }
             if q.len() == 3 {
-                if q[0]==q[2] && q[1]!=q[2] && !(q.contains(&'[') || q.contains(&']')) {
+                if q[0] == q[2] && q[1] != q[2] && !(q.contains(&'[') || q.contains(&']')) {
                     if mode {
-                        let inverseq: Vec<char> = vec![q[1],q[0],q[1]];
+                        let inverseq: Vec<char> = vec![q[1], q[0], q[1]];
                         hypernet.push(inverseq.to_vec());
                     } else {
                         supernet.push(q.to_vec());
@@ -105,10 +107,14 @@ pub fn run() {
         hypernet.clear();
 
         if valid {
-            counter+=1;
+            counter += 1;
         }
     }
 
     let after2 = Instant::now();
-    println!("Part 2: {}, in {:?}", counter, after2.duration_since(start2));
+    println!(
+        "Part 2: {}, in {:?}",
+        counter,
+        after2.duration_since(start2)
+    );
 }
