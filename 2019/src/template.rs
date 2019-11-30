@@ -2,10 +2,10 @@ use std::time::{Instant};
 use super::tools;
 
 pub fn run() {
-    println!("Day 1 of 2019");
+    println!("Day xx of 2019");
 
-    let input_file = "./input/day01_19_test.txt";
-    // let input_file = "./input/day01_19_real.txt";
+    let input_file = "./input/dayxx_19_test.txt";
+    // let input_file = "./input/dayxx_19_real.txt";
 
     let start1 = Instant::now();
 
