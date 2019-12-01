@@ -6,10 +6,9 @@ pub fn run() {
 
     let input_file = "./input/dayxx_19_test.txt";
     // let input_file = "./input/dayxx_19_real.txt";
+    let input = tools::get_input(String::from(input_file));
 
     let start1 = Instant::now();
-
-    let input = tools::get_input(String::from(input_file));
 
     let after1 = Instant::now();
     println!("Part 1: {}, in {:?}", 0, after1.duration_since(start1));

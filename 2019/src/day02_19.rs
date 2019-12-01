@@ -1,7 +1,12 @@
 use std::time::{Instant};
+use super::tools;
 
 pub fn run() {
     println!("Day 2 of 2019");
+
+    let input_file = "./input/day02_19_test.txt";
+    // let input_file = "./input/day02_19_real.txt";
+    let input = tools::get_input(String::from(input_file));
 
     let start1 = Instant::now();
 
