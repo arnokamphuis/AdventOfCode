@@ -15,7 +15,7 @@ pub fn run() {
 
     let start1 = Instant::now();
 
-    let mut fuel: i64 = input.clone().into_iter()
+    let mut fuel: i64 = (&input).into_iter()
         .map(|n| n.parse::<i64>().unwrap())
         .map(|mass| mass / 3 - 2)
         .sum::<i64>();
@@ -25,7 +25,7 @@ pub fn run() {
 
     let start2 = Instant::now();
 
-    fuel = input.clone().into_iter()
+    fuel = (&input).into_iter()
         .map(|n| n.parse::<i64>().unwrap())
         .map(|mass| calculate_fuel(mass))
         .sum::<i64>();
