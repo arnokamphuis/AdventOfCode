@@ -7,6 +7,7 @@ struct IntCodeComputer {
 }
 
 impl IntCodeComputer {
+
     fn new(m: &Vec<u64>) -> IntCodeComputer {
         IntCodeComputer {
             memory: m.clone(),
@@ -23,26 +24,19 @@ impl IntCodeComputer {
         let mut result = true;
         loop {
             let opcode = self.memory[self.pc+0];
+            const PARAMSIZE: usize = 3;
+
+            
+            let memaddr: Vec<usize> = if opcode == 1 || opcode == 2 
+                { self.memory[self.pc+1..self.pc+PARAMSIZE+1].iter().filter_map(|s| Some(*s as usize)).collect() } 
+            else 
+                { vec![] } ;
+
             match opcode {
-                1 => {
-                    let memaddr1 = self.memory[self.pc+1] as usize;
-                    let memaddr2 = self.memory[self.pc+2] as usize;
-                    let memaddr3 = self.memory[self.pc+3] as usize;
-                    self.memory[memaddr3] = self.memory[memaddr1] + self.memory[memaddr2];
-                }
-                2 => {
-                    let memaddr1 = self.memory[self.pc+1] as usize;
-                    let memaddr2 = self.memory[self.pc+2] as usize;
-                    let memaddr3 = self.memory[self.pc+3] as usize;
-                    self.memory[memaddr3] = self.memory[memaddr1] * self.memory[memaddr2];
-                }
-                99 => {
-                    break;
-                }
-                _ => {
-                    result = false;
-                    break;
-                }
+                1 => { self.memory[memaddr[2]] = self.memory[memaddr[0]] + self.memory[memaddr[1]]; }
+                2 => { self.memory[memaddr[2]] = self.memory[memaddr[0]] * self.memory[memaddr[1]]; }
+                99 => { break; }
+                _ => { result = false; break; }
             }
             self.pc += 4;
         }
@@ -73,8 +67,8 @@ pub fn run() {
 
     let start2 = Instant::now();
 
-    let mut res_verb = 0; 
-    let mut res_noun = 0; 
+    let mut res_verb = 0;
+    let mut res_noun = 0;
     for verb in 0..100 {
         for noun in 0..100 {
             let mut computer = IntCodeComputer::new(&commands);
@@ -84,7 +78,7 @@ pub fn run() {
                 res_noun = noun;
                 res_verb = verb;
                 break;
-            }        
+            }
         }
     }
 
