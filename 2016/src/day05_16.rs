@@ -20,7 +20,7 @@ pub fn run() {
         loop {
             let door = String::from(door_id) + &number.to_string();
             let hash = md5::compute(door.as_bytes());
-            let hex = hex::encode(hash);
+            let hex = format!("{:x}",hash);
             let mut found = true;
             for c in hex[0..5].chars() {
                 if c != '0' {
@@ -49,7 +49,7 @@ pub fn run() {
         loop {
             let door = String::from(door_id) + &number.to_string();
             let hash = md5::compute(door.as_bytes());
-            let hex = hex::encode(hash);
+            let hex = format!("{:x}",hash);
             let mut found = true;
             for c in hex[0..5].chars() {
                 if c != '0' {
