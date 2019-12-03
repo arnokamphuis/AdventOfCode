@@ -87,6 +87,7 @@ fn get_lines(line: &String) -> Vec<Line> {
     res
 }
 
+#[allow(dead_code)]
 pub fn run() {
     println!("Day 03 of 2019");
 
@@ -119,10 +120,10 @@ pub fn run() {
     let after1 = Instant::now();
     println!("Part 1: {}, in {:?}", mindist, after1.duration_since(start1));
 
+    let start2 = Instant::now();
+
     let mut min_duration: i64 = std::i64::MAX;
     intersections.iter().for_each( |inter| min_duration = std::cmp::min(min_duration, (inter.1).0 + (inter.1).1) );
-
-    let start2 = Instant::now();
 
     let after2 = Instant::now();
     println!("Part 2: {}, in {:?}", min_duration, after2.duration_since(start2));

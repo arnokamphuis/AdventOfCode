@@ -51,7 +51,7 @@ pub fn run() {
 
     let start1 = Instant::now();
 
-    let mut mindist = std::i64::MAX;
+    let mut mindist: i64 = std::i64::MAX;
     let mut mindura: i64 = std::i64::MAX;
 
     points1.iter().for_each( |(p1, _)| if points2.contains_key(p1) {
