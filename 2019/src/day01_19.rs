@@ -6,6 +6,7 @@ fn calculate_fuel(mass: i64) -> i64 {
     if fuel_for_mass <= 0 { 0 } else { fuel_for_mass + calculate_fuel(fuel_for_mass) }
 }
 
+#[allow(dead_code)]
 pub fn run() {
     println!("Day 1 of 2019");
 
