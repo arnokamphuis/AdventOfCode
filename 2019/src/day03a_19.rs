@@ -9,6 +9,7 @@ struct Point {
 }
 
 
+#[allow(dead_code)]
 fn get_points(line: &String) -> HashMap<Point, i64> {
     let mut res : HashMap<Point, i64> = HashMap::new();
     let mut c_pos = Point{x:0,y:0};
@@ -34,6 +35,7 @@ fn get_points(line: &String) -> HashMap<Point, i64> {
     res
 }
 
+#[allow(dead_code)]
 pub fn run() {
     println!("Day 03 of 2019");
 
