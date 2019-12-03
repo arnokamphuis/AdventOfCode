@@ -28,7 +28,11 @@ fn get_intersect(l1: &Line, l2: &Line) -> Option<((i64,i64), (i64,i64))> {
         if minv < h.b.1 && h.b.1 < maxv && minh < v.b.0 && v.b.0 < maxh {
             let d1 = (v.b.0 - h.b.0).abs() + h.bt;
             let d2 = (h.b.1 - v.b.1).abs() + v.bt;
-            Some(((v.b.0, h.b.1), (d1,d2))) 
+            if v.b.0 == 0 && h.b.1 == 0 {
+                None
+            } else {
+                Some(((v.b.0, h.b.1), (d1,d2))) 
+            }
         } else {
             None
         }
@@ -44,7 +48,11 @@ fn get_intersect(l1: &Line, l2: &Line) -> Option<((i64,i64), (i64,i64))> {
         if minv < h.b.1 && h.b.1 < maxv && minh < v.b.0 && v.b.0 < maxh {
             let d1 = (v.b.1 - h.b.1).abs() + v.bt;
             let d2 = (h.b.0 - v.b.0).abs() + h.bt;
-            Some(((v.b.0, h.b.1), (d1,d2))) 
+            if v.b.0 == 0 && h.b.1 == 0 {
+                None
+            } else {
+                Some(((v.b.0, h.b.1), (d1,d2))) 
+            }
         } else {
             None
         }
@@ -102,10 +110,8 @@ pub fn run() {
     lines1.iter().for_each( |l1|
         lines2.iter().for_each( |l2|
             if let Some(inter) = get_intersect(&l1,&l2) {
-                if !((inter.0).0 == 0 && (inter.0).1 == 0) { // remove origin
-                    mindist = std::cmp::min((inter.0).0.abs() + (inter.0).1.abs(),mindist);
-                    intersections.push( inter ); // store for part 2
-                }
+                mindist = std::cmp::min((inter.0).0.abs() + (inter.0).1.abs(),mindist);
+                intersections.push( inter ); // store for part 2
             }
         )
     );
