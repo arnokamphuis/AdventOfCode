@@ -9,6 +9,6 @@ fn main() {
     // day01_19::run();
     // day02_19::run();
     // day03_19::run();
-    day03a_19::run();
-    // day04_19::run();
+    // day03a_19::run();
+    day04_19::run();
 }
