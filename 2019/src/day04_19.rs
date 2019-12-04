@@ -51,14 +51,15 @@ pub fn run() {
     let start2 = Instant::now();
     
     count = 0;
-    for i in 172851..675870 {
-        const RADIX: u32 = 10;
+
+    (172851..675870).into_iter().for_each(|i| {
         format!("{}",i).chars().enumerate().for_each(|(i,v)| code[i] = v.to_digit(RADIX).unwrap() as u8);
         if check_rules(&code, true) {
-            // println!("{:?}", code);
+            // let chr_strings : Vec<String> = code.iter().map(|i| i.to_string()).collect();
+            // println!("{}", chr_strings.join(""));
             count += 1;
         }
-    }
+    });
 
     let after2 = Instant::now();
     println!("Part 2: {}, in {:?}", count, after2.duration_since(start2));
