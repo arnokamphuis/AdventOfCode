@@ -51,7 +51,6 @@ pub fn run() {
     let start2 = Instant::now();
     
     count = 0;
-
     (172851..675870).into_iter().for_each(|i| {
         format!("{}",i).chars().enumerate().for_each(|(i,v)| code[i] = v.to_digit(RADIX).unwrap() as u8);
         if check_rules(&code, true) {
