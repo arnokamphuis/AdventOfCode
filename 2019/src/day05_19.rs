@@ -46,10 +46,10 @@ impl IntCodeComputer {
 
 #[allow(dead_code)]
 pub fn run() {
-    println!("Day 2 of 2019");
+    println!("Day 5 of 2019");
 
-    // let input_file = "./input/day02_19_test.txt";
-    let input_file = "./input/day02_19_real.txt";
+    let input_file = "./input/day05_19_test.txt";
+    // let input_file = "./input/day05_19_real.txt";
     let input = tools::get_input(String::from(input_file));
     let line = &input[0];
     let command_strings: Vec<&str> = line.split(",").collect();
