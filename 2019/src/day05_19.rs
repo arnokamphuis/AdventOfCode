@@ -29,6 +29,7 @@ impl IntCodeComputer {
     fn run(&mut self) -> bool{
         let mut result = true;
         loop {
+            // let mut prev_instr = 0;
             let mut instructioncode: i64 = self.memory[self.pc+0];
             let opcode = instructioncode % 100;
 
@@ -54,13 +55,15 @@ impl IntCodeComputer {
 
             let mut paramsize: usize = 3;
 
-            let memaddr: Vec<usize> = if opcode == 1 || opcode == 2 
+            let memaddr: Vec<usize> = if opcode == 1 || opcode == 2 || opcode == 7 || opcode == 8
                 { paramsize = 3; self.memory[self.pc+1..self.pc+paramsize+1].iter().filter_map(|s| Some(*s as usize)).collect() } 
-            else if opcode == 3 || opcode ==4 
+            else if opcode == 3 || opcode == 4 
                 { paramsize = 1; self.memory[self.pc+1..self.pc+paramsize+1].iter().filter_map(|s| Some(*s as usize)).collect() } 
+            else if opcode == 5 || opcode == 6 
+                { paramsize = 2; self.memory[self.pc+1..self.pc+paramsize+1].iter().filter_map(|s| Some(*s as usize)).collect() } 
             else
                 { vec![] } ;
-
+            let mut pc_modified = false;
             match opcode {
                 1 => { 
                     let wpos = if modes[2]==Mode::POS { memaddr[2] } else { self.pc+3 }; 
@@ -88,10 +91,43 @@ impl IntCodeComputer {
                     //     println!(" Memory: {:?}", self.memory); 
                     // } 
                 }
+                5 => { // jump if true first paramter is non-zero ip is iset to parameter 2
+                    let val2test: i64 = if modes[0]==Mode::POS { self.memory[memaddr[0]] } else { self.memory[self.pc+1] };
+                    if val2test != 0 {
+                        let rpos = if modes[1]==Mode::POS { memaddr[1] } else { self.pc+2 }; 
+                        self.pc = self.memory[rpos as usize] as usize;
+                        pc_modified = true;
+                    }
+                }
+                6 => { // jump if false first paramter is non-zero ip is iset to parameter 2
+                    let val2test: i64 = if modes[0]==Mode::POS { self.memory[memaddr[0]] } else { self.memory[self.pc+1] };
+                    if val2test == 0 {
+                        let rpos = if modes[1]==Mode::POS { memaddr[1] } else { self.pc+2 }; 
+                        self.pc = self.memory[rpos as usize] as usize;
+                        pc_modified = true;
+                    }
+                }
+                7 => { // less than p1 < p2 => 1 in p3 else 0 in p3
+                    let val1test: i64 = if modes[0]==Mode::POS { self.memory[memaddr[0]] } else { self.memory[self.pc+1] };
+                    let val2test: i64 = if modes[1]==Mode::POS { self.memory[memaddr[1]] } else { self.memory[self.pc+2] };
+                    let wpos = if modes[2]==Mode::POS { memaddr[2] } else { self.pc+3 }; 
+                    self.memory[wpos as usize] = (val1test < val2test) as i64;
+                }
+                8 => { // less than p1 == p2 => 1 in p3 else 0 in p3
+                    let val1test: i64 = if modes[0]==Mode::POS { self.memory[memaddr[0]] } else { self.memory[self.pc+1] };
+                    let val2test: i64 = if modes[1]==Mode::POS { self.memory[memaddr[1]] } else { self.memory[self.pc+2] };
+                    let wpos = if modes[2]==Mode::POS { memaddr[2] } else { self.pc+3 }; 
+                    self.memory[wpos as usize] = (val1test == val2test) as i64;
+
+                }
                 99 => { break; }
                 _ => { result = false; break; }
             }
-            self.pc += paramsize + 1;
+            // prev_instr = self.pc;
+
+            if !pc_modified {
+                self.pc += paramsize + 1;
+            }
         }
         result
     }
@@ -119,6 +155,11 @@ pub fn run() {
 
     let start2 = Instant::now();
 
+    let mut computer2 = IntCodeComputer::new(&commands);
+    (&mut computer2).input = 5;
+    &computer2.run();
+    let res2 = &computer2.output.last().unwrap(); 
+
     let after2 = Instant::now();
-    println!("Part 2: {}, in {:?}", 0, after2.duration_since(start2));
+    println!("Part 2: {}, in {:?}", res2, after2.duration_since(start2));
 }
