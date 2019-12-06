@@ -4,17 +4,22 @@ use std::collections::HashMap;
 
 struct Node {
   name: String,
+  parent: String,
   children: Vec<String>,
   depth: u64,
 }
 
 impl Node {
     fn new(n: &String) -> Node {
-        Node { name : n.clone(), children: vec![], depth: 0 }
+        Node { name : n.clone(), parent: String::from(""), children: vec![], depth: 0 }
     }
 
     fn add_child(&mut self, n: &String) {
         self.children.push(n.clone());
+    }
+
+    fn set_parent(&mut self, p: &String) {
+        self.parent = p.clone();
     }
 
     fn get_chidren(&self) -> Vec<String> {
@@ -52,6 +57,10 @@ impl Tree {
         }
         if let Some(ma) = self.nodes.get_mut(a) {
             (*ma).add_child(b);
+            // println!("adding {} to parent {}", b, a);
+        }
+        if let Some(mb) = self.nodes.get_mut(b) {
+            (*mb).set_parent(a);
             // println!("adding {} to parent {}", b, a);
         }
 }
