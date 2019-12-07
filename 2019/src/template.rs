@@ -4,9 +4,14 @@ use super::tools;
 pub fn run() {
     println!("Day xx of 2019");
 
+    let start0 = Instant::now();
+
     let input_file = "./input/dayxx_19_test.txt";
     // let input_file = "./input/dayxx_19_real.txt";
     let input = tools::get_input(String::from(input_file));
+
+    let after0 = Instant::now();
+    println!("Init in {:?}", after0.duration_since(start0));
 
     let start1 = Instant::now();
 
