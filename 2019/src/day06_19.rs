@@ -79,6 +79,7 @@ impl Tree {
     }
 }
 
+#[allow(dead_code)]
 pub fn run() {
     println!("Day 6 of 2019");
 
