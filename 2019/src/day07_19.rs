@@ -1,7 +1,6 @@
 use std::time::{Instant};
 use super::tools;
 use permutohedron::heap_recursive;
-// use queues::*;
 
 #[derive(Clone, Hash)]
 struct IntCodeComputer {
@@ -111,21 +110,11 @@ impl IntCodeComputer {
                 3 => { 
                     if let Some(input) = self.get_input() {
                         if modes[0]==Mode::POS { self.memory[memaddr[0]] = input; } else { self.memory[self.pc+1] = input; }
-                    } else {
-                        println!("ERRRRRRRRRRRRROOOOOOOOOOOOOOOOORRRRRRRRRRRRRRRRRRRRR");
                     }
                 }
                 4 => { 
                     let outval = if modes[0]==Mode::POS { self.memory[memaddr[0]] } else { self.memory[self.pc+1] };
                     self.add_output(outval);
-                    // self.output.push( outval );
-                    // output_produced = true;
-
-                    // let pi: Vec<i64> =  self.memory[prev_instr..prev_instr+4].iter().filter_map(|s| Some(*s as i64)).collect();
-                    // if outval != 0 { 
-                    //     println!("Error in instruction {} -> {:?}", prev_instr, pi); 
-                    //     println!(" Memory: {:?}", self.memory); 
-                    // } 
                 }
                 5 => { // jump if true first paramter is non-zero ip is iset to parameter 2
                     let val2test: i64 = if modes[0]==Mode::POS { self.memory[memaddr[0]] } else { self.memory[self.pc+1] };
@@ -170,50 +159,27 @@ impl IntCodeComputer {
 }
 
 fn run_amplifiers(phases: &Vec<i64>, commands: &Vec::<i64>, part: usize) -> i64 {
-    let mut amplifiers: Vec<IntCodeComputer> = vec![IntCodeComputer::new(&commands); 5];
+    const AMPLIFIERCOUNT: usize = 5;
+    let mut result = -1;
+    let mut amplifiers: Vec<IntCodeComputer> = vec![IntCodeComputer::new(&commands); AMPLIFIERCOUNT];
 
-    // println!("   running amplifiers with {:?}", phases);
-
-    for i in 0..5 {
+    for i in 0..AMPLIFIERCOUNT {
         amplifiers[i].add_input(phases[i]);
     }
 
-    let mut result = -1;
-
     amplifiers[0].add_input(0);
 
-    let mut running: bool = true;
-
+    let mut running = true;
     while running {
-        amplifiers[0].run();
 
-        while let Some(out0) = amplifiers[0].get_output() {
-            amplifiers[1].add_input(out0);
-        }
+        let mut finished: bool = false;
+        for i in 0..AMPLIFIERCOUNT {
+            finished = amplifiers[i].run();
 
-        amplifiers[1].run();
-        
-        while let Some(out1) = amplifiers[1].get_output() {
-            amplifiers[2].add_input(out1);
-        }
-        
-        amplifiers[2].run();
-
-        while let Some(out2) = amplifiers[2].get_output() {
-            amplifiers[3].add_input(out2);
-        }
-
-        amplifiers[3].run();
-
-        while let Some(out3) = amplifiers[3].get_output() {
-            amplifiers[4].add_input(out3);
-        }
-
-        let finished = amplifiers[4].run();
-
-        while let Some(out4) = amplifiers[4].get_output() {
-            amplifiers[0].add_input(out4);
-            result = out4;
+            while let Some(out0) = amplifiers[i].get_output() {
+                amplifiers[(i+1)%5].add_input(out0);
+                result = out0
+            }
         }
 
         if finished || part==1 {
@@ -253,7 +219,6 @@ pub fn run() {
     println!("Part 1: {}, in {:?}", highest_signal, after1.duration_since(start1));
 
     let start2 = Instant::now();
-
 
     part = 2;
     let mut data2 = [5, 6, 7, 8, 9];
