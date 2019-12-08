@@ -1,6 +1,7 @@
 use super::tools;
 use std::time::Instant;
 
+#[allow(dead_code)]
 pub fn run() {
     println!("Day 8 of 2019");
 
