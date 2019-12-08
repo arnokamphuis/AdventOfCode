@@ -1,16 +1,19 @@
-use std::time::{Instant};
 use super::tools;
 use std::collections::HashMap;
 use std::collections::HashSet;
+use std::time::Instant;
 
 struct Node {
-  parent: String,
-  children: Vec<String>,
+    parent: String,
+    children: Vec<String>,
 }
 
 impl Node {
     fn new() -> Node {
-        Node { parent: String::from(""), children: vec![] }
+        Node {
+            parent: String::from(""),
+            children: vec![],
+        }
     }
 
     fn add_child(&mut self, n: &String) {
@@ -40,28 +43,30 @@ struct Tree {
 
 impl Tree {
     fn new() -> Tree {
-        Tree{ nodes: HashMap::new() }
+        Tree {
+            nodes: HashMap::new(),
+        }
     }
 
     fn add_orbit(&mut self, a: &String, b: &String) {
         if !self.nodes.contains_key(b) {
-            self.nodes.insert(b.to_string(),Node::new());            
+            self.nodes.insert(b.to_string(), Node::new());
         }
         if !self.nodes.contains_key(a) {
-            self.nodes.insert(a.to_string(),Node::new());
+            self.nodes.insert(a.to_string(), Node::new());
         }
         if let Some(ma) = self.nodes.get_mut(a) {
             (*ma).add_child(b);
         }
         if let Some(mb) = self.nodes.get_mut(b) {
             (*mb).set_parent(a);
-        }    
+        }
     }
 
     fn calculate_orbits(&mut self, n: String, d: u64) -> u64 {
         let mut total = d;
         for c in self.nodes[&n].get_chidren() {
-            total += self.calculate_orbits(c, d+1);
+            total += self.calculate_orbits(c, d + 1);
         }
         total
     }
@@ -73,7 +78,8 @@ impl Tree {
         if parent != "" {
             let parent_set = self.get_parent_set(parent.clone());
             parent_set.iter().for_each(|p| {
-                set.insert(p.to_string());});
+                set.insert(p.to_string());
+            });
         }
         set.clone()
     }
@@ -93,7 +99,7 @@ pub fn run() {
         let mut iter = line.split(")");
         let a: String = iter.next().unwrap().to_string();
         let b: String = iter.next().unwrap().to_string();
-        orbits.add_orbit(&a,&b);
+        orbits.add_orbit(&a, &b);
     }
 
     let o = orbits.calculate_orbits("COM".to_string(), 0);
@@ -119,5 +125,9 @@ pub fn run() {
     }
 
     let after2 = Instant::now();
-    println!("Part 2: {}, in {:?}", path.len()-2, after2.duration_since(start2));
+    println!(
+        "Part 2: {}, in {:?}",
+        path.len() - 2,
+        after2.duration_since(start2)
+    );
 }

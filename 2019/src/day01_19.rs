@@ -1,9 +1,13 @@
-use std::time::{Instant};
 use super::tools;
+use std::time::Instant;
 
 fn calculate_fuel(mass: i64) -> i64 {
     let fuel_for_mass = mass / 3 - 2;
-    if fuel_for_mass <= 0 { 0 } else { fuel_for_mass + calculate_fuel(fuel_for_mass) }
+    if fuel_for_mass <= 0 {
+        0
+    } else {
+        fuel_for_mass + calculate_fuel(fuel_for_mass)
+    }
 }
 
 #[allow(dead_code)]
@@ -16,7 +20,8 @@ pub fn run() {
 
     let start1 = Instant::now();
 
-    let mut fuel: i64 = (&input).into_iter()
+    let mut fuel: i64 = (&input)
+        .into_iter()
         .map(|n| n.parse::<i64>().unwrap())
         .map(|mass| mass / 3 - 2)
         .sum::<i64>();
@@ -26,7 +31,8 @@ pub fn run() {
 
     let start2 = Instant::now();
 
-    fuel = (&input).into_iter()
+    fuel = (&input)
+        .into_iter()
         .map(|n| n.parse::<i64>().unwrap())
         .map(|mass| calculate_fuel(mass))
         .sum::<i64>();
