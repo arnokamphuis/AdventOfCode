@@ -42,9 +42,10 @@ pub fn run() {
     });
 
     let found = result.into_owned();
+    
+    let result = universe.difference(&found);
 
-
-    let mut iter = (&res).into_iter();
+    let mut iter = (&result).into_iter();
     let lowest = iter.next().unwrap().lower();
     
     let after1 = Instant::now();
@@ -57,7 +58,7 @@ pub fn run() {
     let start2 = Instant::now();
 
     let mut total = 0;
-    for r in &res {
+    for r in (&result).into_iter() {
         let diff = r.upper() - r.lower() + 1;
         if diff == 1 {
             total += 1;
