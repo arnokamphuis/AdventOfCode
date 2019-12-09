@@ -235,18 +235,12 @@ pub fn run() {
 
     let mut computer1 = IntCodeComputer::new(&commands);
     computer1.add_input(1);
-
-    let mut res1 = vec![];
-    if computer1.run() {
-        while let Some(res) = computer1.get_output() {
-            res1.push(res);
-        }
-    }
+    computer1.run();
 
     let after1 = Instant::now();
     println!(
         "Part 1: {:?}, in {:?}",
-        res1[0],
+        computer1.get_output().unwrap(),
         after1.duration_since(start1)
     );
 
@@ -256,8 +250,10 @@ pub fn run() {
     computer2.add_input(2);
     computer2.run();
 
-    let res2: i64 = computer2.get_output().unwrap();
-
     let after2 = Instant::now();
-    println!("Part 2: {}, in {:?}", res2, after2.duration_since(start2));
+    println!(
+        "Part 2: {}, in {:?}",
+        computer2.get_output().unwrap(),
+        after2.duration_since(start2)
+    );
 }
