@@ -159,8 +159,7 @@ impl IntCodeComputer {
                 5 => {
                     paramsize = 2;
                     // jump if true first paramter is non-zero ip is iset to parameter 2
-                    let val2test = self.get_mem(self.pc + 1, modes[0]);
-                    if val2test != 0 {
+                    if self.get_mem(self.pc + 1, modes[0]) != 0 {
                         self.pc = self.get_mem(self.pc + 2, modes[1]);
                         pc_modified = true;
                     }
@@ -168,8 +167,7 @@ impl IntCodeComputer {
                 6 => {
                     paramsize = 2;
                     // jump if false first paramter is non-zero ip is iset to parameter 2
-                    let val2test = self.get_mem(self.pc + 1, modes[0]);
-                    if val2test == 0 {
+                    if self.get_mem(self.pc + 1, modes[0]) == 0 {
                         self.pc = self.get_mem(self.pc + 2, modes[1]);
                         pc_modified = true;
                     }
@@ -177,16 +175,22 @@ impl IntCodeComputer {
                 7 => {
                     paramsize = 3;
                     // less than p1 < p2 => 1 in p3 else 0 in p3
-                    let val1test = self.get_mem(self.pc + 1, modes[0]);
-                    let val2test = self.get_mem(self.pc + 2, modes[1]);
-                    self.set_mem(self.pc + 3, modes[2], (val1test < val2test) as i64);
+                    self.set_mem(
+                        self.pc + 3,
+                        modes[2],
+                        (self.get_mem(self.pc + 1, modes[0]) < self.get_mem(self.pc + 2, modes[1]))
+                            as i64,
+                    );
                 }
                 8 => {
                     paramsize = 3;
                     // less than p1 == p2 => 1 in p3 else 0 in p3
-                    let val1test = self.get_mem(self.pc + 1, modes[0]);
-                    let val2test = self.get_mem(self.pc + 2, modes[1]);
-                    self.set_mem(self.pc + 3, modes[2], (val1test == val2test) as i64);
+                    self.set_mem(
+                        self.pc + 3,
+                        modes[2],
+                        (self.get_mem(self.pc + 1, modes[0]) == self.get_mem(self.pc + 2, modes[1]))
+                            as i64,
+                    );
                 }
                 9 => {
                     paramsize = 1;
