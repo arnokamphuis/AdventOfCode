@@ -99,6 +99,10 @@ impl IntCodeComputer {
         }
     }
 
+    fn has_output(&self) -> bool {
+        self.output.len() > 0
+    }
+
     fn run(&mut self) -> bool {
         let mut result = false;
         loop {
@@ -238,7 +242,8 @@ impl PaintRobot {
     }
 
     fn paint(&mut self, start_color: i64) {
-        *self.hull.entry(self.current_pos).or_insert(0) = start_color;
+        let mut halted = false;
+        *self.hull.entry(self.current_pos).or_insert(start_color) = start_color;
 
         loop {
             let current_panel = if self.hull.contains_key(&self.current_pos) {
@@ -246,51 +251,57 @@ impl PaintRobot {
             } else {
                 0
             };
+            
             self.brain.add_input(current_panel);
-            if self.brain.run() {
-                break;
-            } else {
-                let output1 = self.brain.get_output().unwrap();
-                let output2 = self.brain.get_output().unwrap();
-                self.painted.insert(self.current_pos);
+            
+            if !halted {
+                halted = self.brain.run();
+            }
 
-                *self.hull.entry(self.current_pos).or_insert(0) = output1;
+            let output1 = self.brain.get_output().unwrap();
+            let output2 = self.brain.get_output().unwrap();
+            self.painted.insert(self.current_pos);
 
-                match output2 {
-                    0 => match self.current_dir {
-                        DIR_UP => {
-                            self.current_dir = DIR_LEFT;
-                        }
-                        DIR_LEFT => {
-                            self.current_dir = DIR_DOWN;
-                        }
-                        DIR_DOWN => {
-                            self.current_dir = DIR_RIGHT;
-                        }
-                        DIR_RIGHT => {
-                            self.current_dir = DIR_UP;
-                        }
-                        _ => {}
-                    },
-                    1 => match self.current_dir {
-                        DIR_DOWN => {
-                            self.current_dir = DIR_LEFT;
-                        }
-                        DIR_LEFT => {
-                            self.current_dir = DIR_UP;
-                        }
-                        DIR_UP => {
-                            self.current_dir = DIR_RIGHT;
-                        }
-                        DIR_RIGHT => {
-                            self.current_dir = DIR_DOWN;
-                        }
-                        _ => {}
-                    },
+            *self.hull.entry(self.current_pos).or_insert(output1) = output1;
+
+            match output2 {
+                0 => match self.current_dir {
+                    DIR_UP => {
+                        self.current_dir = DIR_LEFT;
+                    }
+                    DIR_LEFT => {
+                        self.current_dir = DIR_DOWN;
+                    }
+                    DIR_DOWN => {
+                        self.current_dir = DIR_RIGHT;
+                    }
+                    DIR_RIGHT => {
+                        self.current_dir = DIR_UP;
+                    }
                     _ => {}
-                }
-                self.current_pos.0 = self.current_pos.0 + self.current_dir.0;
-                self.current_pos.1 = self.current_pos.1 + self.current_dir.1;
+                },
+                1 => match self.current_dir {
+                    DIR_DOWN => {
+                        self.current_dir = DIR_LEFT;
+                    }
+                    DIR_LEFT => {
+                        self.current_dir = DIR_UP;
+                    }
+                    DIR_UP => {
+                        self.current_dir = DIR_RIGHT;
+                    }
+                    DIR_RIGHT => {
+                        self.current_dir = DIR_DOWN;
+                    }
+                    _ => {}
+                },
+                _ => {}
+            }
+            self.current_pos.0 = self.current_pos.0 + self.current_dir.0;
+            self.current_pos.1 = self.current_pos.1 + self.current_dir.1;
+            
+            if halted && !self.brain.has_output() {
+                break;
             }
         }
     }
@@ -307,17 +318,59 @@ impl PaintRobot {
             maxy = std::cmp::max(maxy, panel.1);
         });
 
-        minx += 1;
-        maxx -= 3;
-        for y in miny..=maxy {
-            for x in minx..=maxx {
+        let mut count_white: Vec<usize> = vec![];
+        for x in minx..=maxx {
+            let mut count = 0;
+            for y in miny..=maxy {
                 let pos = (x, y);
-                if self.hull.contains_key(&pos) && self.hull[&pos] == 0 {
-                    print!(" ");
-                } else {
-                    print!("#");
+                if !(self.hull.contains_key(&pos) && self.hull[&pos] == 0) {
+                    count += 1;
                 }
             }
+            count_white.push(count);
+        }
+
+        let mut pos1 = 0;
+        let mut pos2 = 0;
+        let mut white_indices: Vec<usize> = vec![];
+        count_white.iter().enumerate().for_each(|(i,w)| {
+            if *w == 0 {
+                white_indices.push(i);
+            }
+            if i > 0 && pos2==0 {
+                if pos1==0 && *w==0 {
+                    pos1 = i;
+                } else if *w==0 {
+                    pos2 = i;
+                }
+            }
+        });
+        let width = pos2-pos1;
+        let height = (maxy-miny+1) as usize;
+        while white_indices[0] >= width {
+            white_indices.insert(0, white_indices[0]-width);
+        }
+
+        let mut letters = vec![ vec![ vec![0usize; width]; height]; white_indices.len()-1];
+        white_indices[..white_indices.len()-1].iter().enumerate().for_each(|(l, i)| {
+            (i+1..i+width).into_iter().enumerate().for_each(|(x, vx)| {
+                (miny..maxy+1).into_iter().enumerate().for_each(|(y,vy)| {
+                    let pos = (vx as i64,vy as i64);
+                    if !(self.hull.contains_key(&pos) && self.hull[&pos] == 0) {
+                        letters[l][y][x] = 1;
+                    }
+                });
+            });
+        });
+        
+        for l in &letters {
+            for row in l {
+                for c in row {
+                    print!("{}", if *c == 1 { '#' } else { ' ' });
+                }
+                println!("");
+            }
+            println!("");
             println!("");
         }
     }
@@ -358,12 +411,13 @@ pub fn run() {
 
     let mut robot2 = PaintRobot::new(&commands);
     robot2.paint(1);
-    robot2.print();
 
     let after2 = Instant::now();
     println!(
         "Part 2: {}, in {:?}",
-        "see print above",
+        "see print below",
         after2.duration_since(start2)
     );
+
+    robot2.print();
 }
