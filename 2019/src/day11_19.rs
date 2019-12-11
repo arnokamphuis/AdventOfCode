@@ -141,6 +141,7 @@ impl IntCodeComputer {
             match opcode {
                 1 => {
                     paramsize = 3;
+                    assert!(modes[2]!=Mode::IMM, "write mode in opcode 1 invalid");
                     self.set_mem(
                         self.pc + 3,
                         modes[2],
@@ -149,6 +150,7 @@ impl IntCodeComputer {
                 }
                 2 => {
                     paramsize = 3;
+                    assert!(modes[2]!=Mode::IMM, "write mode in opcode 2 invalid");
                     self.set_mem(
                         self.pc + 3,
                         modes[2],
@@ -158,6 +160,7 @@ impl IntCodeComputer {
                 3 => {
                     paramsize = 1;
                     if let Some(input) = self.get_input() {
+                        assert!(modes[0]!=Mode::IMM, "write mode in opcode 3 invalid");
                         self.set_mem(self.pc + 1, modes[0], input);
                     }
                 }
@@ -183,6 +186,7 @@ impl IntCodeComputer {
                 }
                 7 => {
                     paramsize = 3;
+                    assert!(modes[2]!=Mode::IMM, "write mode in opcode 7 invalid");
                     // less than p1 < p2 => 1 in p3 else 0 in p3
                     self.set_mem(
                         self.pc + 3,
@@ -193,6 +197,7 @@ impl IntCodeComputer {
                 }
                 8 => {
                     paramsize = 3;
+                    assert!(modes[2]!=Mode::IMM, "write mode in opcode 8 invalid");
                     // less than p1 == p2 => 1 in p3 else 0 in p3
                     self.set_mem(
                         self.pc + 3,
