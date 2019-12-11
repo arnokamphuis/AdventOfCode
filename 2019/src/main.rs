@@ -1,3 +1,5 @@
+mod tools;
+mod intcode;
 mod day01_19;
 mod day02_19;
 mod day03_19;
@@ -10,7 +12,6 @@ mod day08_19;
 mod day09_19;
 mod day10_19;
 mod day11_19;
-mod tools;
 
 fn main() {
     // day01_19::run();
