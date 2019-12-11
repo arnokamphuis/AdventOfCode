@@ -150,17 +150,33 @@ impl PaintRobot {
                 });
             });
         });
-        
+
+
+        let mut letter_offset: u32 = 0;
+        let letter_width: u32 = width as u32 +1;
+        let imagewidth: u32 = letters.len() as u32 * letter_width;
+        let imageheight: u32 = height as u32;
+
+        let mut img_data: Vec<u8> = vec![255; (imagewidth*imageheight*4) as usize];
+
         for l in &letters {
+            let mut y = 0;
             for row in l {
+                let mut x = 0;
                 for c in row {
-                    print!("{}", if *c == 1 { '#' } else { ' ' });
+                    let index = 4 * ( letter_offset * letter_width + y * imagewidth + x );
+                    img_data[index as usize + 0 ] = if *c==1 { 255 } else { 255 };
+                    img_data[index as usize + 1 ] = if *c==1 {   0 } else { 255 } ;
+                    img_data[index as usize + 2 ] = if *c==1 {   0 } else { 255 } ;
+                    img_data[index as usize + 3 ] = 255 ;
+                    x += 1;
                 }
-                println!("");
+                y += 1;
             }
-            println!("");
-            println!("");
+            letter_offset += 1;
         }
+
+        tools::save_png(&img_data, imagewidth, imageheight, &"output.png".to_string());
     }
 }
 
@@ -203,7 +219,7 @@ pub fn run() {
     let after2 = Instant::now();
     println!(
         "Part 2: {}, in {:?}",
-        "see print below",
+        "see output image",
         after2.duration_since(start2)
     );
 
