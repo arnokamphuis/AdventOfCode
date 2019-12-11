@@ -307,6 +307,8 @@ impl PaintRobot {
             maxy = std::cmp::max(maxy, panel.1);
         });
 
+        minx += 1;
+        maxx -= 3;
         for y in miny..=maxy {
             for x in minx..=maxx {
                 let pos = (x, y);
