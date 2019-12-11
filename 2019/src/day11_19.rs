@@ -1,6 +1,5 @@
 use super::tools;
 use std::time::Instant;
-// use std::collections::HashMap;
 use std::collections::BTreeMap;
 use std::collections::BTreeSet;
 
@@ -20,10 +19,10 @@ enum Mode {
     REL,
 }
 
-const DIR_UP:    (i64,i64) = ( 0,-1);
-const DIR_DOWN:  (i64,i64) = ( 0, 1);
-const DIR_LEFT:  (i64,i64) = (-1, 0);
-const DIR_RIGHT: (i64,i64) = ( 1, 0);
+const DIR_UP: (i64, i64) = (0, -1);
+const DIR_DOWN: (i64, i64) = (0, 1);
+const DIR_LEFT: (i64, i64) = (-1, 0);
+const DIR_RIGHT: (i64, i64) = (1, 0);
 
 impl IntCodeComputer {
     fn new(m: &BTreeMap<i64, i64>) -> IntCodeComputer {
@@ -220,35 +219,33 @@ impl IntCodeComputer {
 }
 
 struct PaintRobot {
-    hull: BTreeMap<(i64,i64), i64>,
-    painted: BTreeSet<(i64,i64)>,
-    current_dir: (i64,i64),
-    current_pos: (i64,i64),
+    hull: BTreeMap<(i64, i64), i64>,
+    painted: BTreeSet<(i64, i64)>,
+    current_dir: (i64, i64),
+    current_pos: (i64, i64),
     brain: IntCodeComputer,
 }
 
 impl PaintRobot {
-    fn new(program:  &BTreeMap<i64, i64>) -> PaintRobot {
+    fn new(program: &BTreeMap<i64, i64>) -> PaintRobot {
         PaintRobot {
             hull: BTreeMap::new(),
             painted: BTreeSet::new(),
             current_dir: DIR_UP,
-            current_pos: (0,0),
+            current_pos: (0, 0),
             brain: IntCodeComputer::new(program),
         }
     }
 
     fn paint(&mut self, start_color: i64) {
-        let mut first = true;
+        *self.hull.entry(self.current_pos).or_insert(0) = start_color;
 
         loop {
-            self.current_pos.0 = self.current_pos.0 + self.current_dir.0;
-            self.current_pos.1 = self.current_pos.1 + self.current_dir.1;
-
-            let default_color = if first { start_color } else { 0 };
-            first = false;
-
-            let current_panel = if self.hull.contains_key(&self.current_pos) { self.hull[&self.current_pos] } else { default_color };
+            let current_panel = if self.hull.contains_key(&self.current_pos) {
+                self.hull[&self.current_pos]
+            } else {
+                0
+            };
             self.brain.add_input(current_panel);
             if self.brain.run() {
                 break;
@@ -256,50 +253,63 @@ impl PaintRobot {
                 let output1 = self.brain.get_output().unwrap();
                 let output2 = self.brain.get_output().unwrap();
                 self.painted.insert(self.current_pos);
-                
+
                 *self.hull.entry(self.current_pos).or_insert(0) = output1;
 
                 match output2 {
-                    0 => {
-                        match self.current_dir {
-                            DIR_UP => { self.current_dir = DIR_LEFT; }
-                            DIR_LEFT => { self.current_dir = DIR_DOWN; }
-                            DIR_DOWN => { self.current_dir = DIR_RIGHT; }
-                            DIR_RIGHT => { self.current_dir = DIR_UP; }
-                            _ => {}
+                    0 => match self.current_dir {
+                        DIR_UP => {
+                            self.current_dir = DIR_LEFT;
                         }
-                    }
-                    1 => {
-                        match self.current_dir {
-                            DIR_DOWN => { self.current_dir = DIR_LEFT; }
-                            DIR_LEFT => { self.current_dir = DIR_UP; }
-                            DIR_UP => { self.current_dir = DIR_RIGHT; }
-                            DIR_RIGHT => { self.current_dir = DIR_DOWN; }
-                            _ => {}
+                        DIR_LEFT => {
+                            self.current_dir = DIR_DOWN;
                         }
-                    }
+                        DIR_DOWN => {
+                            self.current_dir = DIR_RIGHT;
+                        }
+                        DIR_RIGHT => {
+                            self.current_dir = DIR_UP;
+                        }
+                        _ => {}
+                    },
+                    1 => match self.current_dir {
+                        DIR_DOWN => {
+                            self.current_dir = DIR_LEFT;
+                        }
+                        DIR_LEFT => {
+                            self.current_dir = DIR_UP;
+                        }
+                        DIR_UP => {
+                            self.current_dir = DIR_RIGHT;
+                        }
+                        DIR_RIGHT => {
+                            self.current_dir = DIR_DOWN;
+                        }
+                        _ => {}
+                    },
                     _ => {}
                 }
+                self.current_pos.0 = self.current_pos.0 + self.current_dir.0;
+                self.current_pos.1 = self.current_pos.1 + self.current_dir.1;
             }
         }
-
     }
-    
+
     fn print(&self) {
         let mut minx: i64 = std::i64::MAX;
         let mut miny: i64 = std::i64::MAX;
         let mut maxx: i64 = std::i64::MIN;
         let mut maxy: i64 = std::i64::MIN;
         self.painted.iter().for_each(|panel| {
-            minx = std::cmp::min( minx, panel.0 );
-            miny = std::cmp::min( miny, panel.1 );
-            maxx = std::cmp::max( maxx, panel.0 );
-            maxy = std::cmp::max( maxy, panel.1 );
+            minx = std::cmp::min(minx, panel.0);
+            miny = std::cmp::min(miny, panel.1);
+            maxx = std::cmp::max(maxx, panel.0);
+            maxy = std::cmp::max(maxy, panel.1);
         });
 
         for y in miny..=maxy {
             for x in minx..=maxx {
-                    let pos = (x,y);
+                let pos = (x, y);
                 if self.hull.contains_key(&pos) && self.hull[&pos] == 0 {
                     print!(" ");
                 } else {
@@ -317,6 +327,7 @@ pub fn run() {
 
     // let input_file = "./input/day11_19_test.txt";
     let input_file = "./input/day11_19_real.txt";
+    // let input_file = "./input/day11_19_esther.txt";
     let input = tools::get_input(String::from(input_file));
     let line = &input[0];
     let command_strings: Vec<&str> = line.split(",").collect();
