@@ -4,6 +4,7 @@ use std::collections::BTreeMap;
 use std::collections::BTreeSet;
 
 use super::intcode::IntCodeComputer;
+use super::tools::Image;
 
 const DIR_UP: (i64, i64) = (0, -1);
 const DIR_DOWN: (i64, i64) = (0, 1);
@@ -151,32 +152,27 @@ impl PaintRobot {
             });
         });
 
+        let letter_width: usize = width + 1;
+        let imagewidth: usize = letters.len() * letter_width;
+        let imageheight: usize = height;
 
-        let mut letter_offset: u32 = 0;
-        let letter_width: u32 = width as u32 +1;
-        let imagewidth: u32 = letters.len() as u32 * letter_width;
-        let imageheight: u32 = height as u32;
+        let mut image: Image = Image::new(imagewidth, imageheight, 40);
 
-        let mut img_data: Vec<u8> = vec![255; (imagewidth*imageheight*4) as usize];
+        letters.iter().enumerate().for_each(|(letter_offset, letter)| {
+            letter.iter().enumerate().for_each(|(y, row)| {
+                row.iter().enumerate().for_each(|(x, c)| {
+                    let color = (
+                        if *c==1 {   0 } else { 255 },
+                        if *c==1 {   0 } else { 255 },
+                        if *c==1 {   0 } else { 255 },
+                        255
+                    );
+                    image.set_pixel( x + letter_offset * letter_width , y, color );
+                });
+            });
+        });
 
-        for l in &letters {
-            let mut y = 0;
-            for row in l {
-                let mut x = 0;
-                for c in row {
-                    let index = 4 * ( letter_offset * letter_width + y * imagewidth + x );
-                    img_data[index as usize + 0 ] = if *c==1 { 255 } else { 255 };
-                    img_data[index as usize + 1 ] = if *c==1 {   0 } else { 255 } ;
-                    img_data[index as usize + 2 ] = if *c==1 {   0 } else { 255 } ;
-                    img_data[index as usize + 3 ] = 255 ;
-                    x += 1;
-                }
-                y += 1;
-            }
-            letter_offset += 1;
-        }
-
-        tools::save_png(&img_data, imagewidth, imageheight, &"output.png".to_string());
+        image.save_png(&"output.png".to_string());
     }
 }
 
