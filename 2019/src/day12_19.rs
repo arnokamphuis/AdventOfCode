@@ -67,7 +67,6 @@ impl MoonSystem {
         }
     }
 
-    // <x=-8, y=-10, z=0>
     fn add_moon(&mut self, line: &String) {
         let mut iter = line.split(", ");
         let x_str = iter.next().unwrap()[3..].to_string();
@@ -163,44 +162,33 @@ impl MoonSystem {
     }
 
     fn push_state(&mut self) -> (bool, u8) {
-        if self.repeats[0] == 0 {
-            let mut state_x = vec![0; 2 * self.positions.len()];
-            for i in 0..self.positions.len() {
-                state_x[2 * i + 0] = self.positions[i].x;
-                state_x[2 * i + 1] = self.velocities[i].x;
+        for dim in 0..3 {
+            if self.repeats[dim] == 0 {
+                let mut state = vec![0; 2 * self.positions.len()];
+                for i in 0..self.positions.len() {
+                    state[2 * i + 0] = match dim {
+                        0 => self.positions[i].x,
+                        1 => self.positions[i].y,
+                        2 => self.positions[i].z,
+                        _ => {
+                            panic!("Impossible to get here");
+                        }
+                    };
+                    state[2 * i + 1] = match dim {
+                        0 => self.velocities[i].x,
+                        1 => self.velocities[i].y,
+                        2 => self.velocities[i].z,
+                        _ => {
+                            panic!("Impossible to get here");
+                        }
+                    };
+                }
+                if self.prev_states[dim].contains(&state) {
+                    return (true, dim as u8);
+                }
+                self.prev_states[dim].insert(state);
             }
-
-            if self.prev_states[0].contains(&state_x) {
-                return (true, 0);
-            }
-            self.prev_states[0].insert(state_x);
         }
-
-        if self.repeats[1] == 0 {
-            let mut state_y = vec![0; 2 * self.positions.len()];
-            for i in 0..self.positions.len() {
-                state_y[2 * i + 0] = self.positions[i].y;
-                state_y[2 * i + 1] = self.velocities[i].y;
-            }
-
-            if self.prev_states[1].contains(&state_y) {
-                return (true, 1);
-            }
-            self.prev_states[1].insert(state_y);
-        }
-
-        if self.repeats[2] == 0 {
-            let mut state_z = vec![0; 2 * self.positions.len()];
-            for i in 0..self.positions.len() {
-                state_z[2 * i + 0] = self.positions[i].z;
-                state_z[2 * i + 1] = self.velocities[i].z;
-            }
-            if self.prev_states[2].contains(&state_z) {
-                return (true, 2);
-            }
-            self.prev_states[2].insert(state_z);
-        }
-
         (false, std::u8::MAX)
     }
 
