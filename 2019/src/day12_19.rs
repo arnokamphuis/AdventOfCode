@@ -69,21 +69,19 @@ impl MoonSystem {
 
     fn add_moon(&mut self, line: &String) {
         let mut iter = line.split(", ");
-        let x_str = iter.next().unwrap()[3..].to_string();
-        let y_str = iter.next().unwrap()[2..].to_string();
-        let z_str_tmp = iter.next().unwrap()[2..].to_string();
-        let z_str = z_str_tmp[..z_str_tmp.len() - 1].to_string();
 
         let mut pos = Vector::new();
         let vel = Vector::new();
 
-        if let Ok(x) = x_str.parse::<i64>() {
+        if let Ok(x) = iter.next().unwrap()[3..].to_string().parse::<i64>() {
             pos.x = x;
         }
-        if let Ok(y) = y_str.parse::<i64>() {
+        if let Ok(y) = iter.next().unwrap()[2..].to_string().parse::<i64>() {
             pos.y = y;
         }
-        if let Ok(z) = z_str.parse::<i64>() {
+
+        let z_str_tmp = iter.next().unwrap()[2..].to_string();
+        if let Ok(z) = z_str_tmp[..z_str_tmp.len() - 1].to_string().parse::<i64>() {
             pos.z = z;
         }
 
