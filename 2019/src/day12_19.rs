@@ -1,7 +1,9 @@
-use std::time::{Instant};
 use super::tools;
-use std::collections::BTreeSet;
 use std::cmp::Ordering;
+use std::collections::BTreeSet;
+use std::time::Instant;
+
+use num::integer::gcd;
 
 #[derive(Eq, Clone)]
 struct Vector {
@@ -10,16 +12,15 @@ struct Vector {
     z: i64,
 }
 
-
 impl Ord for Vector {
     fn cmp(&self, other: &Self) -> Ordering {
-        let Ox = self.x.cmp(&other.x);
-        if Ox == Ordering::Less {
-            return Ox
+        let ox = self.x.cmp(&other.x);
+        if ox == Ordering::Less {
+            return ox;
         } else {
-            let Oy = self.y.cmp(&other.y);
-            if Oy == Ordering::Less {
-                return Oy
+            let oy = self.y.cmp(&other.y);
+            if oy == Ordering::Less {
+                return oy;
             } else {
                 self.z.cmp(&other.z)
             }
@@ -39,10 +40,9 @@ impl PartialEq for Vector {
     }
 }
 
-
 impl Vector {
     fn new() -> Vector {
-        Vector{x:0, y:0, z:0}
+        Vector { x: 0, y: 0, z: 0 }
     }
 
     fn energy(&self) -> i64 {
@@ -53,7 +53,8 @@ impl Vector {
 struct MoonSystem {
     positions: Vec<Vector>,
     velocities: Vec<Vector>,
-    prev_state: Vec<BTreeSet<(Vector, Vector)>>,
+    prev_states: Vec<BTreeSet<Vec<i64>>>,
+    repeats: Vec<i64>,
 }
 
 impl MoonSystem {
@@ -61,7 +62,8 @@ impl MoonSystem {
         MoonSystem {
             positions: vec![],
             velocities: vec![],
-            prev_state: vec![],
+            prev_states: vec![],
+            repeats: vec![],
         }
     }
 
@@ -71,23 +73,29 @@ impl MoonSystem {
         let x_str = iter.next().unwrap()[3..].to_string();
         let y_str = iter.next().unwrap()[2..].to_string();
         let z_str_tmp = iter.next().unwrap()[2..].to_string();
-        let z_str = z_str_tmp[..z_str_tmp.len()-1].to_string();
+        let z_str = z_str_tmp[..z_str_tmp.len() - 1].to_string();
 
         let mut pos = Vector::new();
         let vel = Vector::new();
 
-        if let Ok(x) = x_str.parse::<i64>() { pos.x = x; } 
-        if let Ok(y) = y_str.parse::<i64>() { pos.y = y; } 
-        if let Ok(z) = z_str.parse::<i64>() { pos.z = z; } 
+        if let Ok(x) = x_str.parse::<i64>() {
+            pos.x = x;
+        }
+        if let Ok(y) = y_str.parse::<i64>() {
+            pos.y = y;
+        }
+        if let Ok(z) = z_str.parse::<i64>() {
+            pos.z = z;
+        }
 
         self.positions.push(pos.clone());
         self.velocities.push(vel.clone());
 
-        self.prev_state.push(BTreeSet::new());
-        
-        let moon_count = self.positions.len();
+        self.prev_states.push(BTreeSet::new());
+        self.prev_states.push(BTreeSet::new());
+        self.prev_states.push(BTreeSet::new());
 
-        self.prev_state[moon_count-1].insert((pos.clone(), vel.clone()));
+        self.repeats = vec![0; 3];
     }
 
     fn update_positions(&mut self) {
@@ -96,16 +104,33 @@ impl MoonSystem {
             self.positions[i].y += self.velocities[i].y;
             self.positions[i].z += self.velocities[i].z;
         }
-
     }
 
     fn determine_velocities(&mut self) {
         for i in 0..self.velocities.len() {
             for j in 0..self.velocities.len() {
-                if i!=j {
-                    self.velocities[i].x += if self.positions[i].x > self.positions[j].x { -1 } else if self.positions[i].x < self.positions[j].x { 1 } else { 0 };
-                    self.velocities[i].y += if self.positions[i].y > self.positions[j].y { -1 } else if self.positions[i].y < self.positions[j].y { 1 } else { 0 };
-                    self.velocities[i].z += if self.positions[i].z > self.positions[j].z { -1 } else if self.positions[i].z < self.positions[j].z { 1 } else { 0 };
+                if i != j {
+                    self.velocities[i].x += if self.positions[i].x > self.positions[j].x {
+                        -1
+                    } else if self.positions[i].x < self.positions[j].x {
+                        1
+                    } else {
+                        0
+                    };
+                    self.velocities[i].y += if self.positions[i].y > self.positions[j].y {
+                        -1
+                    } else if self.positions[i].y < self.positions[j].y {
+                        1
+                    } else {
+                        0
+                    };
+                    self.velocities[i].z += if self.positions[i].z > self.positions[j].z {
+                        -1
+                    } else if self.positions[i].z < self.positions[j].z {
+                        1
+                    } else {
+                        0
+                    };
                 }
             }
         }
@@ -119,27 +144,92 @@ impl MoonSystem {
         energy
     }
 
+    #[allow(dead_code)]
     fn print(&self) {
         println!("--------------------------------------------");
         for i in 0..self.positions.len() {
-            println!("{} -> {} {} {} - {} {} {}",i, self.positions[i].x, self.positions[i].y, self.positions[i].z, self.velocities[i].x, self.velocities[i].y, self.velocities[i].z)
+            println!(
+                "{} -> {} {} {} - {} {} {}",
+                i,
+                self.positions[i].x,
+                self.positions[i].y,
+                self.positions[i].z,
+                self.velocities[i].x,
+                self.velocities[i].y,
+                self.velocities[i].z
+            )
         }
         println!("--------------------------------------------");
     }
 
-    fn find_repeats(&mut self) {
+    fn push_state(&mut self) -> (bool, u8) {
+        if self.repeats[0] == 0 {
+            let mut state_x = vec![0; 2 * self.positions.len()];
+            for i in 0..self.positions.len() {
+                state_x[2 * i + 0] = self.positions[i].x;
+                state_x[2 * i + 1] = self.velocities[i].x;
+            }
+
+            if self.prev_states[0].contains(&state_x) {
+                return (true, 0);
+            }
+            self.prev_states[0].insert(state_x);
+        }
+
+        if self.repeats[1] == 0 {
+            let mut state_y = vec![0; 2 * self.positions.len()];
+            for i in 0..self.positions.len() {
+                state_y[2 * i + 0] = self.positions[i].y;
+                state_y[2 * i + 1] = self.velocities[i].y;
+            }
+
+            if self.prev_states[1].contains(&state_y) {
+                return (true, 1);
+            }
+            self.prev_states[1].insert(state_y);
+        }
+
+        if self.repeats[2] == 0 {
+            let mut state_z = vec![0; 2 * self.positions.len()];
+            for i in 0..self.positions.len() {
+                state_z[2 * i + 0] = self.positions[i].z;
+                state_z[2 * i + 1] = self.velocities[i].z;
+            }
+            if self.prev_states[2].contains(&state_z) {
+                return (true, 2);
+            }
+            self.prev_states[2].insert(state_z);
+        }
+
+        (false, std::u8::MAX)
+    }
+
+    fn find_repeats(&mut self) -> i64 {
+        self.push_state();
         let mut t = 0;
         loop {
             self.run(1);
-            t += 1;
-            for i in 0..self.positions.len() {
-                if self.prev_state[i].contains(&(self.positions[i].clone(), self.velocities[i].clone())) {
-                    println!(" found repetition pos {} at {}", i, t);
-                }
 
-                self.prev_state[i].insert( (self.positions[i].clone(), self.velocities[i].clone()) );
+            t += 1;
+
+            let repetion_found = self.push_state();
+            if repetion_found.0 {
+                self.repeats[repetion_found.1 as usize] = t;
+            }
+
+            let mut all_repeat = true;
+            self.repeats.iter().for_each(|r| {
+                all_repeat = all_repeat && (*r > 0);
+            });
+
+            if all_repeat {
+                break;
             }
         }
+
+        let tmp = self.repeats[0] * self.repeats[1] / gcd(self.repeats[0], self.repeats[1]);
+        let tmp = tmp * self.repeats[2] / gcd(tmp, self.repeats[2]);
+        tmp
     }
 
     fn run(&mut self, timesteps: i64) {
@@ -147,7 +237,7 @@ impl MoonSystem {
         while t < timesteps {
             self.determine_velocities();
             self.update_positions();
-            t+=1;
+            t += 1;
         }
     }
 }
@@ -182,8 +272,8 @@ pub fn run() {
 
     let start2 = Instant::now();
 
-    system2.find_repeats();
+    let res2 = system2.find_repeats();
 
     let after2 = Instant::now();
-    println!("Part 2: {}, in {:?}", 0, after2.duration_since(start2));
+    println!("Part 2: {}, in {:?}", res2, after2.duration_since(start2));
 }
