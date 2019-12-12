@@ -3,7 +3,7 @@ use std::cmp::Ordering;
 use std::collections::BTreeSet;
 use std::time::Instant;
 
-use num::integer::gcd;
+use num::integer::lcm;
 
 #[derive(Eq, Clone)]
 struct Vector {
@@ -213,9 +213,7 @@ impl MoonSystem {
             }
         }
 
-        let tmp = self.repeats[0] * self.repeats[1] / gcd(self.repeats[0], self.repeats[1]);
-        let tmp = tmp * self.repeats[2] / gcd(tmp, self.repeats[2]);
-        tmp
+        lcm(self.repeats[2], lcm(self.repeats[0], self.repeats[1]))
     }
 
     fn run(&mut self, timesteps: i64) {
