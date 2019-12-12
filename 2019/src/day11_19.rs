@@ -1,7 +1,7 @@
 use super::tools;
-use std::time::Instant;
 use std::collections::BTreeMap;
 use std::collections::BTreeSet;
+use std::time::Instant;
 
 use super::intcode::IntCodeComputer;
 use super::tools::Image;
@@ -40,9 +40,9 @@ impl PaintRobot {
             } else {
                 0
             };
-            
+
             self.brain.add_input(current_panel);
-            
+
             if !halted {
                 halted = self.brain.run();
             }
@@ -88,7 +88,7 @@ impl PaintRobot {
             }
             self.current_pos.0 = self.current_pos.0 + self.current_dir.0;
             self.current_pos.1 = self.current_pos.1 + self.current_dir.1;
-            
+
             if halted && !self.brain.has_output() {
                 break;
             }
@@ -122,35 +122,44 @@ impl PaintRobot {
         let mut pos1 = 0;
         let mut pos2 = 0;
         let mut white_indices: Vec<usize> = vec![];
-        count_white.iter().enumerate().for_each(|(i,w)| {
+        count_white.iter().enumerate().for_each(|(i, w)| {
             if *w == 0 {
                 white_indices.push(i);
             }
-            if i > 0 && pos2==0 {
-                if pos1==0 && *w==0 {
+            if i > 0 && pos2 == 0 {
+                if pos1 == 0 && *w == 0 {
                     pos1 = i;
-                } else if *w==0 {
+                } else if *w == 0 {
                     pos2 = i;
                 }
             }
         });
-        let width = pos2-pos1;
-        let height = (maxy-miny+1) as usize;
+        let width = pos2 - pos1;
+        let height = (maxy - miny + 1) as usize;
         while white_indices[0] >= width {
-            white_indices.insert(0, white_indices[0]-width);
+            white_indices.insert(0, white_indices[0] - width);
         }
 
-        let mut letters = vec![ vec![ vec![0usize; width]; height]; white_indices.len()-1];
-        white_indices[..white_indices.len()-1].iter().enumerate().for_each(|(l, i)| {
-            (i+1..i+width).into_iter().enumerate().for_each(|(x, vx)| {
-                (miny..maxy+1).into_iter().enumerate().for_each(|(y,vy)| {
-                    let pos = (vx as i64,vy as i64);
-                    if !(self.hull.contains_key(&pos) && self.hull[&pos] == 0) {
-                        letters[l][y][x] = 1;
-                    }
-                });
+        let mut letters = vec![vec![vec![0usize; width]; height]; white_indices.len() - 1];
+        white_indices[..white_indices.len() - 1]
+            .iter()
+            .enumerate()
+            .for_each(|(l, i)| {
+                (i + 1..i + width)
+                    .into_iter()
+                    .enumerate()
+                    .for_each(|(x, vx)| {
+                        (miny..maxy + 1)
+                            .into_iter()
+                            .enumerate()
+                            .for_each(|(y, vy)| {
+                                let pos = (vx as i64, vy as i64);
+                                if !(self.hull.contains_key(&pos) && self.hull[&pos] == 0) {
+                                    letters[l][y][x] = 1;
+                                }
+                            });
+                    });
             });
-        });
 
         let letter_width: usize = width + 1;
         let imagewidth: usize = letters.len() * letter_width;
@@ -158,19 +167,22 @@ impl PaintRobot {
 
         let mut image: Image = Image::new(imagewidth, imageheight, 40);
 
-        letters.iter().enumerate().for_each(|(letter_offset, letter)| {
-            letter.iter().enumerate().for_each(|(y, row)| {
-                row.iter().enumerate().for_each(|(x, c)| {
-                    let color = (
-                        if *c==1 {   0 } else { 255 },
-                        if *c==1 {   0 } else { 255 },
-                        if *c==1 {   0 } else { 255 },
-                        255
-                    );
-                    image.set_pixel( x + letter_offset * letter_width , y, color );
+        letters
+            .iter()
+            .enumerate()
+            .for_each(|(letter_offset, letter)| {
+                letter.iter().enumerate().for_each(|(y, row)| {
+                    row.iter().enumerate().for_each(|(x, c)| {
+                        let color = (
+                            if *c == 1 { 0 } else { 255 },
+                            if *c == 1 { 0 } else { 255 },
+                            if *c == 1 { 0 } else { 255 },
+                            255,
+                        );
+                        image.set_pixel(x + letter_offset * letter_width, y, color);
+                    });
                 });
             });
-        });
 
         image.save_png(&"output.png".to_string());
     }

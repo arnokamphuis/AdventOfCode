@@ -1,7 +1,7 @@
 use super::tools;
 use permutohedron::heap_recursive;
-use std::time::Instant;
 use std::collections::BTreeMap;
+use std::time::Instant;
 
 use super::intcode::IntCodeComputer;
 
