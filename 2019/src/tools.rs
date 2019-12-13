@@ -33,7 +33,7 @@ pub struct Image {
 impl Image {
     pub fn new(w: usize, h: usize, s: usize) -> Image {
         Image {
-            data: vec![255; 4 * w * s * h * s],
+            data: vec![0; 4 * w * s * h * s],
             width: w,
             height: h,
             scale: s,
