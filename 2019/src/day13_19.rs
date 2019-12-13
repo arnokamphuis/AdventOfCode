@@ -69,14 +69,15 @@ impl Game {
                     // score
                     self.score = out_triple[2];
                 } else if out_triple[2] == 0 {
+                    // remove block from field
                     self.img.set_pixel(
                         out_triple[0] as usize,
                         out_triple[1] as usize,
                         (0, 0, 0, 255),
                     );
                 } else if out_triple[2] == 3 {
+                    // paddle movement
                     if make_movie {
-                        // paddle
                         self.img.set_pixel(
                             self.paddle_pos.0 as usize,
                             self.paddle_pos.1 as usize,
@@ -95,7 +96,7 @@ impl Game {
                         );
                     }
                 } else if out_triple[2] == 4 {
-                    // ball
+                    // ball movement
                     if make_movie {
                         self.img.set_pixel(
                             self.ball_pos.0 as usize,
@@ -124,22 +125,16 @@ impl Game {
             )));
         }
         self.frame_counter += 1;
-
-        if self.frame_counter % 100 == 0 {
-            println!("frame counter: {} ", self.frame_counter);
-        }
     }
 
     fn play(&mut self) -> i64 {
-        let mut score = 0;
-
         self.computer.set_mem(0, super::intcode::Mode::IMM, 2);
 
         let mut finished = false;
         let mut initial = true;
         while !finished {
             finished = self.computer.run();
-            let process_result = self.process_score(initial, false);
+            self.process_score(initial, false);
             initial = false;
             let move_dir = if self.paddle_pos.0 < self.ball_pos.0 {
                 1
@@ -182,7 +177,6 @@ pub fn run() {
     let mut game1 = IntCodeComputer::new(&commands);
     game1.run();
 
-    let mut output: Vec<i64> = vec![];
     let mut c = 0;
     let mut c_blocks = 0;
     while let Some(o) = game1.get_output() {
