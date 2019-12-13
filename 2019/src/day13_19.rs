@@ -201,9 +201,6 @@ pub fn run() {
 
     let start2 = Instant::now();
 
-    // let mut img = Image::new(35, 25, 10);
-    //    img.set_pixel(pos.0 as usize, pos.1 as usize, ((50 * o) as u8, 0, 0, 255));
-    //    img.save_png(&String::from("game.png"));
     let mut game = Game::new(&commands);
     let res2 = game.play();
 
