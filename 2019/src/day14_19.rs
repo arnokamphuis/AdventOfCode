@@ -79,6 +79,79 @@ impl Nanofactory {
         }
         res
     }
+
+    fn calculate_costs(&self, fuel_needed: u64) -> u64 {
+        let res1;
+        let mut have: BTreeMap<String, u64> = BTreeMap::new();
+        let mut need: BTreeMap<String, u64> = BTreeMap::new();
+        let mut input_counters = self.inputs.clone();
+        need.insert(String::from("FUEL"), fuel_needed);
+        have.insert(String::from("FUEL"), 0);
+
+        loop {
+            if need.len() == 1 && need.contains_key("ORE") {
+                res1 = need["ORE"];
+                break;
+            }
+
+            let mut target = String::from("");
+            for (t, input_count) in &input_counters {
+                if *input_count == 0 {
+                    target = t.clone();
+                    break;
+                }
+            }
+
+            let needed = need[&target];
+            let already_have = have[&target];
+
+            if needed < already_have {
+                have.entry(target.clone()).and_modify(|e| *e -= needed);
+                need.remove(&target);
+            } else {
+                let reactions = self.find_product(&target);
+                for reaction in reactions {
+                    let produces_amount = reaction.amount;
+
+                    let delta = needed - already_have;
+
+                    let mut factor = (delta) / produces_amount;
+                    if delta % produces_amount > 0 {
+                        factor += 1;
+                    }
+
+                    for (reactant, required_amount) in &reaction.from {
+                        let total_required = factor * required_amount;
+
+                        input_counters
+                            .entry(reactant.to_string())
+                            .and_modify(|r| *r -= 1);
+
+                        if !need.contains_key(reactant) {
+                            need.insert(reactant.to_string(), 0);
+                        }
+
+                        need.entry(reactant.to_string())
+                            .and_modify(|e| *e += total_required);
+
+                        if !have.contains_key(reactant) {
+                            have.insert(reactant.to_string(), 0);
+                        }
+                    }
+
+                    let redundant = factor * produces_amount - delta;
+                    if redundant > 0 {
+                        *have.entry(target.clone()).or_insert(0) = redundant;
+                    }
+                }
+
+                need.remove(&target);
+            }
+
+            input_counters.remove(&target);
+        }
+        res1
+    }
 }
 
 #[allow(dead_code)]
@@ -101,87 +174,28 @@ pub fn run() {
 
     let start1 = Instant::now();
 
-    let mut todo: Vec<String> = vec![];
-    let mut have: BTreeMap<String, u64> = BTreeMap::new();
-    let mut need: BTreeMap<String, u64> = BTreeMap::new();
-
-    need.insert(String::from("FUEL"), 1);
-    have.insert(String::from("FUEL"), 0);
-    todo.push(String::from("FUEL"));
-
-    let mut input_counters = factory.inputs.clone();
-
-    let res1;
-
-    loop {
-        if need.len() == 1 && need.contains_key("ORE") {
-            res1 = need["ORE"];
-            break;
-        }
-
-        let mut target = String::from("");
-        for (t, input_count) in &input_counters {
-            if *input_count == 0 {
-                target = t.clone();
-                break;
-            }
-        }
-
-        let needed = need[&target];
-        let already_have = have[&target];
-
-        if needed < already_have {
-            have.entry(target.clone()).and_modify(|e| *e -= needed);
-            need.remove(&target);
-            todo.remove(0);
-        } else {
-            let reactions = &factory.find_product(&target);
-            for reaction in reactions {
-                let produces_amount = reaction.amount;
-
-                let delta = needed - already_have;
-
-                let mut factor = (delta) / produces_amount;
-                if delta % produces_amount > 0 {
-                    factor += 1;
-                }
-
-                for (reactant, required_amount) in &reaction.from {
-                    let total_required = factor * required_amount;
-
-                    input_counters
-                        .entry(reactant.to_string())
-                        .and_modify(|r| *r -= 1);
-
-                    if !need.contains_key(reactant) {
-                        need.insert(reactant.to_string(), 0);
-                    }
-
-                    need.entry(reactant.to_string())
-                        .and_modify(|e| *e += total_required);
-
-                    if !have.contains_key(reactant) {
-                        have.insert(reactant.to_string(), 0);
-                    }
-                }
-
-                let redundant = factor * produces_amount - delta;
-                if redundant > 0 {
-                    *have.entry(target.clone()).or_insert(0) = redundant;
-                }
-            }
-
-            need.remove(&target);
-        }
-
-        input_counters.remove(&target);
-    }
+    let res1 = factory.calculate_costs(1);
 
     let after1 = Instant::now();
     println!("Part 1: {}, in {:?}", res1, after1.duration_since(start1));
 
     let start2 = Instant::now();
 
+    let res2;
+    let mut low = 0;
+    let mut high = 10000000;
+    while low < high {
+        let mid = (high + low + 1) / 2;
+        let cost = factory.calculate_costs(mid);
+        if cost <= 1000000000000 {
+            low = mid;
+        } else {
+            high = mid - 1;
+        }
+    }
+
+    res2 = low;
+
     let after2 = Instant::now();
-    println!("Part 2: {}, in {:?}", 0, after2.duration_since(start2));
+    println!("Part 2: {}, in {:?}", res2, after2.duration_since(start2));
 }
