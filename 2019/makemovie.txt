@@ -1,2 +1,7 @@
 ffmpeg -framerate 60 -i %05d.png -s:v 1280x720 -c:v libx264 -profile:v high -crf 20 -pix_fmt yuv420p search-60fps.mp4
 ffmpeg -framerate 10 -i %05d.png -s:v 1280x720 -c:v libx264 -profile:v high -crf 20 -pix_fmt yuv420p search-10fps.mp4
+
+
+
+ffmpeg -framerate 60 -i phase1%05d.png -s:v 1280x720 -c:v libx264 -profile:v high -crf 20 -pix_fmt yuv420p discover-60fps.mp4
+ffmpeg -f concat -safe 0 -i mylist.txt -c copy output.mp4
