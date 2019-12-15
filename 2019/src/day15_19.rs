@@ -11,7 +11,7 @@ struct Cleaner {
     env: BTreeMap<(i64, i64), bool>,
     pos: (i64, i64),
     q: Queue<(i64, i64)>,
-    paths: BTreeMap<(i64, i64), Vec<usize>>,
+    paths: BTreeMap<(i64, i64), (Vec<usize>, IntCodeComputer)>,
     oxygen: (i64, i64),
 }
 
@@ -139,7 +139,8 @@ impl Cleaner {
         // let mut step = 0;
         self.env.insert(self.pos, false);
         self.q.add(self.pos).unwrap();
-        self.paths.insert(self.pos, vec![]);
+        self.paths
+            .insert(self.pos, (vec![], IntCodeComputer::new(&self.commands)));
 
         // self.env_to_img(
         //     &format!("movie-day15/phase1{:05}.png", step),
@@ -151,7 +152,7 @@ impl Cleaner {
         let directions = [(0, 1), (0, -1), (-1, 0), (1, 0)];
         while self.q.size() > 0 {
             if let Ok(c_pos) = self.q.remove() {
-                let path = self.paths[&c_pos].clone();
+                let path = self.paths[&c_pos].0.clone();
 
                 for dir in 1i64..=4 {
                     let dir_vec = directions[dir as usize - 1];
@@ -160,17 +161,11 @@ impl Cleaner {
                     new_pos.1 += dir_vec.1;
                     let new_dist = path.len() + 1;
 
-                    if !(self.paths.contains_key(&new_pos) && self.paths[&new_pos].len() < new_dist)
+                    if !(self.paths.contains_key(&new_pos)
+                        && self.paths[&new_pos].0.len() < new_dist)
                     {
                         if !(self.env.contains_key(&new_pos) && self.env[&new_pos]) {
-                            let mut computer = IntCodeComputer::new(&self.commands);
-                            for index in 0..path.len() {
-                                computer.add_input(path[index] as i64);
-                                computer.run();
-                                let tempres = computer.get_output().unwrap();
-                                assert!(tempres == 1, format!("PATH NOT FREE {}", tempres));
-                            }
-
+                            let mut computer = self.paths[&c_pos].1.clone();
                             computer.add_input(dir);
                             computer.run();
                             let status = computer.get_output().unwrap();
@@ -179,13 +174,13 @@ impl Cleaner {
                                     self.oxygen = new_pos;
                                     let mut new_path = path.clone();
                                     new_path.push(dir as usize);
-                                    self.paths.insert(new_pos, new_path);
+                                    self.paths.insert(new_pos, (new_path, computer.clone()));
                                     self.env.insert(new_pos, false);
                                 }
                                 1 => {
                                     let mut new_path = path.clone();
                                     new_path.push(dir as usize);
-                                    self.paths.insert(new_pos, new_path);
+                                    self.paths.insert(new_pos, (new_path, computer.clone()));
                                     self.q.add(new_pos).unwrap();
                                     self.env.insert(new_pos, false);
                                 }
@@ -210,7 +205,7 @@ impl Cleaner {
         // step += 1;
         // self.env_to_img(&format!("movie-day15/phase1{:05}.png", step), vec![], None);
 
-        self.paths[&self.oxygen].len() as u64
+        self.paths[&self.oxygen].0.len() as u64
     }
 
     fn calculate_fill_time(&mut self) -> u64 {
