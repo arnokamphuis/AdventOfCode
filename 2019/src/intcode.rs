@@ -16,6 +16,19 @@ pub enum Mode {
     REL,
 }
 
+pub fn get_commands_from_line(line: &String) -> BTreeMap<i64, i64> {
+    let command_strings: Vec<&str> = line.split(",").collect();
+    let mut commands: BTreeMap<i64, i64> = BTreeMap::new();
+    command_strings
+        .iter()
+        .filter_map(|s| s.parse::<i64>().ok())
+        .enumerate()
+        .for_each(|(i, c)| {
+            commands.insert(i as i64, c);
+        });
+    commands
+}
+
 impl IntCodeComputer {
     pub fn new(m: &BTreeMap<i64, i64>) -> IntCodeComputer {
         IntCodeComputer {
