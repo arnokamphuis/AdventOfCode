@@ -1,6 +1,7 @@
 use super::intcode::get_commands_from_line;
 use super::intcode::IntCodeComputer;
 use super::tools;
+use super::tools::Image;
 use queues::*;
 use std::collections::BTreeMap;
 use std::time::Instant;
@@ -59,10 +60,92 @@ impl Cleaner {
         println!("----------------------------------------------------------------------");
     }
 
+    #[allow(dead_code)]
+    fn env_to_img(
+        &self,
+        filename: &String,
+        visited: Vec<(i64, i64)>,
+        range: Option<(i64, i64, i64, i64)>,
+    ) {
+        let mut minx = std::i64::MAX;
+        let mut maxx = std::i64::MIN;
+        let mut miny = std::i64::MAX;
+        let mut maxy = std::i64::MIN;
+
+        let use_black_for_walls = range == None;
+
+        if range == None {
+            for (p, _) in &self.env {
+                minx = std::cmp::min(minx, p.0);
+                maxx = std::cmp::max(maxx, p.0);
+                miny = std::cmp::min(miny, p.1);
+                maxy = std::cmp::max(maxy, p.1);
+            }
+        } else {
+            minx = range.unwrap().0;
+            maxx = range.unwrap().1;
+            miny = range.unwrap().2;
+            maxy = range.unwrap().3;
+        }
+
+        let width = maxx - minx + 1;
+        let height = maxy - miny + 1;
+        let mut img = Image::new(width as usize, height as usize, 50);
+        for y in miny..=maxy {
+            for x in minx..=maxx {
+                if !self.env.contains_key(&(x, y)) {
+                    img.set_pixel((x - minx) as usize, (y - miny) as usize, (0, 0, 0, 255));
+                // empty
+                } else if self.env[&(x, y)] {
+                    if use_black_for_walls {
+                        img.set_pixel((x - minx) as usize, (y - miny) as usize, (0, 0, 0, 255));
+                    } else {
+                        img.set_pixel(
+                            (x - minx) as usize,
+                            (y - miny) as usize,
+                            (100, 100, 100, 255),
+                        );
+                    }
+                // wall
+                } else {
+                    if (x, y) == self.oxygen {
+                        img.set_pixel((x - minx) as usize, (y - miny) as usize, (255, 0, 255, 255));
+                    // oxygen
+                    } else if (x, y) == (0, 0) {
+                        img.set_pixel((x - minx) as usize, (y - miny) as usize, (0, 255, 0, 255));
+                    } else {
+                        let pos = (x, y);
+                        if visited.contains(&pos) {
+                            img.set_pixel(
+                                (x - minx) as usize,
+                                (y - miny) as usize,
+                                (127, 127, 127, 255),
+                            );
+                        } else {
+                            img.set_pixel(
+                                (x - minx) as usize,
+                                (y - miny) as usize,
+                                (255, 255, 255, 255),
+                            );
+                        }
+                    }
+                }
+            }
+        }
+        img.save_png(filename);
+    }
+
     fn search(&mut self) -> u64 {
+        // let mut step = 0;
         self.env.insert(self.pos, false);
         self.q.add(self.pos).unwrap();
         self.paths.insert(self.pos, vec![]);
+
+        // self.env_to_img(
+        //     &format!("movie-day15/phase1{:05}.png", step),
+        //     vec![],
+        //     Some((-21, 19, -19, 21)),
+        // );
 
         // north (1), south (2), west (3), and east (4)
         let directions = [(0, 1), (0, -1), (-1, 0), (1, 0)];
@@ -117,13 +200,24 @@ impl Cleaner {
                     }
                 }
             }
+            // step += 1;
+            // self.env_to_img(
+            //     &format!("movie-day15/phase1{:05}.png", step),
+            //     vec![],
+            //     Some((-21, 19, -19, 21)),
+            // );
         }
+        // step += 1;
+        // self.env_to_img(&format!("movie-day15/phase1{:05}.png", step), vec![], None);
 
         self.paths[&self.oxygen].len() as u64
     }
 
     fn calculate_fill_time(&mut self) -> u64 {
         let mut res: u64 = 0;
+
+        // needed for saving images
+        // let mut step = 0;
 
         // north (1), south (2), west (3), and east (4)
         let directions = [(0, 1), (0, -1), (-1, 0), (1, 0)];
@@ -153,6 +247,8 @@ impl Cleaner {
                     }
                 }
             }
+            // step += 1;
+            //self.env_to_img(&format!("movie-day15/{:05}.png", step), visited.clone(), None);
         }
 
         for (_, d) in dist {
@@ -180,6 +276,7 @@ pub fn run() {
 
     let mut cleaner1 = Cleaner::new(&commands);
     let res1 = cleaner1.search();
+    cleaner1.env_to_img(&String::from("env.png"), vec![], None);
 
     let after1 = Instant::now();
     println!("Part 1: {}, in {:?}", res1, after1.duration_since(start1));
