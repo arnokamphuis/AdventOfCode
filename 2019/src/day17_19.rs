@@ -9,6 +9,7 @@ use std::time::Instant;
 struct Ascii {
     computer: IntCodeComputer,
     map: BTreeMap<(i64, i64), i64>,
+    finalmap: BTreeMap<(i64, i64), i64>,
 }
 
 impl Ascii {
@@ -16,6 +17,7 @@ impl Ascii {
         Ascii {
             computer: IntCodeComputer::new(&m),
             map: BTreeMap::new(),
+            finalmap: BTreeMap::new(),
         }
     }
 
@@ -31,35 +33,35 @@ impl Ascii {
             miny = std::cmp::min(miny, p.1);
             maxy = std::cmp::max(maxy, p.1);
         }
-        println!("{} {} {} {}", minx, maxx, miny, maxy);
+        // println!("{} {} {} {}", minx, maxx, miny, maxy);
         let width = maxx - minx + 1;
         let height = maxy - miny + 1;
 
         let mut img = Image::new(width as usize, height as usize, 50);
-        println!("----------------------------------------------------------------------");
+        // println!("----------------------------------------------------------------------");
         for y in miny..=maxy {
             for x in minx..=maxx {
                 if self.map.contains_key(&(x, y)) {
                     if self.map[&(x, y)] == 0 {
                         img.set_pixel(x as usize, y as usize, (0, 0, 0, 255));
-                        print!(".");
+                    // print!(".");
                     } else if self.map[&(x, y)] == 1 {
                         img.set_pixel(x as usize, y as usize, (255, 0, 255, 255));
-                        print!("#");
+                    // print!("#");
                     } else if self.map[&(x, y)] == 4 {
                         img.set_pixel(x as usize, y as usize, (255, 255, 0, 255));
-                        print!("^");
+                    // print!("^");
                     } else if self.map[&(x, y)] == 100 {
                         img.set_pixel(x as usize, y as usize, (0, 255, 0, 255));
-                        print!("O");
+                    // print!("O");
                     } else {
-                        print!("r");
+                        // print!("r");
                     }
                 }
             }
-            print!("\n");
+            // print!("\n");
         }
-        println!("----------------------------------------------------------------------");
+        // println!("----------------------------------------------------------------------");
         img.save_png(&String::from("ascii-scaffold.png"));
     }
 
@@ -163,9 +165,34 @@ impl Ascii {
         }
 
         let _returncode = self.computer.run();
-        while let Some(out) = self.computer.get_output() {
-            res = out;
+        let mut pos = (0, 0);
+        while let Some(x) = self.computer.get_output() {
+            match x {
+                35 => {
+                    self.finalmap.insert(pos, 1); // scaffolding
+                }
+                46 => {
+                    self.finalmap.insert(pos, 0); // space
+                }
+                10 => {
+                    pos = (-1, pos.1 + 1);
+                }
+                94 => {
+                    self.finalmap.insert(pos, 4); // startpos moving up
+                }
+                _ => {
+                    if x < 255 {
+                        // println!("  unexpected value: {}", (x as u8) as char);
+                    } else {
+                        res = x;
+                    }
+                }
+            }
+            pos = (pos.0 + 1, pos.1);
         }
+
+        self.map = self.finalmap.clone();
+        self.print_env();
         res
     }
 }
