@@ -65,7 +65,7 @@ pub fn run() {
 
     let start2 = Instant::now();
 
-    let mut res2;
+    let res2;
 
     loop {
         let ll = pos;
