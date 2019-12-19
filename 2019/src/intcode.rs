@@ -170,8 +170,9 @@ impl IntCodeComputer {
                     }
                 }
                 4 => {
-                    paramsize = 1;
+                    // paramsize = 1;
                     self.add_output(self.get_mem(self.pc + 1, modes[0]));
+                    break;
                 }
                 5 => {
                     paramsize = 2;
