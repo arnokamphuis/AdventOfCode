@@ -16,7 +16,7 @@ mod day14_19;
 mod day15_19;
 mod day16_19;
 mod day17_19;
-mod day18a_19;
+mod day18_19;
 mod day19_19;
 mod intcode;
 mod tools;
@@ -40,6 +40,6 @@ fn main() {
     // day15_19::run();
     // day16_19::run();
     // day17_19::run();
-    // day18a_19::run();
-    day19_19::run();
+    day18_19::run();
+    // day19_19::run();
 }
