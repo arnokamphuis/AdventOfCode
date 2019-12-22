@@ -94,6 +94,7 @@ impl Maze {
 
     // }
 
+    #[allow(dead_code)]
     fn print(&self) {
         println!("------------------------------------------------------------------");
         for y in self.min_bound.1..=self.max_bound.1 {
@@ -181,7 +182,7 @@ impl Maze {
         let mut maxx = std::i64::MIN;
         let mut miny = std::i64::MAX;
         let mut maxy = std::i64::MIN;
-        for (pos,v) in &self.field {
+        for (pos,_) in &self.field {
             minx = std::cmp::min(minx, pos.0);
             maxx = std::cmp::max(maxx, pos.0);
             miny = std::cmp::min(miny, pos.1);

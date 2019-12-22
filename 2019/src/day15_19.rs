@@ -140,7 +140,7 @@ impl Cleaner {
         self.env.insert(self.pos, false);
         self.q.add(self.pos).unwrap();
         self.paths
-            .insert(self.pos, (vec![], IntCodeComputer::new(&self.commands)));
+            .insert(self.pos, (vec![], IntCodeComputer::new(&self.commands,false)));
 
         // self.env_to_img(
         //     &format!("movie-day15/phase1{:05}.png", step),

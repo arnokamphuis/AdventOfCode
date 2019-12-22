@@ -16,7 +16,7 @@ struct Game {
 impl Game {
     fn new(commands: &BTreeMap<i64, i64>) -> Game {
         Game {
-            computer: IntCodeComputer::new(commands),
+            computer: IntCodeComputer::new(commands, false),
             ball_pos: (0, 0),
             paddle_pos: (0, 0),
             score: 0,
@@ -174,7 +174,7 @@ pub fn run() {
 
     let start1 = Instant::now();
 
-    let mut game1 = IntCodeComputer::new(&commands);
+    let mut game1 = IntCodeComputer::new(&commands, false);
     game1.run();
 
     let mut c = 0;

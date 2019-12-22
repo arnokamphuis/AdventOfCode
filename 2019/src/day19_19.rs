@@ -16,7 +16,7 @@ impl TractorBeam {
     }
 
     fn check(&mut self, pos: (i64,i64)) -> bool {
-        let mut dronesystem = IntCodeComputer::new(&self.memory);
+        let mut dronesystem = IntCodeComputer::new(&self.memory, true);
         dronesystem.add_input(pos.0);
         dronesystem.add_input(pos.1);
         dronesystem.run();

@@ -20,7 +20,7 @@ pub fn run() {
 
     let input_file = "./input/day21_19_real.txt";
     let input = tools::get_input(String::from(input_file));
-    let mut commands = get_commands_from_line(&input[0]);
+    let commands = get_commands_from_line(&input[0]);
 
     let after0 = Instant::now();
     println!("Init in {:?}", after0.duration_since(start0));

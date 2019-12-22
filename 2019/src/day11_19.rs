@@ -26,7 +26,7 @@ impl PaintRobot {
             painted: BTreeSet::new(),
             current_dir: DIR_UP,
             current_pos: (0, 0),
-            brain: IntCodeComputer::new(program),
+            brain: IntCodeComputer::new(program, false),
         }
     }
 

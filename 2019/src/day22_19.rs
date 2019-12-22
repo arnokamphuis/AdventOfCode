@@ -18,8 +18,8 @@ impl Deck {
     }
 
     fn cut(&mut self, cutoff: i32) {
-        let mut co_index: usize = 0;
-        let mut res = self.cards.clone();
+        let co_index: usize;
+        let res = self.cards.clone();
         if cutoff < 0 {
             let mut co = cutoff;
             while co < 0 { co += res.len() as i32; }

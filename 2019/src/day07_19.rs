@@ -9,7 +9,7 @@ fn run_amplifiers(phases: &Vec<i64>, commands: &BTreeMap<i64, i64>, part: usize)
     const AMPLIFIERCOUNT: usize = 5;
     let mut result = -1;
     let mut amplifiers: Vec<IntCodeComputer> =
-        vec![IntCodeComputer::new(&commands); AMPLIFIERCOUNT];
+        vec![IntCodeComputer::new(&commands, false); AMPLIFIERCOUNT];
 
     for i in 0..AMPLIFIERCOUNT {
         amplifiers[i].add_input(phases[i]);

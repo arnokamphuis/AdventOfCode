@@ -15,7 +15,7 @@ struct Ascii {
 impl Ascii {
     fn new(m: &BTreeMap<i64, i64>) -> Ascii {
         Ascii {
-            computer: IntCodeComputer::new(&m),
+            computer: IntCodeComputer::new(&m,false),
             map: BTreeMap::new(),
             finalmap: BTreeMap::new(),
         }

@@ -25,7 +25,7 @@ pub fn run() {
 
     let start1 = Instant::now();
 
-    let mut computer1 = IntCodeComputer::new(&commands);
+    let mut computer1 = IntCodeComputer::new(&commands, false);
     computer1.add_input(1);
     computer1.run();
 
@@ -38,7 +38,7 @@ pub fn run() {
 
     let start2 = Instant::now();
 
-    let mut computer2 = IntCodeComputer::new(&commands);
+    let mut computer2 = IntCodeComputer::new(&commands, false);
     computer2.add_input(2);
     computer2.run();
 

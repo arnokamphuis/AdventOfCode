@@ -243,7 +243,6 @@ impl Cave {
         let mut visited: Vec<(Robots,Vec<char>)> = vec![];
         let mut already_in_heap: Vec<(Robots,Vec<char>)> = vec![];
         
-        let mut counter = 0;
         while let Some(s) = heap.pop() {
 
             let mut current_keys: Vec<char> = s.robots.loc.clone();
@@ -257,7 +256,6 @@ impl Cave {
             if current_keys.len() == (self.keys.len()+self.start.len()) {
                 return s.distance;
             } else {
-                // s.print();
                 visited.push( (s.robots.clone(), s.has_keys.clone()) );
 
                 let mut robot_index = 0;
@@ -293,11 +291,8 @@ impl Cave {
                                     if !visited.contains(&(rs.clone(), keys.clone())) {
 
                                         let new_state = State { distance: s.distance + candidate.1, robots: rs.clone(), has_keys: keys.clone() };
-                                        // print!("Adding the following state ");
-                                        // new_state.print();
                                         heap.push(new_state);
                                         already_in_heap.push( (rs.clone(), keys.clone()) );
-                                        // println!("Current heap size = {}", heap.len());
                                     }
                                 }
                             }

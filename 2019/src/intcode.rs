@@ -7,6 +7,7 @@ pub struct IntCodeComputer {
     relative_base: i64,
     input: Vec<i64>,
     output: Vec<i64>,
+    wait_on_output: bool,
 }
 
 #[derive(Eq, PartialEq, Clone, Copy, Hash)]
@@ -30,13 +31,14 @@ pub fn get_commands_from_line(line: &String) -> BTreeMap<i64, i64> {
 }
 
 impl IntCodeComputer {
-    pub fn new(m: &BTreeMap<i64, i64>) -> IntCodeComputer {
+    pub fn new(m: &BTreeMap<i64, i64>, w_o_o: bool) -> IntCodeComputer {
         IntCodeComputer {
             memory: m.clone(),
             pc: 0,
             relative_base: 0,
             input: vec![],
             output: vec![],
+            wait_on_output: w_o_o,
         }
     }
 
@@ -170,9 +172,11 @@ impl IntCodeComputer {
                     }
                 }
                 4 => {
-                    // paramsize = 1;
+                    paramsize = 1;
                     self.add_output(self.get_mem(self.pc + 1, modes[0]));
-                    break;
+                    if self.wait_on_output {
+                        break;
+                    }
                 }
                 5 => {
                     paramsize = 2;
