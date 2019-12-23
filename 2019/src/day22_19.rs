@@ -1,5 +1,5 @@
-use std::time::{Instant};
 use super::tools;
+use std::time::Instant;
 
 struct Deck {
     cards: Vec<u32>,
@@ -7,9 +7,7 @@ struct Deck {
 
 impl Deck {
     fn new(length: usize) -> Deck {
-        let mut d = Deck {
-            cards: vec![],
-        };
+        let mut d = Deck { cards: vec![] };
         for i in 0..length {
             d.cards.push(i as u32);
         }
@@ -22,7 +20,9 @@ impl Deck {
         let res = self.cards.clone();
         if cutoff < 0 {
             let mut co = cutoff;
-            while co < 0 { co += res.len() as i32; }
+            while co < 0 {
+                co += res.len() as i32;
+            }
             co_index = co as usize;
         } else {
             co_index = cutoff as usize;
@@ -63,7 +63,7 @@ impl Deck {
                     "with" => {
                         iter.next();
                         let increment = iter.next().unwrap().parse::<usize>().unwrap();
-                        self.increment(increment);        
+                        self.increment(increment);
                     }
                     "into" => {
                         self.newstack();
@@ -75,7 +75,6 @@ impl Deck {
         }
     }
 }
-
 
 fn modinv(mut a: i128, mut base: i128) -> i128 {
     if base == 1 {
@@ -119,7 +118,6 @@ fn modp(b: i128, exp: i128, base: i128) -> i128 {
     x
 }
 
-
 struct EfficientDeck {
     cards: i128,
     repeats: i128,
@@ -138,6 +136,7 @@ impl EfficientDeck {
     }
 
     fn final_calc(&self) -> i128 {
+        println!("a: {}, b: {}", self.increment_mul, self.offset_diff);
         let i1 = modp(self.increment_mul, self.repeats, self.cards) * 2020i128 % self.cards;
         let i2 = (modp(self.increment_mul, self.repeats, self.cards) + self.cards - 1) % self.cards;
         let i3 = self.offset_diff * i2 % self.cards;
@@ -151,7 +150,11 @@ impl EfficientDeck {
         match c1 {
             "cut" => {
                 let offset = iter.next().unwrap().parse::<i128>().unwrap();
-                self.offset_diff += if offset < 0 { offset + self.cards } else { offset };
+                self.offset_diff += if offset < 0 {
+                    offset + self.cards
+                } else {
+                    offset
+                };
             }
             "deal" => {
                 let c2 = iter.next().unwrap();
@@ -196,6 +199,7 @@ pub fn run() {
 
     // let input_file = "./input/day22_19_test.txt";
     let input_file = "./input/day22_19_real.txt";
+    // let input_file = "./input/day22_19_esther.txt";
     let input = tools::get_input(String::from(input_file));
 
     // const DECKSIZE: usize = 10;
@@ -211,10 +215,9 @@ pub fn run() {
     for line in &input {
         cards.perform(&line);
     }
-    
     let mut res1 = 0;
     if DECKSIZE > 10 {
-        for (i,v) in cards.cards.iter().enumerate() {
+        for (i, v) in cards.cards.iter().enumerate() {
             if *v == 2019 {
                 res1 = i;
             }
@@ -239,9 +242,7 @@ pub fn run() {
         deck2.perform(&line);
     }
 
-
     let res2 = deck2.final_calc();
-    
     let after2 = Instant::now();
     println!("Part 2: {}, in {:?}", res2, after2.duration_since(start2));
 }

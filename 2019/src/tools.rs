@@ -1,3 +1,4 @@
+use std::collections::BTreeMap;
 use std::fs::File;
 use std::io::BufWriter;
 use std::io::{self, BufRead};
@@ -21,6 +22,19 @@ pub fn get_input(filename: String) -> Vec<String> {
         }
     }
     input
+}
+
+pub fn get_commands_from_line(line: &String) -> BTreeMap<i64, i64> {
+    let command_strings: Vec<&str> = line.split(",").collect();
+    let mut commands: BTreeMap<i64, i64> = BTreeMap::new();
+    command_strings
+        .iter()
+        .filter_map(|s| s.parse::<i64>().ok())
+        .enumerate()
+        .for_each(|(i, c)| {
+            commands.insert(i as i64, c);
+        });
+    commands
 }
 
 pub struct Image {
