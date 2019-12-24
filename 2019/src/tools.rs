@@ -54,6 +54,14 @@ impl Image {
         }
     }
 
+    pub fn clear(&mut self, color: (u8, u8, u8, u8)) {
+        for w in 0..self.width {
+            for h in 0..self.height {
+                self.set_pixel(w, h, color);
+            }
+        }
+    }
+
     pub fn set_pixel(&mut self, x: usize, y: usize, color: (u8, u8, u8, u8)) {
         let real_x = self.scale * x;
         let real_y = self.scale * y;

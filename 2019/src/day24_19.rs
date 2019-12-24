@@ -2,6 +2,7 @@ use super::tools;
 use std::collections::BTreeMap;
 use std::collections::HashSet;
 use std::time::Instant;
+use tools::Image;
 
 struct Field {
     map: Vec<bool>,
@@ -297,7 +298,66 @@ impl RecursiveField {
                 }
             }
         }
+
+        if new_map[&self.min_depth].iter().filter(|b| **b).count() == 0 {
+            new_map.remove(&self.min_depth);
+            self.min_depth += 1;
+        }
+        if new_map[&self.max_depth].iter().filter(|b| **b).count() == 0 {
+            new_map.remove(&self.max_depth);
+            self.max_depth -= 1;
+        }
         self.map = new_map.clone();
+    }
+
+    #[allow(dead_code)]
+    fn save(&self, frame: &String) {
+        // const MAX_DEPTH: u32 = 202;
+        let w = 15 * 6; // 15 = sqrt(202)
+        let mut img = Image::new(16 * w / 9, w, 20);
+        img.clear((40, 40, 40, 255));
+        let extra_offset = ((16 * w / 9) - w) / 2;
+
+        let total_depth = self.max_depth - self.min_depth + 1;
+        let mut level_offset_x = 0;
+        let mut level_offset_y = 0;
+
+        for level in -110..=110 {
+            if self.map.contains_key(&level) {
+                // println!("working on level {}", level);
+                // loop from the highest depth down to the lower levels
+                let depth = 110 - level;
+                let remaining_levels = total_depth - depth;
+                let cell_width = 6;
+                level_offset_x = (depth % 15) * cell_width;
+                level_offset_y = (depth / 15) * cell_width;
+
+                for i in 0..25 {
+                    if i != 12 {
+                        // offset within this level
+                        let xi = i % 5;
+                        let yi = i / 5;
+
+                        let x = xi + level_offset_x + extra_offset as i64;
+                        let y = yi + level_offset_y;
+
+                        let level_value: i64 = level;
+                        let color = if self.map[&level_value][i as usize] {
+                            if level == 0 {
+                                (255, 0, 255, 255)
+                            } else {
+                                (255, 255, 255, 255)
+                            }
+                        } else {
+                            (0, 0, 0, 255)
+                        };
+                        img.set_pixel(x as usize, y as usize, color);
+                    }
+                }
+            }
+        }
+
+        img.save_png(&String::from(format!("movie/{}.png", frame)));
     }
 }
 
@@ -331,8 +391,9 @@ pub fn run() {
 
     let start2 = Instant::now();
 
-    for _ in 0..200 {
+    for t in 0..200 {
         f2.update();
+        f2.save(&format!("{:03}", t).to_string());
     }
     let res2 = f2.count_bugs();
 
