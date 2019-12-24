@@ -24,6 +24,7 @@ mod day20_2_19;
 mod day21_19;
 mod day22_19;
 mod day23_19;
+mod day24_19;
 mod intcode;
 mod intcodestepper;
 mod tools;
@@ -54,5 +55,6 @@ fn main() {
     // day20_2_19::run();
     // day21_19::run();
     // day22_19::run();
-    day23_19::run();
+    // day23_19::run();
+    day24_19::run();
 }
