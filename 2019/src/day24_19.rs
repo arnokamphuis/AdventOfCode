@@ -318,16 +318,14 @@ impl RecursiveField {
         img.clear((40, 40, 40, 255));
         let extra_offset = ((16 * w / 9) - w) / 2;
 
-        let total_depth = self.max_depth - self.min_depth + 1;
-        let mut level_offset_x = 0;
-        let mut level_offset_y = 0;
+        let mut level_offset_x;
+        let mut level_offset_y;
 
         for level in -110..=110 {
             if self.map.contains_key(&level) {
                 // println!("working on level {}", level);
                 // loop from the highest depth down to the lower levels
                 let depth = 110 - level;
-                let remaining_levels = total_depth - depth;
                 let cell_width = 6;
                 level_offset_x = (depth % 15) * cell_width;
                 level_offset_y = (depth / 15) * cell_width;
@@ -369,6 +367,7 @@ pub fn run() {
 
     // let input_file = "./input/day24_19_test.txt";
     let input_file = "./input/day24_19_real.txt";
+    // let input_file = "./input/day24_19_esther.txt";
     let input = tools::get_input(String::from(input_file));
 
     let mut f1 = Field::new();
@@ -391,9 +390,13 @@ pub fn run() {
 
     let start2 = Instant::now();
 
-    for t in 0..200 {
+    for _t in 0..200 {
         f2.update();
-        f2.save(&format!("{:03}", t).to_string());
+        // if t < 20 {
+        //     println!("Minute {}", t + 1);
+        //     f2.print();
+        // }
+        // f2.save(&format!("{:03}", t).to_string());
     }
     let res2 = f2.count_bugs();
 
