@@ -1,31 +1,24 @@
 use super::tools;
-use std::collections::HashMap;
+use std::collections::BTreeMap;
 use std::time::Instant;
 
-macro_rules! hashmap {
-    ($( $key: expr => $val: expr ),*) => {{
-         let map = ::std::collections::HashMap::new();
-         $( map.insert($key, $val); )*
-         map
-    }}
-}
-
+#[derive(Clone, Eq, PartialEq)]
 enum RTGelement {
     GENERATOR = 1,
     MICROCHIP,
 }
 
-#[derive(Clone)]
+#[derive(Clone, Eq, PartialEq)]
 struct RTG {
     name: String,
     generator: i8,
     microchip: i8,
 }
 
-#[derive(Clone)]
+#[derive(Clone, Eq, PartialEq)]
 struct Building {
     elevator: i8,
-    rtgs: HashMap<String, RTG>,
+    rtgs: BTreeMap<String, RTG>,
 }
 
 impl RTG {
@@ -39,35 +32,11 @@ impl RTG {
     }
 
     #[allow(dead_code)]
-    fn active(&self) -> bool {
-        self.generator == self.microchip
-    }
-
-    #[allow(dead_code)]
-    fn on_floor(&self) -> i8 {
-        if self.active() {
-            self.generator
-        } else {
-            -1
-        }
-    }
-
-    #[allow(dead_code)]
     fn element_on_floor(&self, element: RTGelement) -> i8 {
         match element {
             RTGelement::MICROCHIP => self.microchip,
             RTGelement::GENERATOR => self.generator,
         }
-    }
-
-    #[allow(dead_code)]
-    fn gen_id(&self) -> String {
-        format!(
-            "{}{}{}",
-            self.name.to_string(),
-            self.generator.to_string(),
-            self.microchip.to_string()
-        )
     }
 }
 
@@ -76,7 +45,7 @@ impl Building {
     fn new() -> Building {
         Building {
             elevator: 0,
-            rtgs: hashmap![],
+            rtgs: BTreeMap::new(),
         }
     }
 
@@ -106,30 +75,9 @@ impl Building {
     }
 
     #[allow(dead_code)]
-    fn move_elevator(&mut self, direction: i8, items: Vec<(String, RTGelement)>) -> bool {
-        if items.len() > 2 || items.len() == 0 {
-            // println!("ERROR: elevator needs contents or is overloaded");
-            false
-        } else {
-            self.elevator += direction;
-            for item in &items {
-                match item.1 {
-                    RTGelement::GENERATOR => {
-                        self.rtgs.get_mut(&item.0).unwrap().generator += direction;
-                    }
-                    RTGelement::MICROCHIP => {
-                        self.rtgs.get_mut(&item.0).unwrap().microchip += direction;
-                    }
-                }
-            }
-            true
-        }
-    }
-
-    #[allow(dead_code)]
     fn print_state(&self) {
         println!("-------------------------------------------------");
-        for floornr in 0..4 {
+        for floornr in (0..4).rev() {
             let mut floorstr = format!("F{} ", floornr + 1);
             if self.elevator == floornr {
                 floorstr = format!("{}E ", floorstr);
@@ -152,45 +100,38 @@ impl Building {
         }
         println!("-------------------------------------------------");
     }
+}
 
-    #[allow(dead_code)]
-    fn is_valid(&self) -> bool {
-        let mut valid = true;
-        for floornr in 0..5 {
-            for rtg in &self.rtgs {
-                if rtg.1.on_floor() == floornr {
-                    for ortg in &self.rtgs {
-                        if ortg.0 != rtg.0
-                            && ortg.1.element_on_floor(RTGelement::MICROCHIP) == floornr
-                            && ortg.1.element_on_floor(RTGelement::GENERATOR) != floornr
-                        {
-                            valid = false;
-                        }
-                    }
-                }
-            }
-        }
-        valid
+fn search(start: &Building, part: usize) -> u64 {
+    let mut items_per_floor = vec![0;4];
+    let mut total_count = start.rtgs.len() * 2;
+
+    for rtg in &start.rtgs {
+        items_per_floor[rtg.1.element_on_floor(RTGelement::GENERATOR) as usize] += 1;
+        items_per_floor[rtg.1.element_on_floor(RTGelement::MICROCHIP) as usize] += 1;
     }
 
-    #[allow(dead_code)]
-    fn gen_id(&self) -> String {
-        let mut id = format!("{}", self.elevator.to_string());
-
-        for rtg in &self.rtgs {
-            id = format!("{}{}", id, rtg.1.gen_id());
-        }
-
-        id
+    if part==2 {
+        items_per_floor[0] += 4;
+        total_count += 4;
     }
+
+    let mut moves = 0;
+    let mut floor = 0;
+    while items_per_floor[3] != total_count {
+        moves += 2 * items_per_floor[floor] - 3;
+        items_per_floor[floor+1] += items_per_floor[floor];
+        floor += 1;
+    }
+    moves as u64
 }
 
 #[allow(dead_code)]
 pub fn run() {
     println!("Day 11 of 2016");
 
-    let input_file = "./input/day11_16_test.txt";
-    // let input_file = "./input/day11_16_real.txt";
+    // let input_file = "./input/day11_16_test.txt";
+    let input_file = "./input/day11_16_real.txt";
 
     let start1 = Instant::now();
     let input = tools::get_input(String::from(input_file));
@@ -198,7 +139,7 @@ pub fn run() {
     let mut building: Building = Building::new();
     for line in &input {
         //The first floor contains a hydrogen-compatible microchip and a lithium-compatible microchip.
-        let mut tokens = line.split_whitespace();
+        let mut tokens = line.split_whitespace().peekable();
         tokens.next(); // The
         let floor = tokens.next().unwrap();
         let mut floornr = 0;
@@ -218,9 +159,11 @@ pub fn run() {
             _ => {}
         }
         tokens.next(); // floor
-        while let Some(_) = tokens.next() {
-            // contains or and
-            tokens.next(); // a or nothing
+        tokens.next(); // contains
+        while let Some(_) = tokens.peek() {
+            // a or and
+            let a_or_nothing = tokens.next().unwrap(); // a or nothing
+            if a_or_nothing == "and" { tokens.next(); }
             let mut naming = tokens.next().unwrap();
             if naming != "relevant." {
                 if naming.contains("-") {
@@ -230,7 +173,7 @@ pub fn run() {
                 } else { // generator
                 }
                 let mut elementtype = tokens.next().unwrap();
-                if elementtype.contains('.') {
+                if elementtype.contains('.') || elementtype.contains(',') {
                     elementtype = &elementtype[..elementtype.len() - 1];
                 }
                 match elementtype {
@@ -246,13 +189,17 @@ pub fn run() {
         }
     }
 
-    building.print_state();
+    // building.print_state();
+    // println!("building id: {}", building.gen_id());
+
+    let res1 = search(&building,1);
 
     let after1 = Instant::now();
-    println!("Part 1: {}, in {:?}", 0, after1.duration_since(start1));
+    println!("Part 1: {}, in {:?}", res1, after1.duration_since(start1));
 
     let start2 = Instant::now();
+    let res2 = search(&building,2);
 
     let after2 = Instant::now();
-    println!("Part 2: {}, in {:?}", 0, after2.duration_since(start2));
+    println!("Part 2: {}, in {:?}", res2, after2.duration_since(start2));
 }
