@@ -1,0 +1,8 @@
+cpy 479001600 a
+cpy 75 c
+cpy 78 d
+inc a
+dec d
+jnz d -2
+dec c
+jnz c -5
