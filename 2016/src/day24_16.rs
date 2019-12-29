@@ -39,6 +39,7 @@ impl Maze {
         self.size.1 += 1;
     }
 
+    #[allow(dead_code)]
     fn print(&self) {
         for y in 0..self.size.1 {
             for x in 0..self.size.0 {

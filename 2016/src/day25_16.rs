@@ -188,13 +188,9 @@ pub fn run() {
             mycomp1.add_line(&line.to_string());
         }
         let mut clock_cycle = 0;
-        let mut correct = true;
-        while mycomp1.execute() {
+        while clock_cycle < 100000 {
+            mycomp1.execute();
             clock_cycle += 1;
-            if clock_cycle > 100000 {
-                found = true;
-                break;
-            }
         }
         found = mycomp1.check_output_correct();
         if found { res1 = lowest_a; }
