@@ -3,12 +3,12 @@ use super::tools;
 use std::collections::HashMap;
 
 struct Node {
-    x: u32,
-    y: u32,
-    disksize: u32,
+    // x: u32,
+    // y: u32,
+    // disksize: u32,
     used: u32,
     available: u32,
-    use_percentage: u32,
+    // use_percentage: u32,
 }
 
 #[allow(dead_code)]
@@ -27,13 +27,13 @@ pub fn run() {
         let mut iter = line.split_whitespace();
         let name = iter.next().unwrap();
         let disksize_str = iter.next().unwrap().to_string();
-        let disksize = disksize_str[..disksize_str.len()-1].parse::<u32>().unwrap();
+        let _disksize = disksize_str[..disksize_str.len()-1].parse::<u32>().unwrap();
         let used_str = iter.next().unwrap();
         let used = used_str[..used_str.len()-1].parse::<u32>().unwrap();
         let available_str = iter.next().unwrap();
         let available = available_str[..available_str.len()-1].parse::<u32>().unwrap();
         let use_percentage_str = iter.next().unwrap();
-        let use_percentage = use_percentage_str[..use_percentage_str.len()-1].parse::<u32>().unwrap();
+        let _use_percentage = use_percentage_str[..use_percentage_str.len()-1].parse::<u32>().unwrap();
 
         let mut nameiter = name.split("-");
         nameiter.next();
@@ -42,7 +42,7 @@ pub fn run() {
 
         if x > width { width = x; }
         if y > height { height = y; }
-        nodes.insert((x,y), Node { x: x, y: y, disksize: disksize, used: used, available: available, use_percentage: use_percentage });
+        nodes.insert((x,y), Node { /*x: x, y: y, disksize: disksize, */used: used, available: available/*, use_percentage: use_percentage*/ });
     });
 
     let after0 = Instant::now();
@@ -73,20 +73,21 @@ pub fn run() {
 
     let start2 = Instant::now();
     
-    let mut target_pos = (width-1,0);
-    let mut cpos = width-2;
-    loop {
-        if nodes[&(cpos,0)].disksize < nodes[&target_pos].used {
-            println!("doesn't fit");
+    let mut empty = (0,0);
+    for y in 0..height {
+        for x in 0..width {
+            if nodes[&(x,y)].used == 0 {
+                empty = (x,y);
+            }
+            
         }
-        if cpos == 0 { break; } 
-        cpos -= 1;
     }
 
+    let res2 = empty.0 + empty.1 + width + (width-1) * 5;
     let after2 = Instant::now();
     println!(
         "Part 2: {}, in {:?}",
-        0,
+        res2,
         after2.duration_since(start2)
     );
 }
