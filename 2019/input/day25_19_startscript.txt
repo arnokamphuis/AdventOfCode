@@ -1,0 +1,25 @@
+west
+take hologram
+north
+take space heater
+east
+take space law space brochure
+east
+take tambourine
+west
+west
+south
+east
+east
+take festive hat
+east
+take food ration
+east
+take spool of cat6
+west
+west
+south
+east
+east
+take fuel cell
+east
