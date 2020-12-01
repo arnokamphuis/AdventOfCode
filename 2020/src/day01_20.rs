@@ -5,8 +5,8 @@ use std::time::Instant;
 pub fn run() {
     println!("Day 1 of 2020");
 
-    // let input_file = "./input/day01_20_test.txt";
-    let input_file = "./input/day01_20_real.txt";
+    let input_file = "./input/day01_20_test.txt";
+    // let input_file = "./input/day01_20_real.txt";
     let input = tools::get_input(String::from(input_file));
 
     let start1 = Instant::now();
