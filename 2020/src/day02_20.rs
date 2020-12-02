@@ -25,13 +25,11 @@ pub fn run() {
         let ra: Vec<&str> = (&pieces[0]).split(' ').collect();
         // get the character which is in consideration
         let find_c = (&ra[1]).chars().next().unwrap();
-        // get the range integers
+        // get the range integers (low high)
         let range: Vec<usize> = (&ra[0]).split('-').map(|v| { v.parse::<usize>().unwrap() } ).collect();
 
-        // filter the character to only contain the find character
-        let chars: Vec<char> = (&pieces[1]).chars().filter(|c| *c == find_c).collect();
-        // get the length
-        let count: usize = chars.len();
+        // get the count for the specific character
+        let count: usize = (&pieces[1]).chars().filter(|c| *c == find_c).count();
 
         // check part 1 condition
         if range[0] <= count && count <= range[1] {
@@ -41,7 +39,7 @@ pub fn run() {
         // check part 2 condition
         let c1 = (&pieces[1]).chars().nth(range[0]).unwrap();
         let c2 = (&pieces[1]).chars().nth(range[1]).unwrap();
-        if (c1 == find_c || c2 == find_c) && !(c1 == find_c && c2 == find_c) {
+        if (c1 == find_c) ^ (c2 == find_c) {
             res2+=1;
         }
 
