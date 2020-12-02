@@ -3,12 +3,12 @@ use super::tools;
 
 #[allow(dead_code)]
 pub fn run() {
-    println!("Day xx of 2019");
+    println!("Day xx of 2020");
 
     let start0 = Instant::now();
 
-    let input_file = "./input/dayxx_19_test.txt";
-    // let input_file = "./input/dayxx_19_real.txt";
+    let input_file = "./input/dayxx_20_test.txt";
+    // let input_file = "./input/dayxx_20_real.txt";
     let input = tools::get_input(String::from(input_file));
 
     let after0 = Instant::now();

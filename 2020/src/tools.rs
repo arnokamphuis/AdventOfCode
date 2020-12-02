@@ -4,6 +4,7 @@ use std::io::BufWriter;
 use std::io::{self, BufRead};
 use std::path::Path;
 
+#[allow(dead_code)]
 pub fn read_lines<P>(filename: P) -> io::Result<io::Lines<io::BufReader<File>>>
 where
     P: AsRef<Path>,
@@ -12,6 +13,7 @@ where
     Ok(io::BufReader::new(file).lines())
 }
 
+#[allow(dead_code)]
 pub fn get_input(filename: String) -> Vec<String> {
     let mut input = Vec::new();
     if let Ok(lines) = read_lines(filename) {
@@ -24,6 +26,7 @@ pub fn get_input(filename: String) -> Vec<String> {
     input
 }
 
+#[allow(dead_code)]
 pub fn get_commands_from_line(line: &String) -> BTreeMap<i64, i64> {
     let command_strings: Vec<&str> = line.split(",").collect();
     let mut commands: BTreeMap<i64, i64> = BTreeMap::new();
@@ -37,6 +40,7 @@ pub fn get_commands_from_line(line: &String) -> BTreeMap<i64, i64> {
     commands
 }
 
+#[allow(dead_code)]
 pub struct Image {
     data: Vec<u8>,
     width: usize,
@@ -44,6 +48,7 @@ pub struct Image {
     scale: usize,
 }
 
+#[allow(dead_code)]
 impl Image {
     pub fn new(w: usize, h: usize, s: usize) -> Image {
         Image {
