@@ -1,5 +1,5 @@
-use std::time::{Instant};
 use super::tools;
+use std::time::Instant;
 
 #[allow(dead_code)]
 pub fn run() {
@@ -7,9 +7,9 @@ pub fn run() {
 
     let start0 = Instant::now();
 
-    let input_file = "./input/day03_20_test.txt";
-    // let input_file = "./input/day03_20_real.txt";
-    let input = tools::get_input(String::from(input_file));
+    let input_file: &str = "./input/day03_20_test.txt";
+    // let input_file: &str = "./input/day03_20_real.txt";
+    let input: Vec<String> = tools::get_input(String::from(input_file));
 
     let after0 = Instant::now();
     println!("Init in {:?}", after0.duration_since(start0));
