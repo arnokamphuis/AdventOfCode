@@ -35,22 +35,21 @@ pub fn run() {
     let input: Vec<String> = tools::get_input(String::from(input_file));
 
     let mut grid: BTreeMap<(usize, usize), bool> = BTreeMap::new();
-    let mut x: usize = 0;
-    let mut y: usize = 0;
+    let mut size: (usize, usize) = (0, 0);
     for line in &input {
-        x = 0;
+        size.0 = 0;
         for c in line.chars().into_iter() {
-            grid.insert((x, y), c != '#');
-            x += 1;
+            grid.insert(size, c != '#');
+            size.0 += 1;
         }
-        y += 1;
+        size.1 += 1;
     }
 
     let after0 = Instant::now();
     println!("Init in {:?}", after0.duration_since(start0));
 
     let start1 = Instant::now();
-    let res1 = count(&grid, (x, y), (3, 1));
+    let res1 = count(&grid, size, (3, 1));
 
     let after1 = Instant::now();
     println!("Part 1: {}, in {:?}", res1, after1.duration_since(start1));
@@ -58,11 +57,11 @@ pub fn run() {
     let start2 = Instant::now();
 
     let mut res2 = 1;
-    res2 *= count(&grid, (x, y), (1, 1));
-    res2 *= count(&grid, (x, y), (3, 1));
-    res2 *= count(&grid, (x, y), (5, 1));
-    res2 *= count(&grid, (x, y), (7, 1));
-    res2 *= count(&grid, (x, y), (1, 2));
+    res2 *= count(&grid, size, (1, 1));
+    res2 *= count(&grid, size, (3, 1));
+    res2 *= count(&grid, size, (5, 1));
+    res2 *= count(&grid, size, (7, 1));
+    res2 *= count(&grid, size, (1, 2));
 
     let after2 = Instant::now();
     println!("Part 2: {}, in {:?}", res2, after2.duration_since(start2));
