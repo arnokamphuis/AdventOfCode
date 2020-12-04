@@ -4,43 +4,31 @@ use std::collections::BTreeMap;
 use std::time::Instant;
 
 pub fn valid(passport: &BTreeMap<String, String>, part: usize) -> bool {
-    if part == 1 {
-        return passport.contains_key("byr")
+    let mut valid: bool = true;
+
+    valid &= passport.contains_key("byr")
             && passport.contains_key("iyr")
             && passport.contains_key("eyr")
             && passport.contains_key("hgt")
             && passport.contains_key("hcl")
             && passport.contains_key("ecl")
             && passport.contains_key("pid");
-    }
 
-    let mut valid: bool = true;
     if part == 2 {
+
         if let Some(byr_s) = passport.get("byr") {
             let byr = byr_s.parse::<i32>().unwrap();
-            if byr < 1920 || byr > 2002 {
-                valid = false;
-            }
-        } else {
-            valid = false;
+            valid &= byr >= 1920 && byr <= 2002;
         }
 
         if let Some(iyr_s) = passport.get("iyr") {
             let iyr = iyr_s.parse::<i32>().unwrap();
-            if iyr < 2010 || iyr > 2020 {
-                valid = false;
-            }
-        } else {
-            valid = false;
+            valid &= iyr >= 2010 && iyr <= 2020;
         }
 
         if let Some(eyr_s) = passport.get("eyr") {
             let eyr = eyr_s.parse::<i32>().unwrap();
-            if eyr < 2020 || eyr > 2030 {
-                valid = false;
-            }
-        } else {
-            valid = false;
+            valid &= eyr >= 2020 && eyr <= 2030;
         }
 
         if let Some(hgt_s) = passport.get("hgt") {
@@ -49,65 +37,38 @@ pub fn valid(passport: &BTreeMap<String, String>, part: usize) -> bool {
 
             if let Ok(value) = value_s.parse::<i32>() {
                 if unit == "in" {
-                    if value < 59 || value > 76 {
-                        valid = false
-                    }
+                    valid &= value >= 59 && value <= 76;
                 } else if unit == "cm" {
-                    if value < 150 || value > 193 {
-                        valid = false
-                    }
+                    valid &= value >= 150 && value <= 193;
                 } else {
                     valid = false;
                 }
-            } else {
-                valid = false;
             }
-        } else {
-            valid = false;
         }
 
         if let Some(hcl_s) = passport.get("hcl") {
-            if hcl_s.len() != 7 {
-                valid = false;
-            }
-
-            let value_s: String = hcl_s.chars().skip(1).collect();
-
-            let re = Regex::new(r"^[a-f0-9]{6}$").unwrap();
-            if !re.is_match(&value_s) {
-                valid = false;
-            }
-        } else {
-            valid = false;
+            let re = Regex::new(r"^#[a-f0-9]{6}$").unwrap();
+            valid &= re.is_match(&hcl_s) && hcl_s.len()==7;
         }
 
         if let Some(ecl) = passport.get("ecl") {
-            if !(ecl == "amb"
+            valid &= ecl == "amb"
                 || ecl == "blu"
                 || ecl == "brn"
                 || ecl == "gry"
                 || ecl == "grn"
                 || ecl == "hzl"
-                || ecl == "oth")
-            {
-                valid = false;
-            }
-        } else {
-            valid = false;
+                || ecl == "oth";
         }
 
         if let Some(pid_s) = passport.get("pid") {
-            if pid_s.len() != 9 {
-                valid = false;
-            } else if let Ok(pid) = pid_s.parse::<i64>() {
-            } else {
+            valid &= pid_s.len() == 9;
+
+            if let Err(_) = pid_s.parse::<i64>() {
                 valid = false;
             }
-        } else {
-            valid = false;
         }
-    } else {
-        valid = false;
+
     }
 
     valid
