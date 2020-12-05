@@ -20,18 +20,17 @@ pub fn run() {
 
     for line in &input {
         if line == "" {
-            let pp1 = Passport::new(&current_passport, false);
-            match pp1 {
-                Ok(valid_pp) => valid_passports_loose.push(valid_pp),
-                Err(_) => {}
+            // part 1 check
+            if let Ok(valid_pp) = Passport::new(&current_passport, false) {
+                valid_passports_loose.push(valid_pp);
             }
 
-            let pp2 = Passport::new(&current_passport, true);
-            match pp2 {
-                Ok(valid_pp) => valid_passports_strict.push(valid_pp),
-                Err(_) => {}
+            // part 2 check
+            if let Ok(valid_pp) = Passport::new(&current_passport, true) {
+                valid_passports_strict.push(valid_pp);
             }
 
+            // start new passport
             current_passport = BTreeMap::new();
         } else {
             let items: Vec<&str> = line.split(' ').collect();
