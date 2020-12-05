@@ -2,7 +2,6 @@ use super::tools;
 use std::collections::BTreeMap;
 use std::time::Instant;
 use super::passport::Passport;
-use std::iter::FromIterator;
 
 #[allow(dead_code)]
 pub fn run() {
