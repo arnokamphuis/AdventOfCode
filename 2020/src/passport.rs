@@ -2,17 +2,17 @@ use regex::Regex;
 use std::collections::BTreeMap;
 
 pub struct Passport {
-    byr: i32,
-    iyr: i32,
-    eyr: i32,
-    hgt: i32,
-    hgt_unit: String,
-    hcl: String,
-    ecl: String,
-    pid: String,
-    pid_num: i32,
-    cid: String,
-    cid_num:i32,
+    pub byr: i32,
+    pub iyr: i32,
+    pub eyr: i32,
+    pub hgt: i32,
+    pub hgt_unit: String,
+    pub hcl: String,
+    pub ecl: String,
+    pub pid: String,
+    pub pid_num: i32,
+    pub cid: String,
+    pub cid_num:i32,
 }
 
 impl Passport {
@@ -20,16 +20,16 @@ impl Passport {
 
 
         if !(passport.contains_key("byr")
-        && passport.contains_key("iyr")
-        && passport.contains_key("eyr")
-        && passport.contains_key("hgt")
-        && passport.contains_key("hcl")
-        && passport.contains_key("ecl")
-        && passport.contains_key("pid")) {
+            && passport.contains_key("iyr")
+            && passport.contains_key("eyr")
+            && passport.contains_key("hgt")
+            && passport.contains_key("hcl")
+            && passport.contains_key("ecl")
+            && passport.contains_key("pid")) {
             return Err("Invalid passport");
         }
 
-        let mut res: Passport = Passport {byr: 0, iyr: 0, eyr: 0, hgt: 0, hgt_unit: String::from(""), hcl: String::from(""), ecl: String::from(""), pid: String::from(""), pid_num: 0, cid: String::from(""), cid_num: 0};
+        let mut res: Passport = Passport {byr: 0, iyr: 0, eyr: 0, hgt: 0, hgt_unit: String::from(""), hcl: String::from(""), ecl: String::from(""), pid: String::from(""), pid_num: 0, cid: String::from(""), cid_num: -1};
 
         if let Some(byr_s) = passport.get("byr") {
             res.byr = byr_s.parse::<i32>().unwrap();

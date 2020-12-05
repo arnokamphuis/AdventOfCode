@@ -2,6 +2,7 @@ use super::tools;
 use std::collections::BTreeMap;
 use std::time::Instant;
 use super::passport::Passport;
+use std::iter::FromIterator;
 
 #[allow(dead_code)]
 pub fn run() {
@@ -52,4 +53,16 @@ pub fn run() {
     let start2 = Instant::now();
     let after2 = Instant::now();
     println!("Part 2: {}, in {:?}", valid_passports_strict.len(), after2.duration_since(start2));
+
+    // let mut cids: BTreeMap<u32, u32> = BTreeMap::new();
+    // for pp in valid_passports_strict {
+    //     if pp.cid_num >= 0 {
+    //         let cid = cids.entry(pp.cid_num as u32).or_insert(0);
+    //         *cid += 1
+    //     }
+    // }
+
+    // let mut v = Vec::from_iter(cids);
+    // v.sort_by(|&(_, a), &(_, b)| b.cmp(&a));
+    // println!("{:?}", v);
 }
