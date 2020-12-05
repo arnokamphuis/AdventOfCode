@@ -14,35 +14,36 @@ pub fn run() {
     let mut boardingcards: Vec<i64> = vec![];
     for line in &input {
         let card = line.chars().fold(0, |score, c| match c {
-            'B' => score * 2 + 1,
-            'F' => score * 2,
-            'R' => score * 2 + 1,
-            'L' => score * 2,
+            'B' | 'R' => (score << 1) + 1,
+            'F' | 'L' => (score << 1),
             _ => score,
         });
         boardingcards.push(card);
     }
+    boardingcards.sort();
 
     let after0 = Instant::now();
     println!("Init in {:?}", after0.duration_since(start0));
 
     let start1 = Instant::now();
 
-    let res1 =  boardingcards.iter().max().unwrap();
+    let res1 =  boardingcards.iter().last().unwrap();
 
     let after1 = Instant::now();
     println!("Part 1: {}, in {:?}", res1, after1.duration_since(start1));
 
     let start2 = Instant::now();
 
-    let mut res2: i64 = 0;
-
-    boardingcards.sort();
-    for i in 1..boardingcards.len() {
-        if boardingcards[i-1]+1 != boardingcards[i] {
-            res2 = boardingcards[i-1]+1;
-        }
-    }
+    let res2 = boardingcards
+        .iter()
+        .enumerate()
+        .take(boardingcards.len()-1)
+        .skip(1)
+        .filter(|(i,_)| boardingcards[i-1]+2 != boardingcards[i+1])
+        .map(|(_,v)| *v)
+        .collect::<Vec<i64>>()
+        .first()
+        .unwrap() + 1;
 
     let after2 = Instant::now();
     println!("Part 2: {}, in {:?}", res2, after2.duration_since(start2));
