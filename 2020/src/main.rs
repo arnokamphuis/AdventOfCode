@@ -10,6 +10,16 @@ mod passport;
 mod tools;
 
 fn main() {
+
+    let days = [
+        day01_20::run, 
+        day02_20::run,
+        day03_20::run, 
+        day04_20::run,
+        day05_20::run, 
+        day06_20::run
+    ];
+
     let args: Vec<String> = env::args().collect();
     if args.len() != 3 {
         println!("Please specify the day to run!");
@@ -18,14 +28,17 @@ fn main() {
 
     if let Ok(real) = args[2].parse::<bool>() {
 
-        match args[1].parse::<usize>() {
-            Ok(1) => day01_20::run(real),
-            Ok(2) => day02_20::run(real),
-            Ok(3) => day03_20::run(real),
-            Ok(4) => day04_20::run(real),
-            Ok(5) => day05_20::run(real),
-            Ok(6) => day06_20::run(real),
-            _ => println!("Day {} is not available.", args[1])
+        if args[1] == "all" {
+            for day in days.iter() {
+                println!("");
+                day(real);
+            }
+
+        } else {
+            match args[1].parse::<usize>() {
+                Ok(i) => days[i-1](real),
+                _ => println!("Day {} is not available.", args[1])
+            }
         }
     }
 }
