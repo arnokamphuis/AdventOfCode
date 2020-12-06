@@ -2,13 +2,12 @@ use super::tools;
 use std::time::Instant;
 
 #[allow(dead_code)]
-pub fn run() {
+pub fn run(real: bool) {
     println!("Day xx of 2020");
 
     let start0 = Instant::now();
 
-    let input_file: &str = "./input/dayxx_20_test.txt";
-    // let input_file: &str = "./input/dayxx_20_real.txt";
+    let input_file: &str = if !real { "./input/dayxx_20_test.txt" } else { "./input/dayxx_20_real.txt" };
     let input = tools::get_input(String::from(input_file));
 
     let after0 = Instant::now();
