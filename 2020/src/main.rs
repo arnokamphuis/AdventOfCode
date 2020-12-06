@@ -11,7 +11,7 @@ fn main() {
     // day01_20::run();
     // day02_20::run();
     // day03_20::run();
-    day04_20::run();
+    // day04_20::run();
     // day05_20::run();
-    // day06_20::run();
+    day06_20::run();
 }
