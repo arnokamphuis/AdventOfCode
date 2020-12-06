@@ -25,13 +25,12 @@ pub fn count(
 }
 
 #[allow(dead_code)]
-pub fn run() {
+pub fn run(real: bool) {
     println!("Day 03 of 2020");
 
     let start0 = Instant::now();
 
-    // let input_file: &str = "./input/day03_20_test.txt";
-    let input_file: &str = "./input/day03_20_real.txt";
+    let input_file: &str = if !real { "./input/day03_20_test.txt" } else { "./input/day03_20_real.txt" };
     let input: Vec<String> = tools::get_input(String::from(input_file));
 
     let mut grid: BTreeMap<(usize, usize), bool> = BTreeMap::new();

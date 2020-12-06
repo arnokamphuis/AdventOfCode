@@ -2,16 +2,15 @@ use super::tools;
 use std::time::Instant;
 
 #[allow(dead_code)]
-pub fn run() {
+pub fn run(real: bool) {
     println!("Day 05 of 2020");
 
     let start0 = Instant::now();
 
-    // let input_file: &str = "./input/day05_20_test.txt";
-    let input_file: &str = "./input/day05_20_real.txt";
+    let input_file: &str = if !real { "./input/day05_20_test.txt" } else { "./input/day05_20_real.txt" };
     let input = tools::get_input(String::from(input_file));
 
-    let mut boardingcards: Vec<i64> = vec![];
+    let mut boardingcards: Vec<i16> = vec![];
     for line in &input {
         let card = line.chars().fold(0, |score, c| match c {
             'B' | 'R' => (score << 1) + 1,
@@ -41,7 +40,7 @@ pub fn run() {
         .skip(1)
         .filter(|(i,_)| boardingcards[i-1]+2 != boardingcards[i+1])
         .map(|(_,v)| *v)
-        .collect::<Vec<i64>>()
+        .collect::<Vec<i16>>()
         .first()
         .unwrap() + 1;
 

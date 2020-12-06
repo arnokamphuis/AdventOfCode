@@ -3,13 +3,12 @@ use std::time::Instant;
 use std::collections::BTreeSet;
 
 #[allow(dead_code)]
-pub fn run() {
+pub fn run(real: bool) {
     println!("Day 06 of 2020");
 
     let start0 = Instant::now();
 
-    let input_file: &str = "./input/day06_20_test.txt";
-    // let input_file: &str = "./input/day06_20_real.txt";
+    let input_file: &str = if !real { "./input/day06_20_test.txt" } else { "./input/day06_20_real.txt" };
     let input = tools::get_input(String::from(input_file));
 
     let mut groups: Vec<Vec<BTreeSet<char>>> = vec![];
