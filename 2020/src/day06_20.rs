@@ -3,9 +3,7 @@ use std::time::Instant;
 use std::collections::BTreeSet;
 
 #[allow(dead_code)]
-pub fn run(real: bool) {
-    println!("Day 06 of 2020");
-
+pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
     let start0 = Instant::now();
 
     let input_file: &str = if !real { "./input/day06_20_test.txt" } else { "./input/day06_20_real.txt" };
@@ -27,7 +25,6 @@ pub fn run(real: bool) {
     groups.push(group.clone());
 
     let after0 = Instant::now();
-    println!("Init in {:?}", after0.duration_since(start0));
 
     let start1 = Instant::now();
 
@@ -36,7 +33,7 @@ pub fn run(real: bool) {
     ).collect::<Vec<usize>>().iter().sum();
 
     let after1 = Instant::now();
-    println!("Part 1: {}, in {:?}", sum1, after1.duration_since(start1));
+    if print_result { println!("Part 1: {}", sum1); }
 
     let start2 = Instant::now();
 
@@ -45,5 +42,7 @@ pub fn run(real: bool) {
     ).collect::<Vec<usize>>().iter().sum();
 
     let after2 = Instant::now();
-    println!("Part 2: {}, in {:?}", sum2, after2.duration_since(start2));
+    if print_result { println!("Part 2: {}", sum2); }
+
+    (after0.duration_since(start0).as_nanos(), after1.duration_since(start1).as_nanos(), after2.duration_since(start2).as_nanos())
 }
