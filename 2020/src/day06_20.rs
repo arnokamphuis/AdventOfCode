@@ -15,10 +15,11 @@ pub fn run(real: bool) {
     let mut group: Vec<BTreeSet<char>> = vec![];
 
     for line in &input {
-        let mut answers: BTreeSet<char> = BTreeSet::new();
-        for c in line.chars() {
-            answers.insert(c);
-        }
+        let answers = line.chars().fold( BTreeSet::new(), |mut set, c| {set.insert(c); set} );
+        // let mut answers: BTreeSet<char> = BTreeSet::new();
+        // for c in line.chars() {
+        //     answers.insert(c);
+        // }
 
         if answers.len() == 0 {
             groups.push(group.clone());
