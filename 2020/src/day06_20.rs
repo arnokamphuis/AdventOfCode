@@ -35,26 +35,18 @@ pub fn run() {
 
     let start1 = Instant::now();
 
-    let sum1: usize = groups.iter().map(|group| {
-        let mut group_set: BTreeSet<char> = group.first().unwrap().clone();
-        for person in group.iter().skip(1) {
-            group_set = group_set.union(person).cloned().collect();
-        }
-        return group_set.len()
-    }).collect::<Vec<usize>>().iter().sum();
-        
+    let sum1: usize = groups.iter().map(|group|
+        group.iter().skip(1).fold(group.first().unwrap().clone(), |gs, set| gs.union(set).cloned().collect() ).len()
+    ).collect::<Vec<usize>>().iter().sum();
+
     let after1 = Instant::now();
     println!("Part 1: {}, in {:?}", sum1, after1.duration_since(start1));
 
     let start2 = Instant::now();
 
-    let sum2: usize = groups.iter().map(|group| {
-        let mut group_set: BTreeSet<char> = group.first().unwrap().clone();
-        for person in group.iter().skip(1) {
-            group_set = group_set.intersection(person).cloned().collect();
-        }
-        return group_set.len()
-    }).collect::<Vec<usize>>().iter().sum();
+    let sum2: usize = groups.iter().map(|group|
+        group.iter().skip(1).fold(group.first().unwrap().clone(), |gs, set| gs.intersection(set).cloned().collect() ).len()
+    ).collect::<Vec<usize>>().iter().sum();
 
     let after2 = Instant::now();
     println!("Part 2: {}, in {:?}", sum2, after2.duration_since(start2));
