@@ -7,18 +7,20 @@ mod day04_20;
 mod day05_20;
 mod day06_20;
 mod day07_20;
+mod day08_20;
 mod passport;
 mod tools;
 
 fn main() {
     let days: Vec<(&str, fn(bool, bool) -> (u128, u128, u128))> = vec![
-        ("Day 1 of 2020", day01_20::run),
-        ("Day 2 of 2020", day02_20::run),
-        ("Day 3 of 2020", day03_20::run),
-        ("Day 4 of 2020", day04_20::run),
-        ("Day 5 of 2020", day05_20::run),
-        ("Day 6 of 2020", day06_20::run),
-        ("Day 7 of 2020", day07_20::run),
+        ("Day 01 of 2020", day01_20::run),
+        ("Day 02 of 2020", day02_20::run),
+        ("Day 03 of 2020", day03_20::run),
+        ("Day 04 of 2020", day04_20::run),
+        ("Day 05 of 2020", day05_20::run),
+        ("Day 06 of 2020", day06_20::run),
+        ("Day 07 of 2020", day07_20::run),
+        ("Day 08 of 2020", day08_20::run),
     ];
 
     let args: Vec<String> = env::args().collect();
@@ -28,6 +30,7 @@ fn main() {
     }
 
     if let Ok(real) = args[2].parse::<bool>() {
+        println!("-----------------------------------------------------------------------------------------------------------------------");
         if args[1] == "performance" {
             let runs = 500u128;
             println!("Running performance check using {} runs", runs);
@@ -64,7 +67,8 @@ fn main() {
                         )
                     });
 
-                println!("{} - init: {:10.0} +/- {:10.0} ns, p1: {:10.0} +/- {:10.0} ns, p2: {:10.0} +/- {:10.0} ns", name, mean.0, variance.0.sqrt(), mean.1, variance.1.sqrt(), mean.2, variance.2.sqrt());
+                println!("{} - init: {:10.0} +/- {:10.0} ns, p1: {:10.0} +/- {:10.0} ns, p2: {:10.0} +/- {:10.0} ns", 
+                    name, mean.0, variance.0.sqrt(), mean.1, variance.1.sqrt(), mean.2, variance.2.sqrt());
             }
         } else if args[1] == "all" {
             for (name, day) in days.iter() {
@@ -75,7 +79,6 @@ fn main() {
                 );
             }
         } else {
-            println!("-----------------------------------------------------------------------------------------------------");
             if let Ok(i) = args[1].parse::<usize>() {
                 println!("{}", days[i - 1].0);
                 println!("");
@@ -86,7 +89,7 @@ fn main() {
                     timing.0, timing.1, timing.2
                 );
             }
-            println!("-----------------------------------------------------------------------------------------------------");
         }
+        println!("-----------------------------------------------------------------------------------------------------------------------");
     }
 }
