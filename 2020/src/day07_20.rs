@@ -3,6 +3,7 @@ use queues::*;
 use std::collections::BTreeMap;
 use std::collections::BTreeSet;
 use std::time::Instant;
+use regex::Regex;
 
 pub fn count_bags(
     current_bag: &String,
@@ -34,39 +35,27 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
 
     let mut rules: BTreeMap<String, Vec<(usize, String)>> = BTreeMap::new();
 
+    let from_regex = Regex::new(r"([\w\s]+) bags").expect("Invalid regex");
+    let target_regex = Regex::new(r"(\d+) ([\w\s]+) bags?").expect("Invalid regex");
+
     for line in &input {
         let mut rule: Vec<(usize, String)> = vec![];
-        let words: Vec<&str> = line.split(' ').collect();
-        let mut w_iter = words.iter().peekable();
 
-        let mut bag = w_iter.next().unwrap().to_string();
-        bag.push_str(w_iter.next().unwrap());
-        bag.push_str(w_iter.next().unwrap());
-        bag = String::from(&bag[0..bag.len() - 1]);
-        w_iter.next();
+        let parts: Vec<&str> = line.split(" contain ").into_iter().collect();
 
-        while w_iter.peek() != None {
-            let amount_str = w_iter.next().unwrap();
-            if amount_str.to_string() == "no" {
-                w_iter.next();
-                w_iter.next();
-            } else {
-                let amount = amount_str.parse::<usize>().unwrap();
-                let mut otherbag = w_iter.next().unwrap().to_string();
-                otherbag.push_str(w_iter.next().unwrap());
-                otherbag.push_str(w_iter.next().unwrap());
-                if amount > 1 {
-                    otherbag = String::from(&otherbag[0..otherbag.len() - 2]);
-                } else {
-                    otherbag = String::from(&otherbag[0..otherbag.len() - 1]);
-                }
-                rule.push((amount, otherbag));
-            }
+        let from: Vec<_> = from_regex.captures_iter(parts[0]).collect();
+        let from_bag = String::from(from[0].get(1).unwrap().as_str());
+
+        for s in target_regex.captures_iter(parts[1]) {
+            let amount = s.get(1).unwrap().as_str().parse::<usize>().unwrap();
+            let target = String::from(s.get(2).unwrap().as_str());
+            rule.push((amount, target.clone()));
         }
-        rules.insert(bag, rule.clone());
+        
+        rules.insert(from_bag, rule.clone());
     }
 
-    let target = String::from("shinygoldbag");
+    let target = String::from("shiny gold");
 
     let after0 = Instant::now();
 
