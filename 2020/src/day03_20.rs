@@ -28,7 +28,11 @@ pub fn count(
 pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
     let start0 = Instant::now();
 
-    let input_file: &str = if !real { "./input/day03_20_test.txt" } else { "./input/day03_20_real.txt" };
+    let input_file: &str = if !real {
+        "./input/day03_20_test.txt"
+    } else {
+        "./input/day03_20_real.txt"
+    };
     let input: Vec<String> = tools::get_input(String::from(input_file));
 
     let mut grid: BTreeMap<(usize, usize), bool> = BTreeMap::new();
@@ -48,7 +52,9 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
     let res1 = count(&grid, size, (3, 1));
 
     let after1 = Instant::now();
-    if print_result { println!("Part 1: {}", res1); }
+    if print_result {
+        println!("Part 1: {}", res1);
+    }
 
     let start2 = Instant::now();
 
@@ -60,7 +66,13 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
     res2 *= count(&grid, size, (1, 2));
 
     let after2 = Instant::now();
-    if print_result { println!("Part 2: {}", res2); }
+    if print_result {
+        println!("Part 2: {}", res2);
+    }
 
-    (after0.duration_since(start0).as_nanos(), after1.duration_since(start1).as_nanos(), after2.duration_since(start2).as_nanos())
+    (
+        after0.duration_since(start0).as_nanos(),
+        after1.duration_since(start1).as_nanos(),
+        after2.duration_since(start2).as_nanos(),
+    )
 }
