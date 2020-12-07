@@ -13,22 +13,19 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
     let input = tools::get_input(String::from(input_file));
 
     let after0 = Instant::now();
-    if print_result {
-        println!("Init in {:?}", after0.duration_since(start0));
-    }
 
     let start1 = Instant::now();
 
     let after1 = Instant::now();
     if print_result {
-        println!("Part 1: {}, in {:?}", 0, after1.duration_since(start1));
+        println!("Part 1: {}", 0);
     }
 
     let start2 = Instant::now();
 
     let after2 = Instant::now();
     if print_result {
-        println!("Part 2: {}, in {:?}", 0, after2.duration_since(start2));
+        println!("Part 2: {}", 0);
     }
 
     (
