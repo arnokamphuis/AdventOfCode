@@ -6,13 +6,11 @@ pub fn execute(program: &Vec<(String, i64)>, doloop: bool) -> Result<i64, &str> 
     let mut executed: Vec<i64> = vec![];
     let mut pc: i64 = 0;
     let mut acc: i64 = 0;
-    let mut first = true;
     loop {
-        if executed.contains(&pc) || (!first && pc == 0) {
+        if executed.contains(&pc) {
             if !doloop {
                 break;
             } else {
-                println!("{:?}", executed);
                 return Err("looping");
             }
         }
@@ -33,7 +31,6 @@ pub fn execute(program: &Vec<(String, i64)>, doloop: bool) -> Result<i64, &str> 
 
         pc += 1;
 
-        // print!("{}-{:?} ", pc, &executed);
         if pc == program.len() as i64 {
             break;
         }
@@ -41,11 +38,7 @@ pub fn execute(program: &Vec<(String, i64)>, doloop: bool) -> Result<i64, &str> 
         if pc < 0 || pc > (program.len() as i64) {
             return Err("out of bounds");
         }
-
-        first = false;
     }
-    // println!("");
-
     Ok(acc)
 }
 
@@ -86,52 +79,23 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
 
     let start2 = Instant::now();
 
-    let mut jmp_lines: Vec<usize> = vec![];
-    let mut nop_lines: Vec<usize> = vec![];
-
-    for (i, pl) in program.iter().enumerate() {
-        match pl.0.as_str() {
-            "jmp" => {
-                jmp_lines.push(i);
-            }
-            "nop" => {
-                nop_lines.push(i);
-            }
-            _ => {}
-        }
-    }
-
-    let mut res2: i64 = 0;
-    for jmp in &jmp_lines {
+    let mut res2 = 0;
+    for i in 0..program.len() {
         let mut new_program = program.clone();
-        if let Some((cmd, _)) = new_program.get_mut(*jmp) {
-            *cmd = String::from("nop");
+        if let Some((cmd, _)) = new_program.get_mut(i) {
+            match cmd.to_string().as_str() {
+                "jmp" => *cmd = String::from("nop"),
+                "nop" => *cmd = String::from("jmp"),
+                _ => continue,
+            }
         }
 
         match execute(&new_program, true) {
             Ok(res) => {
                 res2 = res;
-                println!("Success");
+                break;
             }
-            Err(s) => {
-                println!("Error: {}", s);
-            }
-        }
-    }
-    for nop in &nop_lines {
-        let mut new_program = program.clone();
-        if let Some((cmd, _)) = new_program.get_mut(*nop) {
-            *cmd = String::from("jmp");
-        }
-
-        match execute(&new_program, true) {
-            Ok(res) => {
-                res2 = res;
-                println!("Success");
-            }
-            Err(s) => {
-                println!("Error: {}", s);
-            }
+            Err(_) => {}
         }
     }
 
