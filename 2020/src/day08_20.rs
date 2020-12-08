@@ -2,8 +2,9 @@ use super::tools;
 use std::result::Result;
 use std::time::Instant;
 
-pub fn execute(program: &Vec<(String, i64)>, doloop: bool) -> Result<i64, &str> {
+pub fn execute(program: &Vec<(String, i64)>, doloop: bool) -> Result<(i64, Vec<i64>), &str> {
     let mut executed: Vec<i64> = vec![];
+    let mut jmpnop: Vec<i64> = vec![];
     let mut pc: i64 = 0;
     let mut acc: i64 = 0;
     loop {
@@ -19,11 +20,14 @@ pub fn execute(program: &Vec<(String, i64)>, doloop: bool) -> Result<i64, &str> 
 
         let instruction = &program[pc as usize];
         match instruction.0.as_str() {
-            "nop" => {}
+            "nop" => {
+                jmpnop.push(pc);
+            }
             "acc" => {
                 acc += instruction.1;
             }
             "jmp" => {
+                jmpnop.push(pc);
                 pc += instruction.1 - 1;
             }
             _ => {}
@@ -39,7 +43,7 @@ pub fn execute(program: &Vec<(String, i64)>, doloop: bool) -> Result<i64, &str> 
             return Err("out of bounds");
         }
     }
-    Ok(acc)
+    Ok((acc, jmpnop))
 }
 
 #[allow(dead_code)]
@@ -65,9 +69,11 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
 
     let start1 = Instant::now();
 
+    let mut tobechanged: Vec<i64> = vec![];
     let mut acc = 0;
     if let Ok(res) = execute(&program, false) {
-        acc = res;
+        acc = res.0;
+        tobechanged = res.1;
     } else {
         println!("Error in executing part 1");
     }
@@ -80,22 +86,22 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
     let start2 = Instant::now();
 
     let mut res2 = 0;
-    for i in 0..program.len() {
+    for i in tobechanged {
         let mut new_program = program.clone();
-        if let Some((cmd, _)) = new_program.get_mut(i) {
+        if let Some((cmd, _)) = new_program.get_mut(i as usize) {
             match cmd.to_string().as_str() {
                 "jmp" => *cmd = String::from("nop"),
                 "nop" => *cmd = String::from("jmp"),
                 _ => continue,
             }
-        }
 
-        match execute(&new_program, true) {
-            Ok(res) => {
-                res2 = res;
-                break;
+            match execute(&new_program, true) {
+                Ok(res) => {
+                    res2 = res.0;
+                    break;
+                }
+                Err(_) => {}
             }
-            Err(_) => {}
         }
     }
 
