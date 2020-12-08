@@ -2,12 +2,18 @@ use super::tools;
 use std::result::Result;
 use std::time::Instant;
 
-pub fn execute(program: &Vec<(String, i64)>, doloop: bool) -> Result<(i64, Vec<i64>), &str> {
+#[derive(Debug, Clone)]
+pub enum InstructionType {
+    NOP, ACC, JMP, INVALID
+}
+
+pub fn execute(program: &Vec<(InstructionType, i64)>, doloop: bool) -> Result<(i64, Vec<i64>), &str> {
     let mut executed: Vec<i64> = vec![];
     let mut jmpnop: Vec<i64> = vec![];
     let mut pc: i64 = 0;
     let mut acc: i64 = 0;
-    loop {
+    
+    while pc != (program.len() as i64) {
         if executed.contains(&pc) {
             if !doloop {
                 break;
@@ -19,29 +25,21 @@ pub fn execute(program: &Vec<(String, i64)>, doloop: bool) -> Result<(i64, Vec<i
         executed.push(pc);
 
         let instruction = &program[pc as usize];
-        match instruction.0.as_str() {
-            "nop" => {
+        match instruction.0 {
+            InstructionType::NOP => {
                 jmpnop.push(pc);
             }
-            "acc" => {
+            InstructionType::ACC => {
                 acc += instruction.1;
             }
-            "jmp" => {
+            InstructionType::JMP => {
                 jmpnop.push(pc);
                 pc += instruction.1 - 1;
             }
-            _ => {}
+            InstructionType::INVALID => {}
         }
 
         pc += 1;
-
-        if pc == program.len() as i64 {
-            break;
-        }
-
-        if pc < 0 || pc > (program.len() as i64) {
-            return Err("out of bounds");
-        }
     }
     Ok((acc, jmpnop))
 }
@@ -57,11 +55,17 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
     };
     let input = tools::get_input(String::from(input_file));
 
-    let mut program: Vec<(String, i64)> = vec![];
+    let mut program: Vec<(InstructionType, i64)> = vec![];
     for line in &input {
         let inst: Vec<_> = line.split(' ').collect();
         if let Ok(n) = inst[1].parse::<i64>() {
-            program.push((inst[0].to_string(), n));
+            program.push((
+                match inst[0] {
+                    "nop" => InstructionType::NOP,
+                    "acc" => InstructionType::ACC,
+                    "jmp" => InstructionType::JMP,
+                    &_ => InstructionType::INVALID
+                }, n));
         }
     }
 
@@ -69,29 +73,28 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
 
     let start1 = Instant::now();
 
-    let mut tobechanged: Vec<i64> = vec![];
-    let mut acc = 0;
+    let mut accumulator = 0;
+    let mut executed_jmpnop: Vec<i64> = vec![];
+
     if let Ok(res) = execute(&program, false) {
-        acc = res.0;
-        tobechanged = res.1;
-    } else {
-        println!("Error in executing part 1");
+        accumulator = res.0;
+        executed_jmpnop = res.1;
     }
 
     let after1 = Instant::now();
     if print_result {
-        println!("Part 1: {}", acc);
+        println!("Part 1: {}", accumulator);
     }
 
     let start2 = Instant::now();
 
     let mut res2 = 0;
-    for i in tobechanged {
+    for i in executed_jmpnop {
         let mut new_program = program.clone();
         if let Some((cmd, _)) = new_program.get_mut(i as usize) {
-            match cmd.to_string().as_str() {
-                "jmp" => *cmd = String::from("nop"),
-                "nop" => *cmd = String::from("jmp"),
+            match cmd {
+                InstructionType::JMP => *cmd = InstructionType::NOP,
+                InstructionType::NOP => *cmd = InstructionType::JMP,
                 _ => continue,
             }
 
