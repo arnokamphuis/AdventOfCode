@@ -10,7 +10,7 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
     } else {
         "./input/day09_20_real.txt"
     };
-    let input = tools::get_input(String::from(input_file));
+    let _input = tools::get_input(String::from(input_file));
 
     let after0 = Instant::now();
 

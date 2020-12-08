@@ -2,12 +2,43 @@ use super::tools;
 use std::result::Result;
 use std::time::Instant;
 
-#[derive(Debug, Clone)]
+// use std::collections::BTreeMap;
+// use petgraph::graph::{Graph, NodeIndex};
+// use petgraph::dot::Dot;
+// use std::fs::File;
+// use std::io::Write;
+
+#[derive(Debug, Clone, Eq, PartialEq)]
 pub enum InstructionType {
     NOP, ACC, JMP, INVALID
 }
 
-pub fn execute(program: &Vec<(InstructionType, i64)>, doloop: bool) -> Result<(i64, Vec<i64>), &str> {
+// pub fn save_graph(program: &Vec<(InstructionType, i64)>, steps: &Vec<Vec<i64>>) {
+//     let mut graph = Graph::<String, usize>::new();
+//     let mut nodes: BTreeMap<i64, NodeIndex> = BTreeMap::new();
+
+//     for (index,instr) in program.iter().enumerate() {
+//         let label = index.to_string();
+//         nodes.insert(index as i64, graph.add_node(label));
+//     }
+//     nodes.insert(program.len() as i64, graph.add_node(String::from("THE END")));
+
+//     let mut edges = vec![];
+
+//     for (runindex, run) in steps.iter().enumerate() {
+//         for i in 1..run.len() {
+//             edges.push( (*nodes.get(&run[i-1]).unwrap(), *nodes.get(&run[i]).unwrap(), runindex ));
+//         }
+//         graph.extend_with_edges(edges.iter());
+//     }
+
+
+//     let mut output: File = File::create("graphs/program.dot").unwrap();
+//     output.write_all(format!("{}", Dot::new(&graph)).as_bytes());
+    
+// }
+
+pub fn execute(program: &Vec<(InstructionType, i64)>, doloop: bool) -> Result<(i64, Vec<i64>, Vec<i64>), (&str, Vec<i64>)> {
     let mut executed: Vec<i64> = vec![];
     let mut jmpnop: Vec<i64> = vec![];
     let mut pc: i64 = 0;
@@ -18,7 +49,7 @@ pub fn execute(program: &Vec<(InstructionType, i64)>, doloop: bool) -> Result<(i
             if !doloop {
                 break;
             } else {
-                return Err("looping");
+                return Err( ("looping", executed) );
             }
         }
 
@@ -41,7 +72,10 @@ pub fn execute(program: &Vec<(InstructionType, i64)>, doloop: bool) -> Result<(i
 
         pc += 1;
     }
-    Ok((acc, jmpnop))
+    // if !doloop {
+    //     save_graph(program, &executed);
+    // }
+    Ok((acc, jmpnop, executed))
 }
 
 #[allow(dead_code)]
@@ -88,10 +122,11 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
 
     let start2 = Instant::now();
 
+    let mut steps: Vec<Vec<i64>> = vec![];
     let mut res2 = 0;
-    for i in executed_jmpnop {
+    for i in executed_jmpnop.iter().rev() {
         let mut new_program = program.clone();
-        if let Some((cmd, _)) = new_program.get_mut(i as usize) {
+        if let Some((cmd, _)) = new_program.get_mut(*i as usize) {
             match cmd {
                 InstructionType::JMP => *cmd = InstructionType::NOP,
                 InstructionType::NOP => *cmd = InstructionType::JMP,
@@ -101,12 +136,17 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
             match execute(&new_program, true) {
                 Ok(res) => {
                     res2 = res.0;
+                    steps.push(res.2);
                     break;
                 }
-                Err(_) => {}
+                Err(res) => {
+                    steps.push(res.1);
+                }
             }
         }
     }
+
+    // save_graph(&program, &steps);
 
     let after2 = Instant::now();
     if print_result {
