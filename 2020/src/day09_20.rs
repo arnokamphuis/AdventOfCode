@@ -10,15 +10,41 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
     } else {
         "./input/day09_20_real.txt"
     };
-    let _input = tools::get_input(String::from(input_file));
+    let input = tools::get_input(String::from(input_file));
+
+    let window: usize = if real { 25 } else {5};
+    let numbers: Vec<i64> = input.iter().map(|v| v.parse::<i64>().unwrap()).collect();
 
     let after0 = Instant::now();
 
     let start1 = Instant::now();
 
+    let mut contiguoustarget: i64 = 0;
+
+    for i in window..numbers.len() {
+        let target = numbers.iter().nth(i).unwrap();
+        let sources = numbers.iter().skip(i-window).take(window).collect::<Vec<&i64>>();
+
+        let mut found = false;
+        for j in 0..sources.len() {
+            for k in 0..sources.len() {
+                if j!=k {
+                    if sources[j] + sources[k] == *target {
+                        found = true;
+                        break;
+                    }
+                }
+            }
+        }
+        if !found {
+            contiguoustarget = numbers[i];
+            break;
+        }
+    }
+
     let after1 = Instant::now();
     if print_result {
-        println!("Part 1: {}", 0);
+        println!("Part 1: {}", contiguoustarget);
     }
 
     let start2 = Instant::now();
