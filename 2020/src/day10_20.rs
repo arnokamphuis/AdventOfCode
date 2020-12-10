@@ -13,10 +13,8 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
     let input = tools::get_input(String::from(input_file));
 
     let mut numbers: Vec<i64> = input.iter().map(|v| v.parse::<i64>().unwrap()).collect();
-    numbers.push(numbers.iter().max().unwrap()+3);
-    numbers.push(0);
+    numbers.splice(0..0, [0,numbers.iter().max().unwrap()+3].iter().cloned());
     numbers.sort();
-
 
     let after0 = Instant::now();
 
