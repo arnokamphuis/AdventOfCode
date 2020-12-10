@@ -20,13 +20,32 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
 
     let start1 = Instant::now();
 
+    // let counts = numbers
+    //     .iter()
+    //     .enumerate()
+    //     .skip(1)
+    //     .map(|(index,_)| (numbers[index] - numbers[index-1]) as usize)
+    //     .fold(vec![0,0,0,0], |mut counts, a| {counts.splice(a..a+1, [counts[a] + 1].iter().cloned()); return counts;} );
+    // let res1 = counts[1] * counts[3];
+
+    // let res1 = numbers
+    //     .iter()
+    //     .enumerate()
+    //     .skip(1)
+    //     .map(|(index,_)| (numbers[index] - numbers[index-1]) as usize)
+    //     .fold(vec![0,0,0,0], |mut counts, a| {counts.splice(a..a+1, [counts[a] + 1].iter().cloned()); return counts;} )
+    //     .iter()
+    //     .enumerate()
+    //     .filter(|(i,_)| *i==1 || *i==3)
+    //     .map(|(_,v)| *v)
+    //     .fold(1, |acc, v| acc * v);
+
     let gaps = numbers
         .iter()
         .enumerate()
         .skip(1)
         .map(|(index,_)| numbers[index] - numbers[index-1] )
         .collect::<Vec<i64>>();
-
     let res1 = gaps.iter().filter(|&&v| v == 1).count() * gaps.iter().filter(|&&v| v == 3).count();
 
     let after1 = Instant::now();
