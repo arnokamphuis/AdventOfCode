@@ -45,13 +45,13 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
         let current_count = count[index];
         let current_jolt = numbers[index]; 
 
-        for i2 in 1..numbers.len()-index {
-            if numbers[index+i2]>current_jolt+3 {
+        for i in index+1..numbers.len() {
+            if numbers[i]>current_jolt+3 {
                 break;
             }
-            for delta in 0..4i64 {
-                if numbers[index+i2]==current_jolt+delta {
-                    count[index+i2] += current_count;
+            for delta in 0..4 {
+                if numbers[i] == current_jolt + delta {
+                    count[i] += current_count;
                 }
             }
         }
