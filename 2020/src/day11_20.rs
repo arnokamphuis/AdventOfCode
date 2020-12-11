@@ -3,22 +3,22 @@ use std::time::Instant;
 
 type Grid = Vec<char>;
 
-pub fn set_seat(x: i32, y: i32, _: i32, width: i32, grid: &mut Grid, c: char) {
-    let index = (y * width + x) as usize;
-    grid[index] = c;
+pub fn set_seat(x: i16, y: i16, _: i16, width: i16, grid: &mut Grid, c: char) {
+    grid[(y * width + x) as usize] = c;
 }
 
-pub fn get_seat(x: i32, y: i32, height: i32, width: i32, grid: &Grid) -> char {
+pub fn get_seat(x: i16, y: i16, height: i16, width: i16, grid: &Grid) -> char {
     if !(x < 0 || x >= width || y < 0 || y >= height) {
         let index = y * width + x;
-        if index >= 0 && index < grid.len() as i32 {
+        if index >= 0 && index < (grid.len() as i16) {
             return grid[index as usize];
         }
     }
     '.'
 }
 
-pub fn print_map(height: i32, width: i32, grid: &Grid) {
+#[allow(dead_code)]
+pub fn print_map(height: i16, width: i16, grid: &Grid) {
     for y in 0..height {
         for x in 0..width {
             print!("{}", get_seat(x, y, width, height, &grid));
@@ -27,39 +27,7 @@ pub fn print_map(height: i32, width: i32, grid: &Grid) {
     }
 }
 
-pub fn step(grid: &Grid, height: i32, width: i32) -> (bool, Grid) {
-    let mut not_changed = true;
-    let mut new_grid = grid.clone();
-    for y in 0..height {
-        for x in 0..width {
-            let mut occ_count = 0;
-            for dy in -1..2 {
-                for dx in -1..2 {
-                    if !(dx == 0 && dy == 0) {
-                        let next_seat = get_seat(x + dx, y + dy, height, width, grid);
-                        if next_seat == '#' {
-                            occ_count += 1;
-                        }
-                    }
-                }
-            }
-
-            let seat = get_seat(x, y, height, width, grid);
-
-            if seat == 'L' && occ_count == 0 {
-                set_seat(x, y, height, width, &mut new_grid, '#');
-                not_changed = false;
-            }
-            if seat == '#' && occ_count >= 4 {
-                set_seat(x, y, height, width, &mut new_grid, 'L');
-                not_changed = false;
-            }
-        }
-    }
-    (not_changed, new_grid)
-}
-
-pub fn step2(grid: &Grid, height: i32, width: i32) -> (bool, Grid) {
+pub fn step(grid: &Grid, height: i16, width: i16, queen: bool) -> (bool, Grid) {
     let mut not_changed = true;
     let mut new_grid = grid.clone();
     for y in 0..height {
@@ -92,7 +60,12 @@ pub fn step2(grid: &Grid, height: i32, width: i32) -> (bool, Grid) {
                                 }
                                 break;
                             }
+
                             step_count += 1;
+
+                            if !queen {
+                                break;
+                            }
                         }
                     }
                 }
@@ -104,7 +77,7 @@ pub fn step2(grid: &Grid, height: i32, width: i32) -> (bool, Grid) {
                 set_seat(x, y, height, width, &mut new_grid, '#');
                 not_changed = false;
             }
-            if seat == '#' && occ_count >= 5 {
+            if seat == '#' && occ_count >= if queen { 5 } else { 4 } {
                 set_seat(x, y, height, width, &mut new_grid, 'L');
                 not_changed = false;
             }
@@ -123,41 +96,29 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
         "./input/day11_20_real.txt"
     };
     let input = tools::get_input(String::from(input_file));
-    let height = input.len() as i32;
-    let width = input[0].len() as i32;
+    let height = input.len() as i16;
+    let width = input[0].len() as i16;
 
     let mut grid: Grid = vec![];
-
     for line in input {
         for c in line.chars() {
             grid.push(c);
         }
     }
 
-    // print_map(height, width, &grid);
-
     let after0 = Instant::now();
 
     let start1 = Instant::now();
 
-    let mut round_count = 1;
-    let mut result = step(&grid, height, width);
-    // println!("");
-    // print_map(height, width, &result.1);
-
+    let mut result = (false, grid.clone());
     while !result.0 {
-        result = step(&result.1, height, width);
-        // println!("");
-        // print_map(height, width, &result.1);
-        round_count += 1;
+        result = step(&result.1, height, width, false);
     }
 
     let res1 = result
         .1
         .iter()
         .fold(0, |acc, v| acc + if *v == '#' { 1 } else { 0 });
-
-    println!("round count {}", round_count);
 
     let after1 = Instant::now();
     if print_result {
@@ -166,16 +127,9 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
 
     let start2 = Instant::now();
 
-    round_count = 1;
-    result = step2(&grid, height, width);
-    // println!("");
-    // print_map(height, width, &result.1);
-
+    result = (false, grid.clone());
     while !result.0 {
-        result = step2(&result.1, height, width);
-        // println!("");
-        // print_map(height, width, &result.1);
-        round_count += 1;
+        result = step(&result.1, height, width, true);
     }
 
     let res2 = result
