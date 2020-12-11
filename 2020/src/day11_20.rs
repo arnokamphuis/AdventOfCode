@@ -32,54 +32,58 @@ pub fn step(grid: &Grid, height: i16, width: i16, queen: bool) -> (bool, Grid) {
     let mut new_grid = grid.clone();
     for y in 0..height {
         for x in 0..width {
-            let mut occ_count = 0;
-            for dy in -1..2 {
-                for dx in -1..2 {
-                    if !(dx == 0 && dy == 0) {
-                        let mut step_count = 1;
-                        loop {
-                            if x + step_count * dx < 0
-                                || x + step_count * dx >= width
-                                || y + step_count * dy < 0
-                                || y + step_count * dy >= height
-                            {
-                                break;
-                            }
-
-                            let next_seat = get_seat(
-                                x + step_count * dx,
-                                y + step_count * dy,
-                                height,
-                                width,
-                                grid,
-                            );
-
-                            if next_seat != '.' {
-                                if next_seat == '#' {
-                                    occ_count += 1;
+            let seat = get_seat(x, y, height, width, grid);
+            if seat != '.' {
+                let mut occ_count = 0;
+                'outer: for dy in -1..2 {
+                    for dx in -1..2 {
+                        if !(dx == 0 && dy == 0) {
+                            let mut step_count = 1;
+                            loop {
+                                if x + step_count * dx < 0
+                                    || x + step_count * dx >= width
+                                    || y + step_count * dy < 0
+                                    || y + step_count * dy >= height
+                                {
+                                    break;
                                 }
-                                break;
-                            }
 
-                            step_count += 1;
+                                let next_seat = get_seat(
+                                    x + step_count * dx,
+                                    y + step_count * dy,
+                                    height,
+                                    width,
+                                    grid,
+                                );
 
-                            if !queen {
-                                break;
+                                if next_seat != '.' {
+                                    if next_seat == '#' {
+                                        occ_count += 1;
+                                    }
+                                    break;
+                                }
+
+                                step_count += 1;
+
+                                if !queen {
+                                    break;
+                                }
                             }
+                        }
+                        if occ_count >= 5 {
+                            break 'outer;
                         }
                     }
                 }
-            }
 
-            let seat = get_seat(x, y, height, width, grid);
-
-            if seat == 'L' && occ_count == 0 {
-                set_seat(x, y, height, width, &mut new_grid, '#');
-                not_changed = false;
-            }
-            if seat == '#' && occ_count >= if queen { 5 } else { 4 } {
-                set_seat(x, y, height, width, &mut new_grid, 'L');
-                not_changed = false;
+                if seat == 'L' && occ_count == 0 {
+                    set_seat(x, y, height, width, &mut new_grid, '#');
+                    not_changed = false;
+                }
+                if seat == '#' && occ_count >= if queen { 5 } else { 4 } {
+                    set_seat(x, y, height, width, &mut new_grid, 'L');
+                    not_changed = false;
+                }
             }
         }
     }
