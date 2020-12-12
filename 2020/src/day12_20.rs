@@ -13,7 +13,7 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
     };
     let input = tools::get_input(String::from(input_file));
 
-    let mut path1: Vec<(i32,i32)> = vec![];
+    // let mut path1: Vec<(i32,i32)> = vec![];
 
     let mut commands: Vec<(&str, i32)> = vec![];
     for line in &input {

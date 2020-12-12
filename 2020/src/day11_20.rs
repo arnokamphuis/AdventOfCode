@@ -1,5 +1,6 @@
 use super::tools;
 use std::time::Instant;
+use tools::Image;
 
 type Grid = Vec<char>;
 
@@ -25,6 +26,22 @@ pub fn print_map(height: i16, width: i16, grid: &Grid) {
         }
         println!("");
     }
+}
+
+#[allow(dead_code)]
+pub fn image_map(part: usize, count: usize, height: i16, width: i16, grid: &Grid) {
+    let mut img = Image::new(width as usize, height as usize, 4);
+    for y in 0..height {
+        for x in 0..width {
+            img.set_pixel(x as usize, y as usize, match get_seat(x, y, height, width, &grid) {
+                '#' => (255,0,0,255),
+                'L' => (0,0,255,255),
+                '.' => (0,255,0,255),
+                _ => (0,0,0,255),
+            });
+        }
+    }
+    img.save_png(&format!("images/seats-{}-{:05}.png", part, count));
 }
 
 pub fn step(grid: &Grid, height: i16, width: i16, queen: bool) -> (bool, Grid) {
@@ -103,20 +120,29 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
     let height = input.len() as i16;
     let width = input[0].len() as i16;
 
+    let mut r = 0;
     let mut grid: Grid = vec![];
     for line in input {
+        r += 1;
         for c in line.chars() {
             grid.push(c);
         }
     }
 
+    println!("{} {}", height, width);
+    assert_eq!(r,height);
+
     let after0 = Instant::now();
 
     let start1 = Instant::now();
 
+    // let mut count = 0;
     let mut result = (false, grid.clone());
+    // image_map(1, count, height, width, &result.1);
     while !result.0 {
         result = step(&result.1, height, width, false);
+        // count += 1;
+        // image_map(1, count, height, width, &result.1);
     }
 
     let res1 = result
@@ -131,9 +157,13 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
 
     let start2 = Instant::now();
 
+    // count = 0;
     result = (false, grid.clone());
+    // image_map(2, count, height, width, &result.1);
     while !result.0 {
         result = step(&result.1, height, width, true);
+        // count += 1;
+        // image_map(2, count, height, width, &result.1);
     }
 
     let res2 = result
