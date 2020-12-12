@@ -34,9 +34,9 @@ pub fn image_map(part: usize, count: usize, height: i16, width: i16, grid: &Grid
     for y in 0..height {
         for x in 0..width {
             img.set_pixel(x as usize, y as usize, match get_seat(x, y, height, width, &grid) {
-                '#' => (255,0,0,255),
-                'L' => (0,0,255,255),
-                '.' => (0,255,0,255),
+                '#' => (255,255,255,255),
+                'L' => (200,200,200,255),
+                // '.' => (0,255,0,255),
                 _ => (0,0,0,255),
             });
         }
@@ -142,8 +142,13 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
     while !result.0 {
         result = step(&result.1, height, width, false);
         // count += 1;
-        // image_map(1, count, height, width, &result.1);
+        // image_map(0, count, height, width, &result.1);
     }
+
+    // for i in 0..10 {
+    //     count+=1;
+    //     image_map(0, count, height, width, &result.1);
+    // }
 
     let res1 = result
         .1
@@ -163,8 +168,13 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
     while !result.0 {
         result = step(&result.1, height, width, true);
         // count += 1;
-        // image_map(2, count, height, width, &result.1);
+        // image_map(0, count, height, width, &result.1);
     }
+
+    // for i in 0..10 {
+    //     count+=1;
+    //     image_map(0, count, height, width, &result.1);
+    // }
 
     let res2 = result
         .1
