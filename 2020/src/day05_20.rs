@@ -1,5 +1,14 @@
 use super::tools;
 use std::time::Instant;
+use tools::Image;
+
+#[allow(dead_code)]
+pub fn seats_map(count: usize, row: i16, col: i16, img: &mut Image, save: bool, target: bool) {
+    img.set_pixel(2*col as usize + 1, 2*row as usize + 1, if save { if target {(0,0,255,255)} else {(255,0,0,255)}} else {(200,200,200,255)});
+    if save {
+        img.save_png(&format!("images/seats-{:05}.png", count));
+    }
+}
 
 #[allow(dead_code)]
 pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
@@ -12,6 +21,13 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
     };
     let input = tools::get_input(String::from(input_file));
 
+    // let mut count = 0;
+    // let mut img: Image = Image::new(257, 17, 8);
+    // img.clear((255,255,255,255));
+    // for i in 0..1024 {
+    //     seats_map(0, i&7, i>>3, &mut img, false, false);
+    // }
+
     let mut boardingcards: Vec<i16> = vec![];
     for line in &input {
         let card = line.chars().fold(0, |score, c| match c {
@@ -19,6 +35,7 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
             'F' | 'L' => (score << 1),
             _ => score,
         });
+        // seats_map(count, card & 7, card >> 3, &mut img, true, false); count+=1;
         boardingcards.push(card);
     }
     boardingcards.sort();
@@ -47,6 +64,10 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
         .first()
         .unwrap()
         + 1;
+
+    // for _ in 0..200 {
+    //     seats_map(count, res2 & 7, res2 >> 3, &mut img, true, true); count+=1;
+    // }
 
     let after2 = Instant::now();
     if print_result {
