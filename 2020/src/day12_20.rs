@@ -1,5 +1,6 @@
 use super::tools;
 use std::time::Instant;
+// use tools::Image;
 
 #[allow(dead_code)]
 pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
@@ -11,6 +12,8 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
         "./input/day12_20_real.txt"
     };
     let input = tools::get_input(String::from(input_file));
+
+    let mut path1: Vec<(i32,i32)> = vec![];
 
     let mut commands: Vec<(&str, i32)> = vec![];
     for line in &input {
@@ -51,16 +54,54 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
         }
     };
 
+    // path1.push((0,0));
     let res1 = commands
         .iter()
         .fold((0, (0,0)), |res, &step| {
             let dir = directions[res.0];
             let cur_step = step1(step.0, dir, step.1);
             let new_dir = change_direction(step.0, res.0, step.1);
+            // path1.push((res.1.0 + cur_step.0, res.1.1 + cur_step.1));
             ( new_dir, (res.1.0 + cur_step.0, res.1.1 + cur_step.1))
         });
 
     let after1 = Instant::now();
+
+    // let minimums = path1.iter().fold((10000,10000), | acc, v| {
+    //     (std::cmp::min(acc.0, v.0), std::cmp::min(acc.1,v.1))
+    // });
+    // let maximums = path1.iter().fold((-10000,-10000), | acc, v| {
+    //     (std::cmp::max(acc.0, v.0), std::cmp::max(acc.1,v.1))
+    // });
+
+    // let size = (maximums.0 - minimums.0, maximums.1 - minimums.1);
+
+    // let mut path_image = Image::new(size.0 as usize +1, size.1 as usize +1, 2);
+    // let mut counter = 0;
+    // path_image.save_png(&format!("images/path{:010}.png",counter));
+    // commands
+    //     .iter()
+    //     .fold((0, (0,0)), |res, &step| {
+    //         let dir = directions[res.0];
+    //         let cur_step = step1(step.0, dir, step.1);
+    //         let new_dir = change_direction(step.0, res.0, step.1);
+
+    //         let steps = std::cmp::max(cur_step.0.abs(), cur_step.1.abs());
+    //         if steps > 0 {
+    //             for i in 0..steps+1 {
+    //                 let new_pos = (res.1.0 + (i * cur_step.0)/steps, res.1.1 + (i*cur_step.1)/steps);
+    //                 path_image.set_pixel((new_pos.0 - minimums.0) as usize, (new_pos.1 - minimums.1) as usize, (255,0,0,255));
+    //                 if counter % 8 == 0 {
+    //                     path_image.save_png(&format!("images/path{:010}.png",counter/8));
+    //                 }
+    //                 counter+=1;                    
+    //             }
+    //         }
+    //         println!("{}", counter);
+    //         ( new_dir, (res.1.0 + cur_step.0, res.1.1 + cur_step.1) )
+    //     });
+
+
     if print_result {
         println!("Part 1: {}",  res1.1.0.abs() + res1.1.1.abs());
     }
