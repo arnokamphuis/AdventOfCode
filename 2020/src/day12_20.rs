@@ -25,31 +25,38 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
 
     let directions = vec![(1,0), (0,1), (-1,0), (0,-1)]; // Left is +1, Right is -1
 
+    let step1 = |cmd: &str, dir: (i32,i32), times: i32| {
+        match cmd {
+            "F" => ( times * dir.0, times * dir.1 ),
+            "E" => (times, 0),
+            "N" => (0, times),
+            "W" => (-times, 0),
+            "S" => (0, -times),
+            _ => (0,0)
+        }
+    };
+
+    let change_direction = | cmd: &str, dir: usize, amount: i32| {
+        match cmd {
+            "L" => {
+                let v = (dir as i32 + amount / 90) % 4;
+                v as usize
+            }
+            "R" => {
+                let mut v = (dir as i32 - amount / 90) % 4;
+                if v < 0 { v += 4 } 
+                v as usize
+            }
+            _ => dir
+        }
+    };
+
     let res1 = commands
         .iter()
         .fold((0, (0,0)), |res, &step| {
             let dir = directions[res.0];
-            let cur_step = match step.0 {
-                "F" => ( dir.0 * step.1, dir.1 * step.1 ),
-                "E" => ( step.1, 0),
-                "N" => ( 0, step.1),
-                "W" => ( -step.1, 0),
-                "S" => ( 0, -step.1),
-                _ => (0,0)
-            };
-
-            let new_dir: usize = match step.0 {
-                "L" => {
-                    let v = (res.0 as i32 + step.1 / 90) % 4;
-                    v as usize
-                }
-                "R" => {
-                    let mut v = (res.0 as i32 - step.1 / 90) % 4;
-                    if v < 0 { v += 4 } 
-                    v as usize
-                }
-                _ => res.0
-            };
+            let cur_step = step1(step.0, dir, step.1);
+            let new_dir = change_direction(step.0, res.0, step.1);
             ( new_dir, (res.1.0 + cur_step.0, res.1.1 + cur_step.1))
         });
 
@@ -60,18 +67,39 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
 
     let start2 = Instant::now();
 
+
+    let rotate_steps = |dir: &str, amount: i32| {
+        let rs = amount/90 * if dir == "L" {1} else {-1};
+        if rs < 0 { rs + 4 } else { rs }
+    };
+
+    let rotate2 = | pos: (i32,i32), dir: &str, amount: i32 | {
+        let new_rel_pos: (i32,i32) = match rotate_steps(dir, amount) as usize {
+            0 => ( pos.0,  pos.1),
+            1 => (-pos.1,  pos.0),
+            2 => (-pos.0, -pos.1),
+            3 => ( pos.1, -pos.0),
+            _ => (0,0)
+        };
+        (new_rel_pos.0, new_rel_pos.1)
+    };
+
+    let step2 = |cmd: &str, dir: (i32,i32), times: i32| {
+        match cmd {
+            "F" => (( times * dir.0, times * dir.1 ), (0,0)),
+            "E" => ((0,0),( times, 0)),
+            "N" => ((0,0),( 0, times)),
+            "W" => ((0,0),( -times, 0)),
+            "S" => ((0,0),( 0, -times)),
+            _ => ((0,0),(0,0))
+        }
+    };
+
     let res2 = commands
         .iter()
         .fold(((0,0),(10,1)), |res, &step| {
             // ship is .0 , waypoint is .1
-            let cur_step = match step.0 {
-                "F" => (( step.1 * res.1.0, step.1 * res.1.1 ), (0,0)),
-                "E" => ((0,0),( step.1, 0)),
-                "N" => ((0,0),( 0, step.1)),
-                "W" => ((0,0),( -step.1, 0)),
-                "S" => ((0,0),( 0, -step.1)),
-                _ => ((0,0),(0,0))
-            };
+            let cur_step = step2(step.0, res.1, step.1);
             let mut new_pos = 
                 (
                     (res.0.0+cur_step.0.0,res.0.1+cur_step.0.1),
@@ -79,16 +107,7 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
                 );
 
             if step.0 == "L" || step.0 == "R" {
-                let mut rot_time = step.1/90 * if step.0 == "L" {1} else {-1};
-                if rot_time < 0 { rot_time += 4;}
-                let new_rel_pos: (i32,i32) = match rot_time as usize {
-                    0 => ( res.1.0,  res.1.1),
-                    1 => (-res.1.1,  res.1.0),
-                    2 => (-res.1.0, -res.1.1),
-                    3 => ( res.1.1, -res.1.0),
-                    _ => (0,0)
-                };
-                new_pos = ((res.0.0, res.0.1), (new_rel_pos.0, new_rel_pos.1));
+                new_pos = ((res.0.0, res.0.1), rotate2(res.1, step.0, step.1) );
             }
             new_pos
         });
