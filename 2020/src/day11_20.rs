@@ -120,10 +120,8 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
     let height = input.len() as i16;
     let width = input[0].len() as i16;
 
-    let mut r = 0;
     let mut grid: Grid = vec![];
     for line in input {
-        r += 1;
         for c in line.chars() {
             grid.push(c);
         }
