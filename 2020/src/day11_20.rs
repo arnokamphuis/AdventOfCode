@@ -129,9 +129,6 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
         }
     }
 
-    println!("{} {}", height, width);
-    assert_eq!(r,height);
-
     let after0 = Instant::now();
 
     let start1 = Instant::now();
