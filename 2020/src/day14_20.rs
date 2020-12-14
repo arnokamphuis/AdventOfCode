@@ -27,31 +27,27 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
 
     for line in &input {
         if mask_regex.is_match(line) {
-            let captures = mask_regex.captures_iter(line);
-            for cap in captures {
-                let mask = cap.get(1).unwrap().as_str();
-                or_mask = 0;
-                and_mask = 0;
-                for c in mask.chars() {
-                    match c {
-                        'X' => { or_mask = (or_mask << 1) + 0; and_mask = (and_mask << 1) + 1; },
-                        '1' => { or_mask = (or_mask << 1) + 1; and_mask = (and_mask << 1) + 1; },
-                        '0' => { or_mask = (or_mask << 1) + 0; and_mask = (and_mask << 1) + 0; },
-                        _ => {}
-                    }
+            let mask = mask_regex.captures_iter(line).next().unwrap().get(1).unwrap().as_str();
+            or_mask = 0;
+            and_mask = 0;
+            for c in mask.chars() {
+                match c {
+                    'X' => { or_mask = (or_mask << 1) + 0; and_mask = (and_mask << 1) + 1; },
+                    '1' => { or_mask = (or_mask << 1) + 1; and_mask = (and_mask << 1) + 1; },
+                    '0' => { or_mask = (or_mask << 1) + 0; and_mask = (and_mask << 1) + 0; },
+                    _ => {}
                 }
             }
         }
         if mem_regex.is_match(line) {
-            let captures = mem_regex.captures_iter(line);
-            for cap in captures {
-                let address = cap.get(1).unwrap().as_str().parse::<usize>().unwrap();
-                let value = cap.get(2).unwrap().as_str().parse::<u64>().unwrap();
+            let cap = mem_regex.captures_iter(line).next().unwrap();
+            let address = cap.get(1).unwrap().as_str().parse::<usize>().unwrap();
+            let value = cap.get(2).unwrap().as_str().parse::<u64>().unwrap();
 
-                mem.entry(address).or_insert(0);
-                if let Some(m) = mem.get_mut(&address) {
-                    *m = (value & and_mask) | or_mask;
-                }
+            if let Some(m) = mem.get_mut(&address) {
+                *m = (value & and_mask) | or_mask;
+            } else {
+                mem.insert(address, (value & and_mask) | or_mask);
             }
         }
     }
@@ -70,39 +66,40 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
     for line in &input {
         if mask_regex.is_match(line) {
             x_pos = vec![];
-            let captures = mask_regex.captures_iter(line);
-            for cap in captures {
-                let mask = cap.get(1).unwrap().as_str();
-                or_mask = 0;
-                for (i,c) in mask.chars().enumerate() {
-                    match c {
-                        'X' => { or_mask = (or_mask << 1) + 0; x_pos.push(35-i) },
-                        '1' => { or_mask = (or_mask << 1) + 1 },
-                        '0' => { or_mask = (or_mask << 1) + 0 },
-                        _ => {}
-                    }
+            let cap = mask_regex.captures_iter(line).next().unwrap();
+            let mask = cap.get(1).unwrap().as_str();
+            or_mask = 0;
+            for (i,c) in mask.chars().enumerate() {
+                match c {
+                    'X' => { or_mask = (or_mask << 1) + 0; x_pos.push(35-i) },
+                    '1' => { or_mask = (or_mask << 1) + 1 },
+                    '0' => { or_mask = (or_mask << 1) + 0 },
+                    _ => {}
                 }
             }
         }
         if mem_regex.is_match(line) {
-            let captures = mem_regex.captures_iter(line);
-            for cap in captures {
-                let address = cap.get(1).unwrap().as_str().parse::<u64>().unwrap();
-                let value = cap.get(2).unwrap().as_str().parse::<u64>().unwrap();
+            let cap = mem_regex.captures_iter(line).next().unwrap();
+            let address = cap.get(1).unwrap().as_str().parse::<u64>().unwrap();
+            let value = cap.get(2).unwrap().as_str().parse::<u64>().unwrap();
 
-                for t in 0..(1 << x_pos.len()) {
-                    let mut new_addr = address | or_mask;
-                    let mut tb: usize = 0;
-                    for b in &x_pos {
-                        if t & (1 << tb) > 0 {
-                            new_addr |= 1 << b;
-                        } else {
-                            new_addr &= !(1 << b);
-                        }
-                        tb += 1;
+            // loop through all combinations
+            for t in 0..(1 << x_pos.len()) {
+                // start with the masked address without the X positions
+                let mut new_addr = address | or_mask;
+                // change all the X positions to bits corresponding to t
+                for (tb, &b) in x_pos.iter().enumerate() {
+                    if t & (1 << tb) > 0 {
+                        new_addr |= 1 << b;
+                    } else {
+                        new_addr &= !(1 << b);
                     }
-                    mem.entry(new_addr as usize).or_insert(0);
-                    if let Some(m) = mem.get_mut(&(new_addr as usize)) { *m = value; }
+                }
+                // if in memory, overwrite, else insert
+                if let Some(m) = mem.get_mut(&(new_addr as usize)) { 
+                    *m = value; 
+                } else {
+                    mem.insert(new_addr as usize, value);
                 }
             }
         }
