@@ -2,6 +2,7 @@ use super::tools;
 use std::time::Instant;
 use std::collections::BTreeMap;
 use regex::Regex;
+// use tools::Image;
 
 #[allow(dead_code)]
 pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
@@ -24,6 +25,7 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
 
     let mask_regex = Regex::new(r"mask = ([X10]+)").expect("Invalid regex");
     let mem_regex = Regex::new(r"mem\[(\d+)\] = (\d+)").expect("Invalid regex");
+    // let mut steps: Vec<(usize,u64)> = vec![];
 
     for line in &input {
         if mask_regex.is_match(line) {
@@ -49,8 +51,32 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
             } else {
                 mem.insert(address, (value & and_mask) | or_mask);
             }
+            // steps.push((address, (value & and_mask) | or_mask));
         }
     }
+
+    // let mut count = 0;
+    // let mut img = Image::new(256, 256, 4);
+    // for (i, (a, v)) in steps.iter().enumerate() {
+    //     img.clear((0,0,0,255));
+    //     let x = a >> 8;
+    //     let y = a & 255;
+    //     img.set_pixel(x,y,(0,0,255,255));
+    //     img.save_png(&format!("images/mem-{:05}.png",i));
+    //     count = i;
+    // }
+
+    // img.clear((0,0,0,255));
+    // for (a,v) in &mem {
+    //     let x = a >> 8;
+    //     let y = a & 255;
+    //     img.set_pixel(x,y,(0,255,0,255));        
+    // }
+
+    // for _ in 0..100 {
+    //     count+=1;
+    //     img.save_png(&format!("images/mem-{:05}.png",count));
+    // }
 
     let res1 = mem.iter().fold(0, |acc, v| acc + *v.1 );
 
@@ -95,6 +121,7 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
                         new_addr &= !(1 << b);
                     }
                 }
+
                 // if in memory, overwrite, else insert
                 if let Some(m) = mem.get_mut(&(new_addr as usize)) { 
                     *m = value; 
