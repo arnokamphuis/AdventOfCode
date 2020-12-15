@@ -1,31 +1,71 @@
 use super::tools;
 use std::time::Instant;
+use std::collections::BTreeMap;
+
+pub fn get_number(numbers: &Vec<u64>, it: u64) -> u64 {
+    let mut memory: BTreeMap<u64,u64> = BTreeMap::new();
+    let mut last: u64;
+
+    last = numbers[0];
+    for (i, &n) in numbers.iter().skip(1).enumerate() {
+        memory.insert(last,i as u64 + 2);
+        last = n;
+    }
+
+    for count in numbers.len() as u64..it {
+        let next;
+        let turn = count + 1;
+        if let Some(time) = memory.get(&last) {
+            next = turn - time;
+        } else {
+            next = 0;
+        }
+
+        if let Some(prev) = memory.get_mut(&last) {
+            *prev = turn;
+        } else {
+            memory.insert(last, turn);
+        }
+
+        last = next;
+    }
+
+    last
+}
 
 #[allow(dead_code)]
 pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
     let start0 = Instant::now();
 
     let input_file: &str = if !real {
-        "./input/dayxx_20_test.txt"
+        "./input/day15_20_test.txt"
     } else {
-        "./input/dayxx_20_real.txt"
+        "./input/day15_20_real.txt"
     };
-    let _input = tools::get_input(String::from(input_file));
-
+    let input = tools::get_input(String::from(input_file));
+    let numbers: Vec<u64> = input[0]
+        .split(',')
+        .map(|s| s.parse::<u64>().unwrap())
+        .collect();
+    
     let after0 = Instant::now();
 
     let start1 = Instant::now();
 
+    let res1 = get_number(&numbers, 2020);
+
     let after1 = Instant::now();
     if print_result {
-        println!("Part 1: {}", 0);
+        println!("Part 1: {}", res1);
     }
 
     let start2 = Instant::now();
 
+    let res2 = get_number(&numbers, 30000000);
+
     let after2 = Instant::now();
     if print_result {
-        println!("Part 2: {}", 0);
+        println!("Part 2: {}", res2);
     }
 
     (
