@@ -1,29 +1,25 @@
 use super::tools;
 use std::time::Instant;
-use std::collections::HashMap;
 
-pub fn get_number(numbers: &Vec<u32>, it: u32) -> u32 {
-    let mut memory: HashMap<u32,u32> = HashMap::new();
-    let mut last: u32;
+#[allow(unused_must_use)]
+pub fn get_number(numbers: &Vec<usize>, it: usize) -> usize {
+    let mut memory = vec![0; it];
+    let mut last: usize;
 
     last = numbers[0];
     for (i, &n) in numbers.iter().skip(1).enumerate() {
-        memory.insert(last,i as u32 + 2);
+        memory[last] = i + 2;
         last = n;
     }
 
-    let start: u32 = numbers.len() as u32 + 1;
-    let end: u32 = it+1;
+    let start: usize = numbers.len() + 1;
+    let end: usize = it+1;
     for turn in start..end {
-        let next: u32;
-        if let Some(time) = memory.get(&last) {
-            next = turn - time;
-        } else {
-            next = 0;
-        }
-
-        memory.insert(last, turn);
-
+        let next: usize = match memory[last] {
+            0 => 0,
+            lt => turn - lt
+        };
+        memory[last] = turn;
         last = next;
     }
 
@@ -40,9 +36,9 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
         "./input/day15_20_real.txt"
     };
     let input = tools::get_input(String::from(input_file));
-    let numbers: Vec<u32> = input[0]
+    let numbers: Vec<usize> = input[0]
         .split(',')
-        .map(|s| s.parse::<u32>().unwrap())
+        .map(|s| s.parse::<usize>().unwrap())
         .collect();
     
     let after0 = Instant::now();
