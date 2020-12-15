@@ -154,6 +154,7 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
                 new_pos = ((res.0.0, res.0.1), rotate2(res.1, step.0, step.1) );
             }
             // path2.push(new_pos.0);
+            // println!("{}{} => ship {:?} - waypoint {:?}", step.0, step.1, new_pos.0, new_pos.1);
             new_pos
         });
 
