@@ -1,9 +1,9 @@
 use super::tools;
 use std::time::Instant;
-use std::collections::BTreeMap;
+use std::collections::HashMap;
 
 pub fn get_number(numbers: &Vec<u32>, it: u32) -> u32 {
-    let mut memory: BTreeMap<u32,u32> = BTreeMap::new();
+    let mut memory: HashMap<u32,u32> = HashMap::new();
     let mut last: u32;
 
     last = numbers[0];
@@ -12,20 +12,17 @@ pub fn get_number(numbers: &Vec<u32>, it: u32) -> u32 {
         last = n;
     }
 
-    for count in numbers.len() as u32..it {
-        let next;
-        let turn = count + 1;
+    let start: u32 = numbers.len() as u32 + 1;
+    let end: u32 = it+1;
+    for turn in start..end {
+        let next: u32;
         if let Some(time) = memory.get(&last) {
             next = turn - time;
         } else {
             next = 0;
         }
 
-        if let Some(prev) = memory.get_mut(&last) {
-            *prev = turn;
-        } else {
-            memory.insert(last, turn);
-        }
+        memory.insert(last, turn);
 
         last = next;
     }
