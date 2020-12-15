@@ -54,7 +54,7 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
 
     let start2 = Instant::now();
 
-    let res2 = get_number(&numbers, 30000000);
+    let res2 = get_number(&numbers, 30_000_000);
 
     let after2 = Instant::now();
     if print_result {
