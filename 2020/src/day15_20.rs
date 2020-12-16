@@ -2,14 +2,14 @@ use super::tools;
 use std::time::Instant;
 // use std::collections::HashMap;
 
-// struct VanEijk {
+// struct VanEck {
 //     memory: HashMap<usize, usize>,
 //     init: Vec<usize>,
 //     last: usize,
 //     turn: usize,
 // }
 
-// impl Iterator for VanEijk {
+// impl Iterator for VanEck {
 //     type Item = usize;
 
 //     fn next(&mut self) -> Option<usize> {
@@ -28,9 +28,9 @@ use std::time::Instant;
 //     }
 // }
 
-// impl VanEijk {
-//     pub fn new(nums: &Vec<usize>) -> VanEijk {
-//         VanEijk { last: 0, turn: 0, memory: HashMap::new(), init: nums.clone() }
+// impl VanEck {
+//     pub fn new(nums: &Vec<usize>) -> VanEck {
+//         VanEck { last: 0, turn: 0, memory: HashMap::new(), init: nums.clone() }
 //     }
 
 //     fn add(&mut self, num: usize) {
@@ -89,7 +89,7 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
 
     let start1 = Instant::now();
 
-    // let mut ve = VanEijk::new(&numbers);
+    // let mut ve = VanEck::new(&numbers);
     // let res1 = ve.nth(2020-1).unwrap(); // turn is one more than n-th iteration
     let res1 = get_number(&numbers, 2020);
 
@@ -100,7 +100,7 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
 
     let start2 = Instant::now();
 
-    // let mut ve2 = VanEijk::new(&numbers);
+    // let mut ve2 = VanEck::new(&numbers);
     // let res2 = ve2.nth(30_000_000-1).unwrap(); // turn is one more than n-th iteration
     let res2 = get_number(&numbers, 30_000_000);
 
