@@ -46,33 +46,40 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
 
     let start1 = Instant::now();
 
-    let mut error_rate = 0;
-    let mut valid_tickets: Vec<Vec<usize>> = vec![];
-    for t in &tickets {
-        let mut is_valid = true;
-        for &v in t {
-            let mut count_valid = 0;
-            for rule in &rules {
-                if (rule.0.0 <= v && v <= rule.0.1) || (rule.1.0 <= v && v <= rule.1.1) { // valid rules
-                    count_valid += 1;
-                }
-            }
-            if count_valid == 0 {
-                is_valid = false;
-                error_rate += v;
-            }
-        }
-        if is_valid {
-            valid_tickets.push(t.clone());
-        }
-    }
+    let res1: usize = tickets
+        .iter()
+        .fold(0, |error_rate, ticket| 
+            error_rate + ticket.iter().filter(|&&ticket_value| 
+                rules
+                    .iter()
+                    .filter(|&&rule |
+                        (rule.0.0 <= ticket_value && ticket_value <= rule.0.1) || (rule.1.0 <= ticket_value && ticket_value <= rule.1.1))
+                    .count() == 0 
+            )
+            .sum::<usize>()
+        );
 
     let after1 = Instant::now();
     if print_result {
-        println!("Part 1: {}", error_rate);
+        println!("Part 1: {}", res1);
     }
 
     let start2 = Instant::now();
+
+    let valid_tickets: Vec<Vec<usize>> = tickets
+        .iter()
+        .filter(|&ticket| {
+            ticket.iter().filter(|&&ticket_value| 
+                rules
+                    .iter()
+                    .filter(|&&rule |
+                        (rule.0.0 <= ticket_value && ticket_value <= rule.0.1) || (rule.1.0 <= ticket_value && ticket_value <= rule.1.1))
+                    .count() == 0 
+            )
+            .sum::<usize>() == 0
+        })
+        .map(|v| v.clone())
+        .collect::<Vec<Vec<usize>>>();
 
     for (i, &rule) in rules.iter().enumerate() {
         for t in &valid_tickets {
