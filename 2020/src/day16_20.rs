@@ -2,6 +2,7 @@ use super::tools;
 use std::time::Instant;
 use regex::Regex;
 use std::collections::HashMap;
+use std::collections::BTreeSet;
 
 #[allow(dead_code)]
 pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
@@ -14,7 +15,6 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
     };
     let input = tools::get_input(String::from(input_file));
     let mut rules: Vec<((usize,usize),(usize,usize))> = vec![];
-    let mut valid: Vec<Vec<bool>>;
     let mut tickets: Vec<Vec<usize>> = vec![];
     let mut myticket = vec![];
     let mut rulenames: Vec<&str> = vec![];
@@ -40,7 +40,6 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
             }
         }
     }
-    valid = vec![vec![true; rules.len()]; rules.len()];
 
     let after0 = Instant::now();
 
@@ -81,47 +80,58 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
         .map(|v| v.clone())
         .collect::<Vec<Vec<usize>>>();
 
-    for (i, &rule) in rules.iter().enumerate() {
-        for t in &valid_tickets {
-            for (j, &v) in t.iter().enumerate() {
-                if !((rule.0.0 <= v && v <= rule.0.1) || (rule.1.0 <= v && v <= rule.1.1)) { // invalid
-                    valid[i][j] = false;
-                } else {
-                }
-            }  
-        }
-    }
 
+    let mut sets: Vec<BTreeSet<usize>> = vec![BTreeSet::new(); rules.len()];
+    (0..sets.len()).for_each(|set_index| {
+        if let Some(mutset) = sets.get_mut(set_index) {
+            (0..rules.len()).for_each(|id| { mutset.insert(id); });
+        }
+    });
+        
+    rules.iter().enumerate().for_each(|(rule_index, &rule)| {
+        valid_tickets.iter().for_each(|ticket| {
+            ticket.iter().enumerate().for_each(|(ticket_value_index, &ticket_value)| 
+                if !((rule.0.0 <= ticket_value && ticket_value <= rule.0.1) || (rule.1.0 <= ticket_value && ticket_value <= rule.1.1)) { // invalid
+                    if let Some(mut_set) = sets.get_mut(rule_index) {
+                        mut_set.remove(&ticket_value_index);
+                    }
+                }
+            );
+        });
+    });
+
+    // build map for each rule to ticket value
     let mut assigned: HashMap<usize,usize> = HashMap::new();
 
-    for _ in 0..rules.len() {
-        for i in 0..rules.len() {
-            let mut truecount = 0;
-            let mut single_index = rules.len()+1;
-            for (index2,r) in valid.iter().enumerate() {
-                if r.len() > 0 {
-                    if r[i] { truecount += 1; single_index = index2; }
+    // filter all sets based on already assigned rule/item pairs
+    while sets.iter().fold(0, |acc, v| acc + v.len() ) > 0 {
+        sets
+            .iter()
+            .enumerate()
+            .filter(|(_, set)| set.len() == 1)
+            .for_each(|(index1, aset)| {
+                if let Some(&index2) = aset.iter().next() {
+                    assigned.insert(index1, index2);
                 }
-            }
-            if truecount == 1 {
-                assigned.insert(i, single_index);
-            }
-        }
+            });
 
-        for (_,&k) in &assigned {
-            valid[k] = vec![];
-        }
-    }
+        assigned
+            .iter()
+            .for_each(|(_, ass_to)| {
+                (0..sets.len()).for_each(|set_index| {
+                    if let Some(mutset) = sets.get_mut(set_index) {
+                        mutset.remove(ass_to);
+                    }
+                });
+            });
+    } 
 
-    let mut res2: u64 = 1;
-    for ass in &assigned {
-        let name = rulenames[*ass.1];
-        if name.contains("departure") {
-            res2 *= myticket[*ass.0] as u64;
-        }
-    }
-
-    // println!("{:?}", valid);
+    let res2: u64 = rulenames
+        .iter()
+        .enumerate()
+        .filter(|(_, &name)| name.contains("departure"))
+        .map(|(index, _)| myticket[*(assigned.get(&index).unwrap())] as u64)
+        .product::<u64>();
 
     let after2 = Instant::now();
     if print_result {
