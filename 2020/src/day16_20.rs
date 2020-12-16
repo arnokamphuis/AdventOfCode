@@ -41,6 +41,10 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
         }
     }
 
+    let check_rule = |ticket_value: usize, rule: ((usize,usize),(usize,usize))| -> bool {
+        (rule.0.0 <= ticket_value && ticket_value <= rule.0.1) || (rule.1.0 <= ticket_value && ticket_value <= rule.1.1)
+    };
+
     let after0 = Instant::now();
 
     let start1 = Instant::now();
@@ -51,8 +55,7 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
             error_rate + ticket.iter().filter(|&&ticket_value| 
                 rules
                     .iter()
-                    .filter(|&&rule |
-                        (rule.0.0 <= ticket_value && ticket_value <= rule.0.1) || (rule.1.0 <= ticket_value && ticket_value <= rule.1.1))
+                    .filter(|&&rule | check_rule(ticket_value, rule))
                     .count() == 0 
             )
             .sum::<usize>()
@@ -71,8 +74,8 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
             ticket.iter().filter(|&&ticket_value| 
                 rules
                     .iter()
-                    .filter(|&&rule |
-                        (rule.0.0 <= ticket_value && ticket_value <= rule.0.1) || (rule.1.0 <= ticket_value && ticket_value <= rule.1.1))
+                    .filter(|&&rule | check_rule(ticket_value, rule))
+                        // (rule.0.0 <= ticket_value && ticket_value <= rule.0.1) || (rule.1.0 <= ticket_value && ticket_value <= rule.1.1))
                     .count() == 0 
             )
             .sum::<usize>() == 0
@@ -91,7 +94,7 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
     rules.iter().enumerate().for_each(|(rule_index, &rule)| {
         valid_tickets.iter().for_each(|ticket| {
             ticket.iter().enumerate().for_each(|(ticket_value_index, &ticket_value)| 
-                if !((rule.0.0 <= ticket_value && ticket_value <= rule.0.1) || (rule.1.0 <= ticket_value && ticket_value <= rule.1.1)) { // invalid
+                if !check_rule(ticket_value, rule) { // invalid
                     if let Some(mut_set) = sets.get_mut(rule_index) {
                         mut_set.remove(&ticket_value_index);
                     }
