@@ -78,18 +78,14 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
                     .count() == 0 
             )
             .sum::<usize>() == 0
-        })
-        .map(|v| v.clone())
-        .collect::<Vec<Vec<usize>>>();
+        }).cloned().collect::<Vec<Vec<usize>>>();
 
 
     let mut sets: Vec<BTreeSet<usize>> = vec![BTreeSet::new(); rules.len()];
-    (0..sets.len()).for_each(|set_index| {
-        if let Some(mutset) = sets.get_mut(set_index) {
-            (0..rules.len()).for_each(|id| { mutset.insert(id); });
-        }
+    sets.iter_mut().for_each(|set| {
+        (0..rules.len()).for_each(|id| { set.insert(id); });
     });
-        
+
     rules.iter().enumerate().for_each(|(rule_index, &rule)| {
         valid_tickets.iter().for_each(|ticket| {
             ticket.iter().enumerate().for_each(|(ticket_value_index, &ticket_value)| 
@@ -107,25 +103,15 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
 
     // filter all sets based on already assigned rule/item pairs
     while sets.iter().fold(0, |acc, v| acc + v.len() ) > 0 {
-        sets
-            .iter()
-            .enumerate()
+        sets.iter().enumerate()
             .filter(|(_, set)| set.len() == 1)
             .for_each(|(index1, aset)| {
-                if let Some(&index2) = aset.iter().next() {
-                    assigned.insert(index1, index2);
-                }
+                assigned.insert(index1, aset.iter().fold(0, |acc, v| acc+v));
             });
 
-        assigned
-            .iter()
-            .for_each(|(_, ass_to)| {
-                (0..sets.len()).for_each(|set_index| {
-                    if let Some(mutset) = sets.get_mut(set_index) {
-                        mutset.remove(ass_to);
-                    }
-                });
-            });
+        assigned.iter().for_each(|(_, ass_to)| {
+            sets.iter_mut().for_each(|set| { set.remove(ass_to); });
+        });
     } 
 
     let res2: u64 = rulenames
