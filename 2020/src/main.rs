@@ -15,6 +15,7 @@ mod day12_20;
 mod day13_20;
 mod day14_20;
 mod day15_20;
+mod day16_20;
 mod passport;
 mod tools;
 
@@ -34,7 +35,8 @@ fn main() {
         ("Day 12 of 2020", day12_20::run, 500),
         ("Day 13 of 2020", day13_20::run, 500),
         ("Day 14 of 2020", day14_20::run, 100),
-        ("Day 15 of 2020", day15_20::run, 4),
+        ("Day 15 of 2020", day15_20::run, 10),
+        ("Day 16 of 2020", day16_20::run, 500),
     ];
 
     let args: Vec<String> = env::args().collect();
