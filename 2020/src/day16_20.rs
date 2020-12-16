@@ -75,7 +75,6 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
                 rules
                     .iter()
                     .filter(|&&rule | check_rule(ticket_value, rule))
-                        // (rule.0.0 <= ticket_value && ticket_value <= rule.0.1) || (rule.1.0 <= ticket_value && ticket_value <= rule.1.1))
                     .count() == 0 
             )
             .sum::<usize>() == 0
