@@ -40,7 +40,7 @@ fn main() {
         ("Day 15 of 2020", day15_20::run, 10),
         ("Day 16 of 2020", day16_20::run, 500),
         ("Day 17 of 2020", day17_20::run, 500),
-        ("Day 18 of 2020", day18_20::run, 500),
+        ("Day 18 of 2020", day18_20::run, 100),
     ];
 
     let args: Vec<String> = env::args().collect();
@@ -86,8 +86,12 @@ fn main() {
                         )
                     });
 
-                println!("{} - init: {:10.0} +/- {:10.0} ns, p1: {:10.0} +/- {:10.0} ns, p2: {:10.0} +/- {:10.0} ns", 
-                    name, mean.0, variance.0.sqrt(), mean.1, variance.1.sqrt(), mean.2, variance.2.sqrt());
+                println!("{} - init: {:>10.4} +/- {:>10.4} ms, p1: {:>10.4} +/- {:>10.4} ms, p2: {:>10.4} +/- {:>10.4} ms", 
+                    name, 
+                    mean.0 / 1_000_000f64, variance.0.sqrt() / 1_000_000f64, 
+                    mean.1 / 1_000_000f64, variance.1.sqrt() / 1_000_000f64, 
+                    mean.2 / 1_000_000f64, variance.2.sqrt() / 1_000_000f64
+                );
             }
         } else if args[1] == "all" {
             for (name, day, _) in days.iter() {
