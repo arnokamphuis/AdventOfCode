@@ -1,87 +1,43 @@
 use super::tools;
 use std::time::Instant;
+use std::collections::HashSet;
 
-fn step1(grid: &Vec<Vec<Vec<bool>>>) -> Vec<Vec<Vec<bool>>> {
-    let sz = grid.len() as i16 +2;
-    let sy = grid[0].len() as i16 +2;
-    let sx = grid[0][0].len() as i16 +2;
+fn step(cubes_on: &HashSet<Vec<i16>>, part: usize) -> HashSet<Vec<i16>> {
+    let mut new_on: HashSet<Vec<i16>> = HashSet::new();
 
-    let mut new_grid: Vec<Vec<Vec<bool>>> = vec![
-        vec![
-            vec![
-                false; sx as usize
-            ]; sy as usize
-        ]; sz as usize
-    ];
+    let range = |dim: usize, on: &HashSet<Vec<i16>>| -> std::ops::Range<i16> {
+        let r = on.iter().fold((100,-100), |acc, v| (std::cmp::min(acc.0,v[dim]),std::cmp::max(acc.1,v[dim])));
+        std::ops::Range{ start: r.0-1 , end: r.1+2}
+    };
 
-    for z in 0i16..sz {
-        for y in 0i16..sy {
-            for x in 0i16..sx {
-                let mut count: usize = 0;
-                for dx in -1i16..2 {
-                    for dy in -1i16..2 {
-                        for dz in -1i16..2 {
-                            if !(dx==0 && dy==0 && dz==0) && ( (x+dx) > 0 && (x+dx) < (sx-1) && (y+dy) > 0 && (y+dy) < (sy-1) && (z+dz) > 0 && (z+dz) < (sz-1)) {
-                                if grid[(z-1+dz) as usize][(y-1+dy) as usize][(x-1+dx) as usize] {
-                                    count += 1;
-                                }
-                            }
-                        }                
-                    }  
-                }
-                let mut current = false;
-                if x > 0 && x < sx-1 && y > 0 && y < sy-1 && z > 0 && z < sz-1 { current = grid[(z-1) as usize][(y-1) as usize][(x-1) as usize] }
-                new_grid[z as usize][y as usize][x as usize] = (current && (count == 2 || count == 3)) || (!current && count == 3);
-            }
-        }
-    }
-
-    new_grid
-}
-
-fn step2(grid: &Vec<Vec<Vec<Vec<bool>>>>) -> Vec<Vec<Vec<Vec<bool>>>> {
-    let sw = grid.len() as i16 +2;
-    let sz = grid[0].len() as i16 +2;
-    let sy = grid[0][0].len() as i16 +2;
-    let sx = grid[0][0][0].len() as i16 +2;
-
-    let mut new_grid: Vec<Vec<Vec<Vec<bool>>>> = vec![
-        vec![
-            vec![
-                vec![
-                    false; sx as usize
-                ]; sy as usize
-            ]; sz as usize
-        ]; sw as usize
-    ];
-
-    for w in 0i16..sw {
-        for z in 0i16..sz {
-            for y in 0i16..sy {
-                for x in 0i16..sx {
+    for x in range(0, cubes_on) {
+        for y in range(1, cubes_on) {
+            for z in range(2, cubes_on) {
+                for w in if part == 1 { 0..1 } else { range(3, cubes_on) } {
+                    let pos = vec![x,y,z,w];
                     let mut count: usize = 0;
-                    for dx in -1i16..2 {
-                        for dy in -1i16..2 {
-                            for dz in -1i16..2 {
-                                for dw in -1i16..2 {
-                                    if !(dx==0 && dy==0 && dz==0 && dw==0) && ( (x+dx) > 0 && (x+dx) < (sx-1) && (y+dy) > 0 && (y+dy) < (sy-1) && (z+dz) > 0 && (z+dz) < (sz-1) && (w+dw) > 0 && (w+dw) < (sw-1)) {
-                                        if grid[(w-1+dw) as usize][(z-1+dz) as usize][(y-1+dy) as usize][(x-1+dx) as usize] {
+                    for dx in -1..2i16 {
+                        for dy in -1..2i16 {
+                            for dz in -1..2i16 {
+                                for dw in if part == 1 { 0..1i16 } else { -1..2i16 } {
+                                    if dx!=0 || dy!=0 || dz!=0 || dw!=0 {
+                                        if cubes_on.contains(&vec![x+dx, y+dy, z+dz, w+dw]) {
                                             count += 1;
                                         }
                                     }
                                 }
-                            }                
-                        }  
+                            }
+                        }
                     }
-                    let mut current = false;
-                    if x > 0 && x < sx-1 && y > 0 && y < sy-1 && z > 0 && z < sz-1 && w > 0 && w < sw-1 { current = grid[(w-1) as usize][(z-1) as usize][(y-1) as usize][(x-1) as usize] }
-                    new_grid[w as usize][z as usize][y as usize][x as usize] = (current && (count == 2 || count == 3)) || (!current && count == 3);
+                    let current = cubes_on.contains(&pos);
+                    if (current && (count == 2 || count == 3)) || (!current && count == 3) {
+                        new_on.insert(pos.clone());
+                    }
                 }
-            }
+            }        
         }
     }
-
-    new_grid
+    new_on
 }
 
 #[allow(dead_code)]
@@ -95,32 +51,23 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
     };
     let input = tools::get_input(String::from(input_file));
 
-    let mut grid1: Vec<Vec<Vec<bool>>> = vec![vec![]];
-    let mut grid2: Vec<Vec<Vec<Vec<bool>>>> = vec![vec![vec![]]];
+    let mut grid: HashSet<Vec<i16>> = HashSet::new();
 
-    input.iter().for_each(|line| {
-        let mut r: Vec<bool> = vec![];
-        line.chars().for_each(|c| {
-            r.push( c == '#' );
-        });
-        grid1[0].push(r.clone());
-        grid2[0][0].push(r.clone());
+    input.iter().enumerate().for_each(|(y,line)| {
+        line.chars().enumerate().for_each(|(x, c)| {
+            if c=='#' { grid.insert(vec![x as i16,y as i16,0,0]); }
+        })
     });
     
     let after0 = Instant::now();
 
     let start1 = Instant::now();
 
-    let mut result1 = grid1.clone();
+    let mut cubes_on1 = grid.clone();
     (0..6).for_each(|_| {
-        result1 = step1(&result1);
+        cubes_on1 = step(&cubes_on1, 1);
     });
-
-    let res1 = result1.iter().fold(0, | acc, layer| 
-        acc + layer.iter().fold(0, | acc2, row | 
-            acc2 + row.iter().fold(0, |acc3, v| acc3 + if *v {1} else {0} )
-        )
-    );
+    let res1 = cubes_on1.len();
 
     let after1 = Instant::now();
     if print_result {
@@ -129,18 +76,12 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
 
     let start2 = Instant::now();
 
-    let mut result2 = grid2.clone();
+    let mut cubes_on2 = grid.clone();
     (0..6).for_each(|_| {
-        result2 = step2(&result2);
+        cubes_on2 = step(&cubes_on2, 2);
     });
 
-    let res2 = result2.iter().fold(0, | acc, layer| 
-        acc + layer.iter().fold(0, | acc2, row | 
-            acc2 + row.iter().fold(0, |acc3, col| 
-                acc3 + col.iter().fold(0, |acc4, v| acc4 + if *v {1} else {0} ) 
-            )
-        )
-    );
+    let res2 = cubes_on2.len();
 
     let after2 = Instant::now();
     if print_result {
