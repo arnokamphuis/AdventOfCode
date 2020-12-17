@@ -6,7 +6,8 @@ fn step(cubes_on: &HashSet<Vec<i16>>, part: usize) -> HashSet<Vec<i16>> {
     let mut new_on: HashSet<Vec<i16>> = HashSet::new();
 
     let range = |dim: usize, on: &HashSet<Vec<i16>>| -> std::ops::Range<i16> {
-        let r = on.iter().fold((100,-100), |acc, v| (std::cmp::min(acc.0,v[dim]),std::cmp::max(acc.1,v[dim])));
+        let r = on.iter().fold((100,-100), |acc, v| 
+            (std::cmp::min(acc.0,v[dim]),std::cmp::max(acc.1,v[dim])));
         std::ops::Range{ start: r.0-1 , end: r.1+2}
     };
 
