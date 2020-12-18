@@ -1,6 +1,5 @@
 use super::tools;
 use std::time::Instant;
-// use regex::Regex;
 
 fn operand(l: u128, r: u128, o: char) -> u128 {
     match o {
