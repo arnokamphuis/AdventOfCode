@@ -98,12 +98,13 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
         "./input/day18_20_real.txt"
     };
     let input = tools::get_input(String::from(input_file));
+    let nodes = input.iter().map(|line| Node::new(line) ).collect::<Vec<Node>>();
 
     let after0 = Instant::now();
 
     let start1 = Instant::now();
 
-    let res1 = input.iter().map(|line| { Node::new(line).eval(1) }).sum::<u128>();
+    let res1 = nodes.iter().map(|node| node.eval(1)).sum::<u128>();
 
     let after1 = Instant::now();
     if print_result {
@@ -112,7 +113,7 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
 
     let start2 = Instant::now();
 
-    let res2 = input.iter().map(|line| { Node::new(line).eval(2) }).sum::<u128>();
+    let res2 = nodes.iter().map(|node| node.eval(2)).sum::<u128>();
 
     let after2 = Instant::now();
     if print_result {
