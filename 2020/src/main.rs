@@ -27,6 +27,40 @@ mod day24_20;
 mod day25_20;
 mod passport;
 mod tools;
+// use plotters::prelude::*;
+
+// fn create_graph(data: &Vec<f32>) -> Result<(), Box<dyn std::error::Error>> {
+//     let root =
+//         BitMapBackend::new("images/runtimes.png", (1024, 768)).into_drawing_area();    
+
+//     root.fill(&WHITE)?;
+
+//     let y_axis = (0f32..10f32).step(1.0);
+
+//     let mut chart = ChartBuilder::on(&root)
+//         .x_label_area_size(35)
+//         .y_label_area_size(40)
+//         .margin(5)
+//         .caption("Running times in ms", ("sans-serif", 50))
+//         .build_cartesian_2d((0u32..10u32).into_segmented(), 0f32..10f32)?;
+
+//     chart
+//         .configure_mesh()
+//         .disable_x_mesh()
+//         .bold_line_style(&WHITE.mix(0.3))
+//         .y_desc("Running time")
+//         .x_desc("Day")
+//         .axis_desc_style(("sans-serif", 15))
+//         .draw()?;
+
+//     chart.draw_series(
+//         Histogram::vertical(&chart)
+//             .style(RED.mix(0.5).filled())
+//             .data(data.iter().map(|x: &f32| (*x, 1))),
+//     )?;
+
+//     Ok(())
+// }
 
 fn main() {
     let days: Vec<(&str, fn(bool, bool) -> (u128, u128, u128), usize)> = vec![
@@ -48,7 +82,7 @@ fn main() {
         ("Day 16 of 2020", day16_20::run, 500),
         ("Day 17 of 2020", day17_20::run, 100),
         ("Day 18 of 2020", day18_20::run, 500),
-        ("Day 19 of 2020", day19_20::run, 500),
+        ("Day 19 of 2020", day19_20::run, 10),
         ("Day 20 of 2020", day20_20::run, 500),
         ("Day 21 of 2020", day21_20::run, 500),
         ("Day 22 of 2020", day22_20::run, 500),
@@ -68,6 +102,7 @@ fn main() {
         if args[1] == "performance" {
             println!("Running performance check");
             println!("");
+            // let data: Vec<f32> = vec![];
             for (name, day, runs) in days.iter() {
                 let mut timings: Vec<(u128, u128, u128)> = vec![];
                 for _ in 0..*runs {
@@ -106,7 +141,10 @@ fn main() {
                     mean.1 / 1_000_000f64, variance.1.sqrt() / 1_000_000f64, 
                     mean.2 / 1_000_000f64, variance.2.sqrt() / 1_000_000f64
                 );
+
+                // data.push( (mean.0 + mean.1 + mean.2) as f32 );
             }
+            // create_graph(&data);
         } else if args[1] == "all" {
             for (name, day, _) in days.iter() {
                 let timing = day(real, false);
