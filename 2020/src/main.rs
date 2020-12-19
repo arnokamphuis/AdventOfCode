@@ -27,40 +27,48 @@ mod day24_20;
 mod day25_20;
 mod passport;
 mod tools;
-// use plotters::prelude::*;
 
-// fn create_graph(data: &Vec<f32>) -> Result<(), Box<dyn std::error::Error>> {
-//     let root =
-//         BitMapBackend::new("images/runtimes.png", (1024, 768)).into_drawing_area();    
+use plotly::common::{ErrorData, ErrorType, Marker, Title, Font};
+use plotly::layout::{Axis, BarMode, Layout, Legend, TicksDirection};
+use plotly::{Bar, NamedColor, Plot, Rgb, Rgba, Scatter};
 
-//     root.fill(&WHITE)?;
+fn create_graph(data: &Vec<(usize, (f32,f32,f32))>, errors: &Vec<(usize, (f64,f64,f64))>) {
+    let xlabels: Vec<String> = data.iter().map(|n| format!("day {}", n.0+1)).collect();
 
-//     let y_axis = (0f32..10f32).step(1.0);
+    let init_vec: Vec<f32> = data.iter().map(|n| n.1.0).collect();
+    let part1_vec: Vec<f32> = data.iter().map(|n| n.1.1).collect();
+    let part2_vec: Vec<f32> = data.iter().map(|n| n.1.2).collect();
 
-//     let mut chart = ChartBuilder::on(&root)
-//         .x_label_area_size(35)
-//         .y_label_area_size(40)
-//         .margin(5)
-//         .caption("Running times in ms", ("sans-serif", 50))
-//         .build_cartesian_2d((0u32..10u32).into_segmented(), 0f32..10f32)?;
+    let init_error: Vec<f64> = errors.iter().map(|n| n.1.0).collect();
+    let part1_error: Vec<f64> = errors.iter().map(|n| n.1.1).collect();
+    let part2_error: Vec<f64> = errors.iter().map(|n| n.1.2).collect();
 
-//     chart
-//         .configure_mesh()
-//         .disable_x_mesh()
-//         .bold_line_style(&WHITE.mix(0.3))
-//         .y_desc("Running time")
-//         .x_desc("Day")
-//         .axis_desc_style(("sans-serif", 15))
-//         .draw()?;
+    let trace1 = Bar::new(xlabels.clone(), init_vec).name("Initialization")
+        .marker(Marker::new().color(NamedColor::Red))
+        .error_y(ErrorData::new(ErrorType::Data).array(init_error));
+    let trace2 = Bar::new(xlabels.clone(), part1_vec).name("Part 1")
+        .marker(Marker::new().color(NamedColor::Blue))
+        .error_y(ErrorData::new(ErrorType::Data).array(part1_error));
+    let trace3 = Bar::new(xlabels.clone(), part2_vec).name("Part 2")
+        .marker(Marker::new().color(NamedColor::Green))
+        .error_y(ErrorData::new(ErrorType::Data).array(part2_error));
 
-//     chart.draw_series(
-//         Histogram::vertical(&chart)
-//             .style(RED.mix(0.5).filled())
-//             .data(data.iter().map(|x: &f32| (*x, 1))),
-//     )?;
+    let layout = Layout::new().bar_mode(BarMode::Group)
+        .title(Title::new("Runtimes in ms for Advent of Code 2020").font(Font::new().color(NamedColor::Black).size(24).family("Droid Serif")))
+        .x_axis(Axis::new().title(Title::new("Day").font(Font::new().color(NamedColor::Black).size(12).family("Droid Serif"))))
+        .y_axis(Axis::new().title(Title::new("Runtime in ms").font(Font::new().color(NamedColor::Black).size(12).family("Droid Serif"))).range(vec![0, 10]));
 
-//     Ok(())
-// }
+    let mut plot = Plot::new();
+    plot.add_trace(trace1);
+    plot.add_trace(trace2);
+    plot.add_trace(trace3);
+    plot.set_layout(layout);
+
+    // let mut file = File::create("images/runtimes.html")?;
+    plot.to_html("images/runtimes.html");
+    // let html = plot.to_inline_html(Some("runtimes"));
+    // file.write_all(html.as_bytes());
+}
 
 fn main() {
     let days: Vec<(&str, fn(bool, bool) -> (u128, u128, u128), usize)> = vec![
@@ -102,8 +110,9 @@ fn main() {
         if args[1] == "performance" {
             println!("Running performance check");
             println!("");
-            // let data: Vec<f32> = vec![];
-            for (name, day, runs) in days.iter() {
+            let mut data: Vec<(usize,(f32,f32,f32))> = vec![];
+            let mut errors: Vec<(usize,(f64,f64,f64))> = vec![];
+            for (i, (name, day, runs)) in days.iter().enumerate() {
                 let mut timings: Vec<(u128, u128, u128)> = vec![];
                 for _ in 0..*runs {
                     timings.push(day(real, false));
@@ -142,9 +151,10 @@ fn main() {
                     mean.2 / 1_000_000f64, variance.2.sqrt() / 1_000_000f64
                 );
 
-                // data.push( (mean.0 + mean.1 + mean.2) as f32 );
+                data.push( (i, ((mean.0/1_000_000f64) as f32,(mean.1/1_000_000f64) as f32,(mean.2/1_000_000f64) as f32 ) ) );
+                errors.push( (i, ( variance.0.sqrt() / 1_000_000f64, variance.1.sqrt() / 1_000_000f64, variance.2.sqrt() / 1_000_000f64 )) );
             }
-            // create_graph(&data);
+            create_graph(&data, &errors);
         } else if args[1] == "all" {
             for (name, day, _) in days.iter() {
                 let timing = day(real, false);
