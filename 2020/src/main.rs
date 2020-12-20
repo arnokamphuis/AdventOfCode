@@ -29,8 +29,8 @@ mod passport;
 mod tools;
 
 use plotly::common::{ErrorData, ErrorType, Marker, Title, Font};
-use plotly::layout::{Axis, BarMode, Layout, Legend, TicksDirection};
-use plotly::{Bar, NamedColor, Plot, Rgb, Rgba, Scatter};
+use plotly::layout::{Axis, BarMode, Layout, };
+use plotly::{Bar, NamedColor, Plot};
 
 fn create_graph(data: &Vec<(usize, (f32,f32,f32))>, errors: &Vec<(usize, (f64,f64,f64))>) {
     let xlabels: Vec<String> = data.iter().map(|n| format!("day {}", n.0+1)).collect();
