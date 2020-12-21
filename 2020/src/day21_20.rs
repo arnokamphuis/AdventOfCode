@@ -64,19 +64,21 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
 
     let start2 = Instant::now();
 
+    let mut possibilities: BTreeMap<String, BTreeSet<String>> = allergen_in
+        .iter()
+        .fold(BTreeMap::new(), |mut acc, (name, sets)| {
+            acc.insert(
+                name.to_string(),
+                sets.iter().skip(1)
+                    .fold(sets.first().unwrap().clone(), |gs, set| {
+                        gs.intersection(set).cloned().collect()
+                    })
+            );
+            return acc
+        });
+
+
     let mut mapping: BTreeMap<String,String> = BTreeMap::new();
-    let mut possibilities: BTreeMap<String, BTreeSet<String>> = BTreeMap::new();
-    for (all_name, ing) in &allergen_in {
-        let set = ing
-            .iter()
-            .skip(1)
-            .fold(ing.first().unwrap().clone(), |gs, set| {
-                gs.intersection(set).cloned().collect()
-            });
-        possibilities.insert(all_name.clone(), set.clone());
-    }
-
-
     while mapping.len() != possibilities.len() {
         for poss in &possibilities {
             if poss.1.len() == 1 {
