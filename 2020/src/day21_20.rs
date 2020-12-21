@@ -14,7 +14,7 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
     let input = tools::get_input(String::from(input_file));
 
     let mut ingredients_count: BTreeMap<String, usize> = BTreeMap::new();
-    let mut possibly_save: BTreeSet<String> = BTreeSet::new();
+    let mut possibly_safe: BTreeSet<String> = BTreeSet::new();
     let mut allergen_in: BTreeMap<String, Vec<BTreeSet<String>>> = BTreeMap::new();
     let mut ingredient_contains: BTreeMap<String, Vec<BTreeSet<String>>> = BTreeMap::new();
 
@@ -26,7 +26,7 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
 
         for ing in &ingredients {
             *(ingredients_count.entry(ing.clone()).or_insert(0)) += 1;
-            possibly_save.insert(ing.clone());
+            possibly_safe.insert(ing.clone());
 
             let set: BTreeSet<String> = allergens.iter()
                 .fold(BTreeSet::new(), |mut acc, ing| { acc.insert(ing.clone()); return acc });
@@ -52,11 +52,11 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
                 gs.intersection(set).cloned().collect()
             });
         for ia in in_all {
-            possibly_save.remove(&ia);
+            possibly_safe.remove(&ia);
         }
     }
 
-    let res1 = possibly_save.iter().fold(0, |acc, ps| { acc + ingredients_count[ps] });
+    let res1 = possibly_safe.iter().fold(0, |acc, ps| { acc + ingredients_count[ps] });
 
     let after1 = Instant::now();
     if print_result {
@@ -65,7 +65,7 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
 
     let start2 = Instant::now();
 
-    for all in possibly_save {
+    for all in possibly_safe {
         ingredient_contains.remove(&all);
     }
 
