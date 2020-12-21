@@ -64,10 +64,6 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
 
     let start2 = Instant::now();
 
-    for all in possibly_safe {
-        ingredient_contains.remove(&all);
-    }
-
     let mut mapping: BTreeMap<String,String> = BTreeMap::new();
     let mut possibilities: BTreeMap<String, BTreeSet<String>> = BTreeMap::new();
     for (all_name, ing) in &allergen_in {
