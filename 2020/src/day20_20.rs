@@ -2,6 +2,8 @@ use super::tools;
 use std::time::Instant;
 use std::collections::BTreeMap;
 
+use tools::Image;
+
 fn flip_code(v: u16) -> u16 {
     let mut res = 0;
     let mut t = v;
@@ -12,8 +14,35 @@ fn flip_code(v: u16) -> u16 {
     res
 }
 
-fn find_next(current_puzzle: &Vec<Vec<(u16,u16,u16,u16,i8)>>, options: &BTreeMap<(u16,u16,u16,u16,i8), u32>, x: usize, y: usize, target: usize) -> Option<Vec<Vec<(u16,u16,u16,u16,i8)>>> {
+fn save_puzzle_as_image(current_puzzle: &Vec<Vec<(u16,u16,u16,u16,i8)>>, counter: &usize, tiles: &BTreeMap<(u16,u16,u16,u16,i8), u32>, full_tiles: &BTreeMap<u32, Vec<Vec<char>>>) -> Image {
+    let img_h = current_puzzle.len() * full_tiles.iter().next().unwrap().1.len();
+    let img_w = current_puzzle[0].len() * full_tiles.iter().next().unwrap().1[0].len();
+    let mut img = Image::new(img_w, img_h, 8);
+    img.clear((0,0,0,255));
+    for (row_nr, row) in current_puzzle.iter().enumerate() {
+        for (col_nr, col) in row.iter().enumerate() {
+            if let Some(&tile_id) = tiles.get(col) {
+                let tile = get_correct_tile(tile_id, col.4, full_tiles);
+                let h = tile.len();
+                let w = tile[0].len();
+                for (y,r) in tile.iter().enumerate() {
+                    for (x, &c) in r.iter().enumerate() {
+                        img.set_pixel(col_nr * w + x, row_nr * h + y, if c == '#' {(0,0,255,255)} else {(0,0,0,255)});
+                    }
+                }
+            }
+        }
+    }
+    img.save_png(&format!("images/puzzle-{:05}.png", counter).to_string());
+    img
+}
+
+fn find_next(current_puzzle: &Vec<Vec<(u16,u16,u16,u16,i8)>>, options: &BTreeMap<(u16,u16,u16,u16,i8), u32>, x: usize, y: usize, target: usize, movie: bool, counter: &mut usize, tiles: &BTreeMap<(u16,u16,u16,u16,i8), u32>, full_tiles: &BTreeMap<u32, Vec<Vec<char>>>) -> Option<Vec<Vec<(u16,u16,u16,u16,i8)>>> {
     if y*target+x == target*target {
+        if movie {
+            save_puzzle_as_image(current_puzzle, counter, tiles, full_tiles);
+            *counter += 1;
+        }
         return Some(current_puzzle.clone());
     }
 
@@ -30,8 +59,13 @@ fn find_next(current_puzzle: &Vec<Vec<(u16,u16,u16,u16,i8)>>, options: &BTreeMap
             let mut new_options = options.clone();
             let to_be_removed: BTreeMap<(u16,u16,u16,u16,i8),u32> = new_options.iter().filter(|(_,&tid)| tid==id).map(|(&v,&vid)| (v,vid)).collect();
             to_be_removed.iter().for_each(|(t,_)| { new_options.remove(t); } );
-            
-            if let Some(res) = find_next(&new_puzzle, &new_options, new_x, new_y, target) {
+
+            if movie {
+                save_puzzle_as_image(current_puzzle, counter, tiles, full_tiles);
+                *counter += 1;
+            }
+
+            if let Some(res) = find_next(&new_puzzle, &new_options, new_x, new_y, target, movie, counter, tiles, full_tiles) {
                 return Some(res);
             }
         }
@@ -67,13 +101,26 @@ fn get_correct_tile(tile_id: u32, tile_orientation: i8, tiles: &BTreeMap<u32, Ve
     res
 }
 
-fn find_monster_in_image(sea_monster: &Vec<Vec<char>>, image: &Vec<Vec<char>>, tile_orientation: i8) -> usize {
+fn find_monster_in_image(sea_monster: &Vec<Vec<char>>, image: &Vec<Vec<char>>, tile_orientation: i8, movie: bool, counter: &mut usize) -> usize {
     let mut count = 0;
 
     let inner_height = sea_monster.len();
     let inner_width = sea_monster[0].len();
     let height = image.len() - sea_monster.len();
     let width = image[0].len() - sea_monster[0].len();
+
+    let mut img: Image = Image::new(0,0,0);
+    if movie {
+        let w = image.len();
+        let h = image[0].len();
+        img = Image::new(w, h, 8);
+        for r in 0..h {
+            for c in 0..w {
+                let coor = (r,c);
+                img.set_pixel(coor.1, coor.0, if image[coor.0][coor.1] == '#' {(0,0,255,255)} else {(0,0,100,255)});
+            }
+        }            
+    }
 
     for r in 0..height {
         for c in 0..width {
@@ -83,14 +130,36 @@ fn find_monster_in_image(sea_monster: &Vec<Vec<char>>, image: &Vec<Vec<char>>, t
                     if sea_monster[ir][ic] == '#' {
                         let (nr,nc) = get_correct_coor(&(r+ir,c+ic), tile_orientation, image.len()-1);
                         is_match &= image[nr][nc] == '#';
-                        if !is_match { break 'outer; }
+                        if !is_match && !movie { break 'outer; }
                     }
                 }
             }
 
             if is_match { 
+                if movie {
+                    for ir in 0..inner_height {
+                        for ic in 0..inner_width {
+                            if sea_monster[ir][ic] == '#' {
+                                let (nr, nc) = (r+ir,c+ic);
+                                img.set_pixel(nc,nr, (255,0,0,255));
+                            }
+                        }
+                    }        
+                    for _ in 0..5 {
+                        img.save_png(&format!("images/puzzle-{:05}.png", counter).to_string());
+                        *counter += 1;
+                    }
+                }
                 count += 1; 
             }
+        }
+    }
+
+    if movie {
+        let frames = 3 + 10 * count;
+        for _ in 0..frames  {
+            img.save_png(&format!("images/puzzle-{:05}.png", counter).to_string());
+            *counter += 1;
         }
     }
 
@@ -107,6 +176,8 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
         "./input/day20_20_real.txt"
     };
     let input = tools::get_input(String::from(input_file));
+
+    let movie: bool = false;
 
     let mut tiles: BTreeMap<(u16,u16,u16,u16,i8), u32> = BTreeMap::new();
     let mut full_tiles: BTreeMap<u32, Vec<Vec<char>>> = BTreeMap::new();
@@ -165,7 +236,8 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
 
     let mut tile_ids: Vec<Vec<(u32,i8)>> = vec![vec![(0,0); puzzle_size]; puzzle_size];
     let mut res1 = 0;
-    if let Some(res) = find_next(&current_puzzle, &tiles, 0, 0, puzzle_size) {
+    let mut counter = 0;
+    if let Some(res) = find_next(&current_puzzle, &tiles, 0, 0, puzzle_size, movie, &mut counter, &tiles, &full_tiles) {
 
         // in preparation for part 2...
         for r in 0..puzzle_size { for c in 0..puzzle_size { 
@@ -220,7 +292,7 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
     let mut res2 = 0;
     // for all orientations of the image check if the sea-monster is visible
     for o in -4..4 {
-        let monster_count = find_monster_in_image(&sea_monster, &image, o);
+        let monster_count = find_monster_in_image(&sea_monster, &image, o, movie, &mut counter);
         if monster_count > 0 {
             let monster_pixels = 15 * monster_count; // assume monsters don't overlap !!
             res2 = pixel_count - monster_pixels;
