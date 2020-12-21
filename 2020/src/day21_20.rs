@@ -46,18 +46,15 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
 
     let res1 = allergen_in
         .iter()
-        .fold(
-             possibly_safe.clone(), 
-            |poss_safe, (_,all_in)| {
-                    poss_safe.difference( &all_in
-                        .iter()
-                        .skip(1)
-                        .fold(all_in.first().unwrap().clone(), |gs, set| {
-                            gs.intersection(set).cloned().collect()
-                        })
-                    ).cloned().collect()
-            }
-        )
+        .fold( possibly_safe.clone(), |poss_safe, (_,all_in)| {
+            poss_safe.difference( &all_in
+                .iter()
+                .skip(1)
+                .fold(all_in.first().unwrap().clone(), |gs, set| {
+                    gs.intersection(set).cloned().collect()
+                })
+            ).cloned().collect()
+        })
         .iter()
         .fold(0, |acc, ps| { acc + ingredients_count[ps] });
 
