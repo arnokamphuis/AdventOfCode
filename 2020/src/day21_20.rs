@@ -51,9 +51,8 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
             .fold(all_in.first().unwrap().clone(), |gs, set| {
                 gs.intersection(set).cloned().collect()
             });
-        for ia in in_all {
-            possibly_safe.remove(&ia);
-        }
+
+        possibly_safe = possibly_safe.difference(&in_all).cloned().collect();
     }
 
     let res1 = possibly_safe.iter().fold(0, |acc, ps| { acc + ingredients_count[ps] });
