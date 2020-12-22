@@ -27,10 +27,11 @@ fn play_rc(s_p_deck: &Vec<usize>, s_o_deck: &Vec<usize>, part: usize) -> (usize,
         let o = o_deck.remove(0);
 
         let win_by;
+        
         if part == 2 && p <= p_deck.len() && o <= o_deck.len() {
             win_by = play_rc(&p_deck[0..p].to_vec(), &o_deck[0..o].to_vec(), part).0;
         } else {
-            if p > o { win_by = 1 } else { win_by = 2 }
+            win_by = if p > o { 1 } else { 2 }
         }
 
         if win_by == 1 { p_deck.push(p); p_deck.push(o) } else { o_deck.push(o); o_deck.push(p); }
