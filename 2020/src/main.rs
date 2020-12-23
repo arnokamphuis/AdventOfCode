@@ -27,6 +27,8 @@ mod day24_20;
 mod day25_20;
 mod passport;
 mod tools;
+mod node;
+mod linkedlist; 
 
 use plotly::common::{ErrorData, ErrorType, Marker, Title, Font};
 use plotly::layout::{Axis, BarMode, Layout, };
