@@ -14,6 +14,7 @@ pub struct LLNode {
 }
 
 impl LLNode {
+    #[allow(dead_code)]
     pub fn new(value: usize) -> LLNodeRef {
         Rc::new(RefCell::new(LLNode {
             data: value,
@@ -29,6 +30,7 @@ pub struct ListNodeIterator {
 }
 
 impl ListNodeIterator {
+    #[allow(dead_code)]
     pub fn new(start_at: LLNodeOption) -> Self {
         ListNodeIterator {
             current: start_at,
@@ -39,6 +41,7 @@ impl ListNodeIterator {
 impl Iterator for ListNodeIterator {
     type Item = LLNodeRef;
 
+    #[allow(dead_code)]
     fn next(&mut self) -> LLNodeOption {
         let current = &self.current;
         let mut result = None;
@@ -68,6 +71,7 @@ pub struct LinkedList {
 
 impl LinkedList {
 
+    #[allow(dead_code)]
     pub fn new(value: usize) -> Self {
         let new_node = LLNode::new(value);
         new_node.borrow_mut().next = Some(Rc::clone(&new_node));
@@ -81,6 +85,7 @@ impl LinkedList {
         }
     }
 
+    #[allow(dead_code)]
     pub fn append(&mut self, value: usize, after: usize) {
         if self.nodes.contains_key(&after) {
             let new_node = LLNode::new(value);
@@ -97,6 +102,7 @@ impl LinkedList {
         }
     }
 
+    #[allow(dead_code)]
     pub fn remove(&mut self, value: usize) {
         if self.nodes.contains_key(&value) {
             if let Some(ref value_node) = self.get(value) {
@@ -112,6 +118,7 @@ impl LinkedList {
         }
     }
 
+    #[allow(dead_code)]
     pub fn get(&mut self, value: usize) -> LLNodeOption {
         if self.nodes.contains_key(&value) {
             return Some(Rc::clone(self.nodes.get(&value).unwrap()));
@@ -119,6 +126,7 @@ impl LinkedList {
         None
     }
 
+    #[allow(dead_code)]
     pub fn iter_node(&self, value: usize) -> ListNodeIterator {
         if self.nodes.contains_key(&value) {
             let node = self.nodes.get(&value).unwrap();
@@ -127,10 +135,12 @@ impl LinkedList {
         ListNodeIterator::new(None)
     }
 
+    #[allow(dead_code)]
     pub fn len(&self) -> usize {
         self.nodes.len()
     }
 
+    #[allow(dead_code)]
     pub fn start(&self) -> usize {
         self.start
     }

@@ -22,7 +22,7 @@ mod day19_20;
 mod day20_20;
 mod day21_20;
 mod day22_20;
-mod day23_20;
+mod day23b_20;
 mod day24_20;
 mod day25_20;
 mod passport;
@@ -95,7 +95,7 @@ fn main() {
         ("Day 20 of 2020", day20_20::run, 50),
         ("Day 21 of 2020", day21_20::run, 50),
         ("Day 22 of 2020", day22_20::run, 50),
-        ("Day 23 of 2020", day23_20::run,  5),
+        ("Day 23 of 2020", day23b_20::run,10),
         ("Day 24 of 2020", day24_20::run, 50),
         ("Day 25 of 2020", day25_20::run, 50),
     ];
