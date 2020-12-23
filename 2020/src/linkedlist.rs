@@ -1,47 +1,89 @@
-use super::node::{ LLNode, LLNodeRef, LLNodeOption, ListNodeIterator };
+use std::collections::HashMap;
 use std::cell::RefCell;
 use std::rc::Rc;
 
-use std::collections::HashMap;
+// Types
+pub type LLNodeRef = Rc<RefCell<LLNode>>;
+pub type LLNodeOption = Option<LLNodeRef>;
 
-macro_rules! map(
-    { $($key:expr => $value:expr),+ } => {
-        {
-            let mut m = HashMap::new();
-            $(
-                m.insert($key, $value);
-            )+
-            m
-        }
-     };
-);
+#[derive(PartialEq, Debug)]
+pub struct LLNode {
+    pub data: usize,
+    pub next: LLNodeOption,
+    pub prev: LLNodeOption
+}
+
+impl LLNode {
+    pub fn new(value: usize) -> LLNodeRef {
+        Rc::new(RefCell::new(LLNode {
+            data: value,
+            next: None,
+            prev: None,
+        }))
+    }
+}
+
+// LLNode iterator
+pub struct ListNodeIterator {
+    current: LLNodeOption
+}
+
+impl ListNodeIterator {
+    pub fn new(start_at: LLNodeOption) -> Self {
+        ListNodeIterator {
+            current: start_at,
+        }                
+    }
+}
+
+impl Iterator for ListNodeIterator {
+    type Item = LLNodeRef;
+
+    fn next(&mut self) -> LLNodeOption {
+        let current = &self.current;
+        let mut result = None;
+
+        self.current = match current {
+            Some(ref current) => {
+                result = Some(Rc::clone(current));
+                match &current.borrow().next {
+                    Some(next_node) => {
+                        Some(Rc::clone(next_node))
+                    },
+                    _ => None
+                }
+            },
+            _ => None
+        };
+
+        result
+    }
+}
 
 #[derive(PartialEq, Debug)]
 pub struct LinkedList {
+    start: usize,
     nodes: HashMap<usize, LLNodeRef>,
 }
 
 impl LinkedList {
 
-    pub fn new_empty() -> Self {
-        LinkedList {
-            nodes: HashMap::new(),
-        }
-    }
-
     pub fn new(value: usize) -> Self {
         let new_node = LLNode::new(value);
         new_node.borrow_mut().next = Some(Rc::clone(&new_node));
         new_node.borrow_mut().prev = Some(Rc::clone(&new_node));
+        let mut map: HashMap<usize, LLNodeRef> = HashMap::new();
+        map.insert( value, new_node);
 
         LinkedList {
-            nodes: map!( value => new_node ),
+            start: value,
+            nodes: map,
         }
     }
 
     pub fn append(&mut self, value: usize, after: usize) {
         if self.nodes.contains_key(&after) {
-            let mut new_node = LLNode::new(value);
+            let new_node = LLNode::new(value);
 
             if let Some(ref after_node) = self.get(after) {
 
@@ -77,13 +119,6 @@ impl LinkedList {
         None
     }
 
-    pub fn print_keys(&self) {
-        for (k,_) in &self.nodes {
-            println!("{}", k);
-        }
-    }
-
-
     pub fn iter_node(&self, value: usize) -> ListNodeIterator {
         if self.nodes.contains_key(&value) {
             let node = self.nodes.get(&value).unwrap();
@@ -91,5 +126,12 @@ impl LinkedList {
         }
         ListNodeIterator::new(None)
     }
-    
+
+    pub fn len(&self) -> usize {
+        self.nodes.len()
+    }
+
+    pub fn start(&self) -> usize {
+        self.start
+    }
 }
