@@ -1,38 +1,35 @@
 use super::tools;
 use std::time::Instant;
-use std::collections::HashMap;
+use std::collections::HashSet;
 
-fn step(floor: &HashMap<(i32,i32), bool>) -> HashMap<(i32,i32), bool>  {
-    let minmax = floor
-        .iter()
-        .fold(((i32::MAX, i32::MAX), (i32::MIN, i32::MIN)), 
-            |acc, (&coor,_)| {
-                (( std::cmp::min(acc.0.0, coor.0), std::cmp::min(acc.0.1, coor.1)  ),  
-                 ( std::cmp::max(acc.1.0, coor.0), std::cmp::max(acc.1.1, coor.1)  ))
-        });
+fn step(floor: &HashSet<(i32,i32)>) -> HashSet<(i32,i32)>  {
+    let mut new_floor: HashSet<(i32,i32)> = HashSet::new();
+    let mut to_check: HashSet<(i32,i32)> = HashSet::new();
 
-    let mut new_floor = HashMap::new();
-
-    for x in minmax.0.0-1..minmax.1.0+2 {
-        for y in minmax.0.1-1..minmax.1.1+2 {
-            let mut c = 0;
-            'inner: for &d in vec![(-1,0),(1,0),(0,1),(0,-1),(-1,-1),(1,1)].iter() {
-                if *floor.get(&(x+d.0, y+d.1)).or(Some(&false)).unwrap() {
-                    c+=1; 
-                }
-                if c > 2 { break 'inner; }
+    let directions = vec![(-1,0),(1,0),(0,1),(0,-1),(-1,-1),(1,1)];
+    for tile in floor {
+        for &d in directions.iter() {
+            to_check.insert((tile.0+d.0, tile.1+d.1));
+        }
+    }
+    for tile in to_check {
+        let mut c = 0;
+        'inner: for &d in directions.iter() {
+            if floor.contains(&(tile.0+d.0, tile.1+d.1)) {
+                c+=1; 
             }
+            if c > 2 { break 'inner; }
+        }
 
-            let current_black = *floor.get(&(x,y)).or(Some(&false)).unwrap();
-            let mut new_black = current_black;
-            match current_black {
-                true =>  { if c == 0 || c > 2 { new_black = false; } },
-                false => { if c==2            { new_black = true; } }
-            }
+        let current_black = floor.contains(&tile);
+        let mut new_black = current_black;
+        match current_black {
+            true =>  { if c == 0 || c > 2 { new_black = false; } },
+            false => { if c==2            { new_black = true; } }
+        }
 
-            if new_black {
-                *new_floor.entry((x,y)).or_insert(new_black) = new_black;
-            }
+        if new_black {
+            new_floor.insert(tile);
         }
     }
 
@@ -55,7 +52,7 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
 
     let start1 = Instant::now();
 
-    let mut floor: HashMap<(i32,i32), bool> = HashMap::new();
+    let mut floor: HashSet<(i32,i32)> = HashSet::new();
     for line in &input {
         let mut c_iter = line.chars();
         let mut x = 0;
@@ -76,16 +73,14 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
                 }
             }
         }
-        let tile = floor.entry((x,y)).or_insert(false);
-        *tile = !*tile;
+        if floor.contains(&(x,y)) {
+            floor.remove(&(x,y));
+        } else {
+            floor.insert((x,y));
+        }
     }
 
-
-    let count_black = |floor: &HashMap<(i32,i32),bool>| -> i32 {
-        floor.iter().fold(0, |acc, v| acc + *v.1 as i32 )        
-    };
-
-    let res1 = count_black(&floor);
+    let res1 = floor.len();
 
     let after1 = Instant::now();
     if print_result {
@@ -98,7 +93,7 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
     for _ in 0..100 {
         new_floor = step(&new_floor);
     }
-    let res2 = count_black(&new_floor);
+    let res2 = new_floor.len();
 
 
     let after2 = Instant::now();
