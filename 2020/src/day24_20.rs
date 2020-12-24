@@ -21,9 +21,8 @@ fn step(floor: &HashSet<(i32,i32)>) -> HashSet<(i32,i32)>  {
             if c > 2 { break 'inner; }
         }
 
-        let current_black = floor.contains(&tile);
-        let mut new_black = current_black;
-        match current_black {
+        let mut new_black = floor.contains(&tile);
+        match new_black {
             true =>  { if c == 0 || c > 2 { new_black = false; } },
             false => { if c==2            { new_black = true; } }
         }
