@@ -57,7 +57,7 @@ fn create_graph(data: &Vec<(usize, (f32,f32,f32))>, errors: &Vec<(usize, (f64,f6
     let layout = Layout::new().bar_mode(BarMode::Group)
         .title(Title::new("Runtimes in ms for Advent of Code 2020").font(Font::new().color(NamedColor::Black).size(24).family("Droid Serif")))
         .x_axis(Axis::new().title(Title::new("Day").font(Font::new().color(NamedColor::Black).size(12).family("Droid Serif"))))
-        .y_axis(Axis::new().title(Title::new("Runtime in ms").font(Font::new().color(NamedColor::Black).size(12).family("Droid Serif"))).range(vec![0, 10]));
+        .y_axis(Axis::new().title(Title::new("Runtime in ms").font(Font::new().color(NamedColor::Black).size(12).family("Droid Serif"))).range(vec![0, 150]));
 
     let mut plot = Plot::new();
     plot.add_trace(trace1);
@@ -96,7 +96,7 @@ fn main() {
         ("Day 21 of 2020", day21_20::run, 50),
         ("Day 22 of 2020", day22_20::run, 50),
         ("Day 23 of 2020", day23b_20::run,10),
-        ("Day 24 of 2020", day24_20::run, 50),
+        ("Day 24 of 2020", day24_20::run, 25),
         ("Day 25 of 2020", day25_20::run, 50),
     ];
 
