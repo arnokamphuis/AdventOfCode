@@ -113,6 +113,7 @@ fn main() {
             println!("");
             let mut data: Vec<(usize,(f32,f32,f32))> = vec![];
             let mut errors: Vec<(usize,(f64,f64,f64))> = vec![];
+            let mut totals: (f64,f64,f64) = (0.0f64,0.0f64,0.0f64);
             for (i, (name, day, runs)) in days.iter().enumerate() {
                 let mut timings: Vec<(u128, u128, u128)> = vec![];
                 for _ in 0..*runs {
@@ -121,11 +122,14 @@ fn main() {
                 let total = timings.iter().fold((0, 0, 0), |acc, val| {
                     (acc.0 + val.0, acc.1 + val.1, acc.2 + val.2)
                 });
+
                 let mean = (
                     total.0 as f64 / *runs as f64,
                     total.1 as f64 / *runs as f64,
                     total.2 as f64 / *runs as f64,
                 );
+                totals.0 += mean.0; totals.1 += mean.1; totals.2 += mean.2;
+
                 let variance = timings
                     .iter()
                     .map(|(v1, v2, v3)| {
@@ -155,6 +159,14 @@ fn main() {
                 data.push( (i, ((mean.0/1_000_000f64) as f32,(mean.1/1_000_000f64) as f32,(mean.2/1_000_000f64) as f32 ) ) );
                 errors.push( (i, ( variance.0.sqrt() / 1_000_000f64, variance.1.sqrt() / 1_000_000f64, variance.2.sqrt() / 1_000_000f64 )) );
             }
+
+            let grand_total = (totals.0 + totals.1 + totals.2)/1_000_000_000f64;
+            println!("{} in {:>4.2} - init: {:>10.4} +/- {:>10.4}  s, p1: {:>10.4} +/- {:>10.4}  s, p2: {:>10.4} +/- {:>10.4}  s", 
+                "total:", grand_total, 
+                totals.0 as f64 / 1_000_000_000f64, 0, 
+                totals.1 as f64 / 1_000_000_000f64, 0, 
+                totals.2 as f64 / 1_000_000_000f64, 0
+            );
             create_graph(&data, &errors);
         } else if args[1] == "all" {
             for (name, day, _) in days.iter() {
