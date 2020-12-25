@@ -1,0 +1,48 @@
+<html>
+<head>
+    <meta charset="utf-8"/>
+</head>
+<body>
+<div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-AMS-MML_SVG"></script>
+    <script type="text/javascript">if (window.MathJax) {MathJax.Hub.Config({SVG: {font: "STIX-Web"}});}</script>
+    <script type="text/javascript">window.PlotlyConfig = {MathJaxConfig: 'local'};</script>
+    <script src="https://cdn.plot.ly/plotly-1.54.6.min.js"></script>
+    
+    <div id="plotly-html-element" class="plotly-graph-div" style="height:100%; width:100%;"></div>
+    <div ><img id="image-export" class="plotly-graph-div" hidden></img></div>
+    <script type="text/javascript">
+                
+                window.PLOTLYENV=window.PLOTLYENV || {};                    
+                if (document.getElementById("plotly-html-element")) {
+
+                    var d3 = Plotly.d3;
+                    var image_element= d3.select('#image-export');
+
+                    var trace_0 = {"x":["day 1","day 2","day 3","day 4","day 5","day 6","day 7","day 8","day 9","day 10","day 11","day 12","day 13","day 14","day 15","day 16","day 17","day 18","day 19","day 20","day 21","day 22","day 23","day 24","day 25"],"y":[0.262112,0.280124,1.17675,0.30835,0.293354,1.121318,4.148108,0.2868,0.293446,0.213726,0.76353,0.237586,0.177924,0.81979,0.88654,0.59122,0.65339,0.88417,1.19294,0.647938,2.109728,0.272356,3.10696,0.530048,0.138926],"type":"bar","name":"Initialization","marker":{"color":"red"},"error_y":{"type":"data","array":[1.2435232291581826,0.9979520993634919,1.032291291884224,0.9136043292914061,0.9840705269867589,0.8678533571266513,2.156444462520659,0.9969964986899402,0.9996489958400385,1.0256833696243695,1.8255916098897913,0.9972945959965902,0.7860829568334381,1.9356406456003137,2.0829423247896233,0.9672557103475792,1.4559427546782189,1.4248001712871878,2.0795085997417755,1.1549236000515335,0.9458886257990433,0.783259287633411,4.613034938129127,1.60568933112729,0.029620147264995147]}};
+var trace_1 = {"x":["day 1","day 2","day 3","day 4","day 5","day 6","day 7","day 8","day 9","day 10","day 11","day 12","day 13","day 14","day 15","day 16","day 17","day 18","day 19","day 20","day 21","day 22","day 23","day 24","day 25"],"y":[0.018014,0.34007,0.02486,2.899894,0.000312,0.532124,1.173456,0.014562,0.30646,0.001192,9.80332,0.002894,0.000504,0.57973,0.00592,0.166304,7.46174,0.13261,2141.4512,2.99145,0.299176,0.002274,0.00653,0.277992,104.1071],"type":"bar","name":"Part 1","marker":{"color":"blue"},"error_y":{"type":"data","array":[0.007353176456471041,0.09649448947996979,0.008122930505673429,0.1733438322063984,0.000032496153618543845,0.05372487155871105,0.06785789021182431,0.009317937325395572,0.05298056247342038,0.0037594063361121224,0.7153447851211331,0.0011810859409882072,0.000844502220245749,0.09372413829958641,0.0009031057523900509,0.02598892040851256,0.6791179267255429,0.05166270318130866,13.064148227377856,0.3252463357210962,0.039448931848657186,0.00029038595007334654,0.002041102643180886,0.029888940028043806,1.9643283187899114]}};
+var trace_2 = {"x":["day 1","day 2","day 3","day 4","day 5","day 6","day 7","day 8","day 9","day 10","day 11","day 12","day 13","day 14","day 15","day 16","day 17","day 18","day 19","day 20","day 21","day 22","day 23","day 24","day 25"],"y":[1.171546,0.00032,0.106152,2.39428,0.001322,0.335986,0.00854,0.516754,0.078232,0.001092,21.6332,0.00399,0.00071,10.9258,813.0953,0.462192,200.29155,0.141346,2927.1792,0.747492,0.098174,155.78973,378.2495,112.88538,0.00032],"type":"bar","name":"Part 2","marker":{"color":"green"},"error_y":{"type":"data","array":[0.26320306473139704,0.00004898979485566356,0.013255885334446733,0.14179473474004597,0.0002500319979522621,0.039504901012406037,0.00033166247903554,0.06574863408467128,0.017185091678545105,0.0001741723284566178,1.0543907416133735,0.003911687615339446,0.00007,0.44680732536519585,9.435449763148547,0.0689587234220588,4.3619636395206225,0.08376071683074349,27.70124478823289,0.1327678738852137,0.01309248349244711,3.0885205745074775,21.848336281328148,2.250479978315737,0.00006324555320336759]}};
+var data = [trace_0,trace_1,trace_2];
+var layout = {"title":{"text":"Runtimes in ms for Advent of Code 2020","font":{"family":"Droid Serif","size":24,"color":"black"}},"xaxis":{"title":{"text":"Day","font":{"family":"Droid Serif","size":12,"color":"black"}}},"yaxis":{"title":{"text":"Runtime in ms","font":{"family":"Droid Serif","size":12,"color":"black"}},"range":[0,150]},"barmode":"group"};
+
+                    Plotly.newPlot('plotly-html-element', data, layout,
+                        {"responsive": true})
+                        .then(
+                            function(gd) {
+                              Plotly.toImage(gd,{height:0,width:0})
+                                 .then(
+                                     function(url) {
+                                         if(false) {
+                                             image_element.attr("src", url);
+                                             return Plotly.toImage(gd,{format:'',height:0,width:0});
+                                         }
+                                    })
+                            });
+
+                };
+
+
+    </script>
+</div>
+</body>
+</html>
