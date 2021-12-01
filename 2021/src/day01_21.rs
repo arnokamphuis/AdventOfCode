@@ -38,7 +38,7 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
 
     let res2 = numbers
         .windows(3)
-        .map(|v| v[0] + v[1] + v[2])
+        .map(|v| v.iter().sum())
         .collect::<Vec<i64>>()
         .windows(2)
         .filter(|n| n[1] > n[0])
