@@ -6,9 +6,9 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
     let start0 = Instant::now();
 
     let input_file: &str = if !real {
-        "./input/dayxx_21_test.txt"
+        "./input/day02_21_test.txt"
     } else {
-        "./input/dayxx_21_real.txt"
+        "./input/day02_21_real.txt"
     };
     let input = tools::get_input(String::from(input_file));
 
