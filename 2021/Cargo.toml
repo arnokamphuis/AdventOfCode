@@ -1,0 +1,23 @@
+[package]
+name = "aoc2021"
+version = "0.1.0"
+authors = ["Arno Kamphuis <arno.kamphuis@hu.nl>"]
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+order-stat = "0.1"
+md5 = "0.1"
+hex = "0.4.0"
+permutohedron = "0.2.4"
+queues = "1.1.0"
+num = "^0.3.1"
+png = "0.15.2"
+regex = "1"
+itertools = "^0.9.0"
+petgraph = "0.5.1"
+modinverse = "^0.1.1"
+ruget = "0.4.2"
+plotly = "0.6.0"
+font8x8 = "0.2.7"
