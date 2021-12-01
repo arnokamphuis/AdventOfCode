@@ -21,12 +21,7 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
         .map(|n| n.parse::<i64>().unwrap())
         .collect();
 
-    let res1 = numbers
-        .iter()
-        .enumerate()
-        .skip(1)
-        .filter(|(i, n1)| *n1 > &numbers[i - 1])
-        .count();
+    let res1 = numbers.windows(2).filter(|v| v[1] > v[0]).count();
 
     let after1 = Instant::now();
     if print_result {
@@ -36,10 +31,8 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
     let start2 = Instant::now();
 
     let res2 = numbers
-        .iter()
-        .enumerate()
-        .skip(2)
-        .map(|(i, n)| n + numbers[i - 1] + numbers[i - 2])
+        .windows(3)
+        .map(|v| v[0] + v[1] + v[2])
         .collect::<Vec<i64>>()
         .windows(2)
         .filter(|n| n[1] > n[0])
