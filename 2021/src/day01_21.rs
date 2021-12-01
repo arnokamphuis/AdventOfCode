@@ -1,4 +1,6 @@
 use super::tools;
+// needed to make image
+// use super::tools::Image;
 use std::time::Instant;
 
 #[allow(dead_code)]
@@ -12,14 +14,18 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
     };
     let input = tools::get_input(String::from(input_file));
 
-    let after0 = Instant::now();
-
-    let start1 = Instant::now();
-
     let numbers: Vec<i64> = (&input)
         .into_iter()
         .map(|n| n.parse::<i64>().unwrap())
         .collect();
+    
+    // needed to make image
+    // let depth = *numbers.iter().max().unwrap() as usize;
+    // let t = numbers.len();
+
+    let after0 = Instant::now();
+
+    let start1 = Instant::now();
 
     let res1 = numbers.windows(2).filter(|v| v[1] > v[0]).count();
 
@@ -42,6 +48,31 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
     if print_result {
         println!("Part 2: {}", res2);
     }
+
+    // needed to make image
+    // let s = 8;
+    // let mut img = Image::new(t/s, depth/s+1, s);
+    // img.clear((255,255,255,255));
+    //
+    // numbers
+    //     .iter()
+    //     .enumerate()
+    //     .for_each(|(i,n)| {
+    //         img.set_pixel(i/s,(*n) as usize / s,(0,0,0,255))
+    //     });
+    //
+    // numbers
+    //     .windows(3)
+    //     .map(|v| (v[0] + v[1] + v[2])/3)
+    //     .collect::<Vec<i64>>()
+    //     .iter()
+    //     .enumerate()
+    //     .for_each(|(i,n)| {
+    //         img.set_pixel(i/s,(*n) as usize / s,(255,0,0,255))
+    //     });
+
+    // img.save_png(&String::from("images/day01_2021.png"));
+
 
     (
         after0.duration_since(start0).as_nanos(),

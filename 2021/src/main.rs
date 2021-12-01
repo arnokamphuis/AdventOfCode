@@ -1,6 +1,7 @@
 use std::env;
 
 mod day01_21;
+mod day02_21;
 mod tools;
 
 use plotly::common::{ErrorData, ErrorType, Marker, Title, Font};
@@ -29,7 +30,7 @@ fn create_graph(data: &Vec<(usize, (f32,f32,f32))>, errors: &Vec<(usize, (f64,f6
         .error_y(ErrorData::new(ErrorType::Data).array(part2_error));
 
     let layout = Layout::new().bar_mode(BarMode::Group)
-        .title(Title::new("Runtimes in ms for Advent of Code 2020").font(Font::new().color(NamedColor::Black).size(24).family("Droid Serif")))
+        .title(Title::new("Runtimes in ms for Advent of Code 2021").font(Font::new().color(NamedColor::Black).size(24).family("Droid Serif")))
         .x_axis(Axis::new().title(Title::new("Day").font(Font::new().color(NamedColor::Black).size(12).family("Droid Serif"))))
         .y_axis(Axis::new().title(Title::new("Runtime in ms").font(Font::new().color(NamedColor::Black).size(12).family("Droid Serif"))).range(vec![0, 150]));
 
@@ -57,7 +58,7 @@ fn main() {
         // ("Day 08 of 2021", day08_21::run, 50),
         // ("Day 09 of 2021", day09_21::run, 50),
         // ("Day 10 of 2021", day10_21::run, 50),
-        // ("Day 11 of 2021", day11_21::run, 10),
+        // ("Day 11 of 2021", day11_21::run, 50),
         // ("Day 12 of 2021", day12_21::run, 50),
         // ("Day 13 of 2021", day13_21::run, 50),
         // ("Day 14 of 2021", day14_21::run, 10),
@@ -69,8 +70,8 @@ fn main() {
         // ("Day 20 of 2021", day20_21::run, 50),
         // ("Day 21 of 2021", day21_21::run, 50),
         // ("Day 22 of 2021", day22_21::run, 50),
-        // ("Day 23 of 2021", day23_21::run,10),
-        // ("Day 24 of 2021", day24_21::run, 25),
+        // ("Day 23 of 2021", day23_21::run, 50),
+        // ("Day 24 of 2021", day24_21::run, 50),
         // ("Day 25 of 2021", day25_21::run, 50),
     ];
 

@@ -1,0 +1,48 @@
+<html>
+<head>
+    <meta charset="utf-8"/>
+</head>
+<body>
+<div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-AMS-MML_SVG"></script>
+    <script type="text/javascript">if (window.MathJax) {MathJax.Hub.Config({SVG: {font: "STIX-Web"}});}</script>
+    <script type="text/javascript">window.PlotlyConfig = {MathJaxConfig: 'local'};</script>
+    <script src="https://cdn.plot.ly/plotly-1.54.6.min.js"></script>
+    
+    <div id="plotly-html-element" class="plotly-graph-div" style="height:100%; width:100%;"></div>
+    <div ><img id="image-export" class="plotly-graph-div" hidden></img></div>
+    <script type="text/javascript">
+                
+                window.PLOTLYENV=window.PLOTLYENV || {};                    
+                if (document.getElementById("plotly-html-element")) {
+
+                    var d3 = Plotly.d3;
+                    var image_element= d3.select('#image-export');
+
+                    var trace_0 = {"x":["day 1"],"y":[2.202222],"type":"bar","name":"Initialization","marker":{"color":"red"},"error_y":{"type":"data","array":[0.22314273305666937]}};
+var trace_1 = {"x":["day 1"],"y":[0.093316],"type":"bar","name":"Part 1","marker":{"color":"blue"},"error_y":{"type":"data","array":[0.02456647601916075]}};
+var trace_2 = {"x":["day 1"],"y":[0.18608],"type":"bar","name":"Part 2","marker":{"color":"green"},"error_y":{"type":"data","array":[0.03504987303828646]}};
+var data = [trace_0,trace_1,trace_2];
+var layout = {"title":{"text":"Runtimes in ms for Advent of Code 2021","font":{"family":"Droid Serif","size":24,"color":"black"}},"xaxis":{"title":{"text":"Day","font":{"family":"Droid Serif","size":12,"color":"black"}}},"yaxis":{"title":{"text":"Runtime in ms","font":{"family":"Droid Serif","size":12,"color":"black"}},"range":[0,150]},"barmode":"group"};
+
+                    Plotly.newPlot('plotly-html-element', data, layout,
+                        {"responsive": true})
+                        .then(
+                            function(gd) {
+                              Plotly.toImage(gd,{height:0,width:0})
+                                 .then(
+                                     function(url) {
+                                         if(false) {
+                                             image_element.attr("src", url);
+                                             return Plotly.toImage(gd,{format:'',height:0,width:0});
+                                         }
+                                    })
+                            });
+
+                };
+
+
+    </script>
+</div>
+</body>
+</html>
