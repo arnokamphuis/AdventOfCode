@@ -1,55 +1,6 @@
 use super::tools;
 use std::time::Instant;
 
-struct SubMarine {
-    memory: Vec<(String,i64)>,
-    pos: (i64,i64,i64)
-}
-
-
-impl SubMarine {
-    fn new(m: &Vec<String>) -> SubMarine {
-        let mut sub = SubMarine{memory: vec![], pos: (0,0,0)};
-        m.iter().for_each(|l| {
-            let mut tokens = l.split_whitespace();
-            let op = String::from(tokens.next().unwrap());
-            let val = tokens.next().unwrap().parse::<i64>().unwrap();
-            sub.memory.push((op,val));
-        });
-        sub
-    }
-
-    fn run(&mut self, part: u8) -> (i64,i64,i64) {
-        self.pos = (0,0,0);
-        for (inst, amount) in &self.memory {
-            match inst.as_str() {
-                "forward" => {
-                    self.pos.0 += amount; 
-                    if part == 2 {
-                        self.pos.1 += amount * self.pos.2;
-                    }
-                }
-                "down" => { 
-                    if part == 1 {
-                        self.pos.1 += amount;
-                    } else {
-                        self.pos.2 += amount; 
-                    }
-                }
-                "up" => {
-                    if part == 1 { 
-                        self.pos.1 -= amount; 
-                    } else {
-                        self.pos.2 -= amount; 
-                    }
-                }
-                _ => {}
-            }
-        }
-        self.pos
-    }
-}
-
 #[allow(dead_code)]
 pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
     let start0 = Instant::now();
@@ -61,14 +12,27 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
     };
     let input = tools::get_input(String::from(input_file));
 
-    let mut submarine = SubMarine::new(&input.clone());
-
     let after0 = Instant::now();
 
     let start1 = Instant::now();
 
-    let pos = submarine.run(1);
-    let res1 = pos.0 * pos.1;
+    let endpos1 = input
+        .iter()
+        .map(|line| {
+            let mut tokens = line.split_whitespace();
+            let dir = tokens.next().unwrap();
+            let amount: i64 = tokens.next().unwrap().parse().unwrap();
+            (dir,amount)
+        })
+        .fold((0,0), |(x, d), (dir, amount)| -> (i64,i64) {
+            match dir {
+                "forward" => { (x+amount, d) },
+                "down"    => { (x, d + amount) },
+                "up"      => { (x, d - amount) },
+                _ => panic!()
+            }
+        } );
+    let res1 = endpos1.0 * endpos1.1;
 
     let after1 = Instant::now();
     if print_result {
@@ -77,8 +41,23 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
 
     let start2 = Instant::now();
 
-    let pos = submarine.run(2);
-    let res2 = pos.0 * pos.1;
+    let endpos2 = input
+        .iter()
+        .map(|line| {
+            let mut tokens = line.split_whitespace();
+            let dir = tokens.next().unwrap();
+            let amount: i64 = tokens.next().unwrap().parse().unwrap();
+            (dir,amount)
+        })
+        .fold((0,0,0), |(x, d, a), (dir, amount)| -> (i64, i64, i64) {
+            match dir {
+                "forward" => { (x+amount, d+a*amount, a) },
+                "down"    => { (x, d, a + amount) },
+                "up"      => { (x, d, a - amount) },
+                _ => panic!()
+            }
+        } );
+    let res2 = endpos2.0 * endpos2.1;
 
     let after2 = Instant::now();
     if print_result {
