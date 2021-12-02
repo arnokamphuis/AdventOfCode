@@ -18,13 +18,13 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
 
     let res1 = input
         .iter()
-        .map(|line| {
+        .map(|line| -> (&str, i64) {
             let mut tokens = line.split_whitespace();
             let dir = tokens.next().unwrap();
             let amount: i64 = tokens.next().unwrap().parse().unwrap();
             (dir,amount)
         })
-        .fold([0,0], |[x, d], (dir, amount)| {
+        .fold([0,0], |[x, d], (dir, amount)| -> [i64;2] {
             match dir {
                 "forward" => { [x+amount, d] },
                 "down"    => { [x, d + amount] },
@@ -33,7 +33,7 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
             }
         } )
         .iter()
-        .fold(1, |p, v| p*v);
+        .fold(1, |p, v| -> i64 { p*v });
 
     let after1 = Instant::now();
     if print_result {
@@ -44,13 +44,13 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
 
     let res2 = input
         .iter()
-        .map(|line| {
+        .map(|line| -> (&str,i64) {
             let mut tokens = line.split_whitespace();
             let dir = tokens.next().unwrap();
             let amount: i64 = tokens.next().unwrap().parse().unwrap();
             (dir,amount)
         })
-        .fold([0,0,0], |[x, d, a], (dir, amount)| {
+        .fold([0,0,0], |[x, d, a], (dir, amount)| -> [i64;3] {
             match dir {
                 "forward" => { [x+amount, d+a*amount, a] },
                 "down"    => { [x, d, a + amount] },
@@ -59,7 +59,7 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
             }
         } )[0..2]
         .iter()
-        .fold(1, |p, v| p*v);
+        .fold(1, |p, v| -> i64 { p*v });
 
     let after2 = Instant::now();
     if print_result {
