@@ -16,7 +16,7 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
 
     let start1 = Instant::now();
 
-    let endpos1 = input
+    let res1 = input
         .iter()
         .map(|line| {
             let mut tokens = line.split_whitespace();
@@ -24,15 +24,16 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
             let amount: i64 = tokens.next().unwrap().parse().unwrap();
             (dir,amount)
         })
-        .fold((0,0), |(x, d), (dir, amount)| -> (i64,i64) {
+        .fold([0,0], |[x, d], (dir, amount)| {
             match dir {
-                "forward" => { (x+amount, d) },
-                "down"    => { (x, d + amount) },
-                "up"      => { (x, d - amount) },
+                "forward" => { [x+amount, d] },
+                "down"    => { [x, d + amount] },
+                "up"      => { [x, d - amount] },
                 _ => panic!()
             }
-        } );
-    let res1 = endpos1.0 * endpos1.1;
+        } )
+        .iter()
+        .fold(1, |p, v| p*v);
 
     let after1 = Instant::now();
     if print_result {
@@ -41,7 +42,7 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
 
     let start2 = Instant::now();
 
-    let endpos2 = input
+    let res2 = input
         .iter()
         .map(|line| {
             let mut tokens = line.split_whitespace();
@@ -49,15 +50,16 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
             let amount: i64 = tokens.next().unwrap().parse().unwrap();
             (dir,amount)
         })
-        .fold((0,0,0), |(x, d, a), (dir, amount)| -> (i64, i64, i64) {
+        .fold([0,0,0], |[x, d, a], (dir, amount)| {
             match dir {
-                "forward" => { (x+amount, d+a*amount, a) },
-                "down"    => { (x, d, a + amount) },
-                "up"      => { (x, d, a - amount) },
+                "forward" => { [x+amount, d+a*amount, a] },
+                "down"    => { [x, d, a + amount] },
+                "up"      => { [x, d, a - amount] },
                 _ => panic!()
             }
-        } );
-    let res2 = endpos2.0 * endpos2.1;
+        } )[0..2]
+        .iter()
+        .fold(1, |p, v| p*v);
 
     let after2 = Instant::now();
     if print_result {
