@@ -13,17 +13,17 @@ use plotly::{Bar, NamedColor, Plot};
 fn create_graph(data: &Vec<(usize, (f32,f32,f32))>, errors: &Vec<(usize, (f64,f64,f64))>) {
     let xlabels: Vec<String> = data.iter().map(|n| format!("day {}", n.0+1)).collect();
 
-    let init_vec: Vec<f32> = data.iter().map(|n| n.1.0).collect();
+    // let init_vec: Vec<f32> = data.iter().map(|n| n.1.0).collect();
     let part1_vec: Vec<f32> = data.iter().map(|n| n.1.1).collect();
     let part2_vec: Vec<f32> = data.iter().map(|n| n.1.2).collect();
 
-    let init_error: Vec<f64> = errors.iter().map(|n| n.1.0).collect();
+    // let init_error: Vec<f64> = errors.iter().map(|n| n.1.0).collect();
     let part1_error: Vec<f64> = errors.iter().map(|n| n.1.1).collect();
     let part2_error: Vec<f64> = errors.iter().map(|n| n.1.2).collect();
 
-    let trace1 = Bar::new(xlabels.clone(), init_vec).name("Initialization")
-        .marker(Marker::new().color(NamedColor::Red))
-        .error_y(ErrorData::new(ErrorType::Data).array(init_error));
+    // let trace1 = Bar::new(xlabels.clone(), init_vec).name("Initialization")
+    //     .marker(Marker::new().color(NamedColor::Red))
+    //     .error_y(ErrorData::new(ErrorType::Data).array(init_error));
     let trace2 = Bar::new(xlabels.clone(), part1_vec).name("Part 1")
         .marker(Marker::new().color(NamedColor::Blue))
         .error_y(ErrorData::new(ErrorType::Data).array(part1_error));
@@ -34,10 +34,10 @@ fn create_graph(data: &Vec<(usize, (f32,f32,f32))>, errors: &Vec<(usize, (f64,f6
     let layout = Layout::new().bar_mode(BarMode::Group)
         .title(Title::new("Runtimes in ms for Advent of Code 2021").font(Font::new().color(NamedColor::Black).size(24).family("Droid Serif")))
         .x_axis(Axis::new().title(Title::new("Day").font(Font::new().color(NamedColor::Black).size(12).family("Droid Serif"))))
-        .y_axis(Axis::new().title(Title::new("Runtime in ms").font(Font::new().color(NamedColor::Black).size(12).family("Droid Serif"))).range(vec![0, 150]));
+        .y_axis(Axis::new().title(Title::new("Runtime in ms").font(Font::new().color(NamedColor::Black).size(12).family("Droid Serif"))).range(vec![0, 100]));
 
     let mut plot = Plot::new();
-    plot.add_trace(trace1);
+    // plot.add_trace(trace1);
     plot.add_trace(trace2);
     plot.add_trace(trace3);
     plot.set_layout(layout);
@@ -53,7 +53,7 @@ fn main() {
         ("Day 01 of 2021", day01_21::run, 500),
         ("Day 02 of 2021", day02_21::run, 500),
         ("Day 03 of 2021", day03_21::run, 500),
-        ("Day 04 of 2021", day04_21::run, 500),
+        // ("Day 04 of 2021", day04_21::run, 500),
         // ("Day 05 of 2021", day05_21::run, 50),
         // ("Day 06 of 2021", day06_21::run, 50),
         // ("Day 07 of 2021", day07_21::run, 50),

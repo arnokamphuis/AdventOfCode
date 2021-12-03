@@ -19,11 +19,10 @@
                     var d3 = Plotly.d3;
                     var image_element= d3.select('#image-export');
 
-                    var trace_0 = {"x":["day 1","day 2","day 3","day 4"],"y":[1.9302628,0.9904982,1.4062208,0.0308262],"type":"bar","name":"Initialization","marker":{"color":"red"},"error_y":{"type":"data","array":[0.37056205053426594,0.21579480980032872,0.2651163235399888,0.013908042765249174]}};
-var trace_1 = {"x":["day 1","day 2","day 3","day 4"],"y":[0.0842114,0.6956716,0.2264204,0.000047],"type":"bar","name":"Part 1","marker":{"color":"blue"},"error_y":{"type":"data","array":[0.02409135467423946,0.1624357246218946,0.06071743920687041,0.00004990991885387101]}};
-var trace_2 = {"x":["day 1","day 2","day 3","day 4"],"y":[0.0829936,0.7025158,1.172191,0.0000478],"type":"bar","name":"Part 2","marker":{"color":"green"},"error_y":{"type":"data","array":[0.021455225914447918,0.15648542836430487,0.2660698698819541,0.000049951576551696606]}};
-var data = [trace_0,trace_1,trace_2];
-var layout = {"title":{"text":"Runtimes in ms for Advent of Code 2021","font":{"family":"Droid Serif","size":24,"color":"black"}},"xaxis":{"title":{"text":"Day","font":{"family":"Droid Serif","size":12,"color":"black"}}},"yaxis":{"title":{"text":"Runtime in ms","font":{"family":"Droid Serif","size":12,"color":"black"}},"range":[0,150]},"barmode":"group"};
+                    var trace_0 = {"x":["day 1","day 2","day 3"],"y":[0.0014138,0.023498,0.0047832],"type":"bar","name":"Part 1","marker":{"color":"blue"},"error_y":{"type":"data","array":[0.011420729817310384,0.01663153859388841,0.002921971553591854]}};
+var trace_1 = {"x":["day 1","day 2","day 3"],"y":[0.000878,0.0213036,0.0486808],"type":"bar","name":"Part 2","marker":{"color":"green"},"error_y":{"type":"data","array":[0.0002989247396921178,0.007743453172842209,0.013808672324304034]}};
+var data = [trace_0,trace_1];
+var layout = {"title":{"text":"Runtimes in ms for Advent of Code 2021","font":{"family":"Droid Serif","size":24,"color":"black"}},"xaxis":{"title":{"text":"Day","font":{"family":"Droid Serif","size":12,"color":"black"}}},"yaxis":{"title":{"text":"Runtime in ms","font":{"family":"Droid Serif","size":12,"color":"black"}},"range":[0,100]},"barmode":"group"};
 
                     Plotly.newPlot('plotly-html-element', data, layout,
                         {"responsive": true})
