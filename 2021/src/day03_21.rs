@@ -52,22 +52,22 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
 
     let start2 = Instant::now();
 
-    let most_ones  = |v: u64, bit: usize, bits: usize, nc: usize, zeros: &Vec<usize>| -> bool {
-        !(((v & (1 << (bits-1-bit)) as u64) > 0) ^ (zeros[bit] <= nc))
+    let most  = |v: u64, bit: usize, bits: usize, nc: usize, zeros: &Vec<usize>| -> bool {
+        (v & (1 << (bits-1-bit)) != 0) ^ (zeros[bit] <= nc)
     };
 
     let filter_numbers = | mut nums: Vec<u64>, inv: bool | -> u64 {
         let mut cb = 0;
         while nums.len() > 1 {
-            let zeros = count_zeros(&nums, bits);
             let nc = nums.len()>>1;
-            nums.retain(|&v| most_ones(v,cb,bits,nc,&zeros) ^ inv);
+            let zeros = count_zeros(&nums, bits);
+            nums.retain(|&v| most(v, cb, bits, nc, &zeros) ^ inv);
             cb += 1;
         };
         nums[0]
     };
 
-    let res2 = filter_numbers(numbers.clone(), true) * filter_numbers(numbers.clone(), false);
+    let res2 = filter_numbers(numbers.clone(), false) * filter_numbers(numbers.clone(), true);
 
     let after2 = Instant::now();
     if print_result {
