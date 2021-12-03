@@ -12,18 +12,15 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
     };
     let input = tools::get_input(String::from(input_file));
 
-    let count = |nums: &Vec<u64>, nbs: usize| -> (Vec<usize>,Vec<usize>) {
-        let mut ocs: Vec<usize> = vec![0;nbs];
-        let mut zcs: Vec<usize> = vec![0;nbs];
-        nums
-            .iter()
-            .for_each(|&v| {
-                (0..nbs).for_each(|i| {
-                    ocs[i] += ((v & 1<<(nbs-1-i)) != 0) as usize;
-                    zcs[i] += ((v & 1<<(nbs-1-i)) == 0) as usize;
-                });
-            });
-        (zcs,ocs)
+    let count_zeros = |nums: &Vec<u64>, nbs: usize| -> Vec<usize> {
+        (0..nbs)
+            .map(|i| 
+                nums
+                    .iter()
+                    .fold(0, |zcs, &v| {
+                        zcs + ((v & 1<<(nbs-1-i)) == 0) as usize
+                }))
+            .collect::<Vec<usize>>()
     };
 
     let mut bits = 0;
@@ -32,15 +29,21 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
         bits = line.len();
         numbers.push(line.chars().fold(0, |v, c| (v<<1) + (c=='1') as u64));
     }
+    let nc = numbers.len() >> 1;
+
+    let bw_not = | v:u64 | -> u64 { (!v) & ((1<<bits)-1) };
 
     let after0 = Instant::now();
 
     let start1 = Instant::now();
 
-    let (zeros, ones) = count(&numbers, bits);
-    let res1 = zeros.iter().zip(ones.iter()).fold([0;2],|[gamma, epsilon], (&zero, &one)| {
-        [(gamma << 1) + (zero < one) as u64, (epsilon << 1) + (zero > one) as u64 ]
-    }).iter().fold(1, |res, v| res * v);
+    let gamma = count_zeros(&numbers, bits)
+        .iter()
+        .fold(0, |g, &zero| {
+            (g << 1) + (zero < nc) as u64
+        });
+
+    let res1 = gamma * bw_not(gamma);
 
     let after1 = Instant::now();
     if print_result {
@@ -49,33 +52,22 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
 
     let start2 = Instant::now();
 
-    let most_ones  = |v: u64, bit: usize, revbit: usize, zeros: &Vec<usize>, ones: &Vec<usize>| -> bool {
-        let one = (v & (1 << revbit) as u64) > 0; 
-        (one && (ones[bit] >= zeros[bit])) || (!one && (ones[bit] < zeros[bit]))
+    let most_ones  = |v: u64, bit: usize, bits: usize, nc: usize, zeros: &Vec<usize>| -> bool {
+        !(((v & (1 << (bits-1-bit)) as u64) > 0) ^ (zeros[bit] <= nc))
     };
 
-    let least_ones = |v: u64, bit: usize, revbit: usize, zeros: &Vec<usize>, ones: &Vec<usize>| -> bool {
-        let one = (v & (1 << revbit) as u64) > 0; 
-        (one && (ones[bit] < zeros[bit])) || (!one && (ones[bit] >= zeros[bit]))
-    };
-
-    let filter_numbers = | mut nums: Vec<u64>, condition:  &dyn Fn(u64, usize, usize, &Vec<usize>, &Vec<usize>) -> bool | -> u64 {
+    let filter_numbers = | mut nums: Vec<u64>, inv: bool | -> u64 {
         let mut cb = 0;
         while nums.len() > 1 {
-            let (zeros, ones) = count(&nums, bits);
-            nums = nums
-                .iter()
-                .filter(|&&v| {
-                    condition(v, cb, bits-1-cb, &zeros, &ones)
-                })
-                .map(|&v| v)
-                .collect();
+            let zeros = count_zeros(&nums, bits);
+            let nc = nums.len()>>1;
+            nums.retain(|&v| most_ones(v,cb,bits,nc,&zeros) ^ inv);
             cb += 1;
         };
         nums[0]
     };
 
-    let res2 = filter_numbers(numbers.clone(), &most_ones) * filter_numbers(numbers.clone(), &least_ones);
+    let res2 = filter_numbers(numbers.clone(), true) * filter_numbers(numbers.clone(), false);
 
     let after2 = Instant::now();
     if print_result {
