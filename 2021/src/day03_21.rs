@@ -37,9 +37,9 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
 
     let start1 = Instant::now();
 
-    let (zerocounters, onescounters) = count(&numbers, bits);
-    let res1 = zerocounters.iter().zip(onescounters.iter()).fold([0;2],|[gamma, epsilon], (&zc,&oc)| {
-        [(gamma << 1) + (zc<oc) as u64, (epsilon << 1) + (zc>oc) as u64 ]
+    let (zeros, ones) = count(&numbers, bits);
+    let res1 = zeros.iter().zip(ones.iter()).fold([0;2],|[gamma, epsilon], (&zero, &one)| {
+        [(gamma << 1) + (zero < one) as u64, (epsilon << 1) + (zero > one) as u64 ]
     }).iter().fold(1, |res, v| res * v);
 
     let after1 = Instant::now();
