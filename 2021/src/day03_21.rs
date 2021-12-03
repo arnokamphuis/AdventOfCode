@@ -61,20 +61,16 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
 
     let filter_numbers = | mut nums: Vec<u64>, condition:  &dyn Fn(u64, usize, usize, &Vec<usize>, &Vec<usize>) -> bool | -> u64 {
         let mut cb = 0;
-        let mut rb = bits-1-cb;
         while nums.len() > 1 {
             let (zeros, ones) = count(&nums, bits);
             nums = nums
                 .iter()
                 .filter(|&&v| {
-                    condition(v, cb, rb, &zeros, &ones)
+                    condition(v, cb, bits-1-cb, &zeros, &ones)
                 })
                 .map(|&v| v)
                 .collect();
-            if nums.len()>1 {
-                cb += 1;
-                rb -= 1;
-            }
+            cb += 1;
         };
         nums[0]
     };
