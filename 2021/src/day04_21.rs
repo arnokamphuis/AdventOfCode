@@ -1,5 +1,8 @@
+// use super::chars;
 use super::tools;
+// use chars::print_num;
 use std::time::Instant;
+// use tools::Image;
 
 #[derive(Debug, Copy, Clone)]
 struct Board {
@@ -62,7 +65,50 @@ impl Board {
 
         false
     }
+
+    // fn print_img(&self, img: &mut Image, x: usize, y: usize, extrax: usize, extray: usize) {
+    //     for i in 0..5usize {
+    //         for j in 0..5usize {
+    //             if !self.marked[i][j] {
+    //                 print_num(
+    //                     img,
+    //                     self.numbers[i][j] as u8,
+    //                     x + i + extrax,
+    //                     y + j + extray,
+    //                     1,
+    //                     (255, 0, 0, 255),
+    //                 );
+    //             }
+    //         }
+    //     }
+    // }
 }
+
+// fn print_boards(
+//     img: &mut Image,
+//     boards: &Vec<Board>,
+//     w: usize,
+//     h: usize,
+//     called: i16,
+//     iteration: u8,
+// ) {
+//     img.clear((255, 255, 255, 255));
+
+//     (0..w).for_each(|i| {
+//         (0..h).for_each(|j| {
+//             let idx = i + w * j;
+//             if !boards[idx].finished {
+//                 boards[idx].print_img(img, 5 * i, 5 * j, 5 + 2 * i, 5 + 2 * j);
+//             }
+//         })
+//     });
+
+//     if called > 0 {
+//         print_num(img, called as u8, 20, 10, 4, (0, 0, 255, 255));
+//     }
+
+//     img.save_png(&format!("images/boards-{:05}.png", iteration));
+// }
 
 #[allow(dead_code)]
 pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
@@ -102,11 +148,36 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
 
     let boardcount = boards.len();
 
+    // let boardcountwidth = 10;
+    // let boardcountheight = 10;
+
+    // let boardwidth = 5 * 24;
+    // let boardheight = 5 * 24;
+
+    // let mut img: Image = Image::new(
+    //     2 * boardcountwidth * boardwidth,
+    //     boardcountheight * boardheight,
+    //     1,
+    // );
+    // print_boards(&mut img, &boards, boardcountwidth, boardcountheight, -1, 0);
+
     let mut finishedcount = 0;
+    // let mut iteration = 0;
 
     let mut run = |targetcount: usize| -> i16 {
         loop {
             let number = called[0];
+
+            // iteration += 1;
+            // print_boards(
+            //     &mut img,
+            //     &boards,
+            //     boardcountwidth,
+            //     boardcountheight,
+            //     number,
+            //     iteration,
+            // );
+
             for board in boards.iter_mut() {
                 if !board.finished {
                     if let Some(value) = board.call(number) {
@@ -117,6 +188,7 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
                     }
                 }
             }
+
             called.remove(0);
         }
     };

@@ -6,6 +6,7 @@ mod day03_21;
 mod day04_21;
 mod day05_21;
 mod tools;
+mod chars;
 
 use plotly::common::{ErrorData, ErrorType, Marker, Title, Font};
 use plotly::layout::{Axis, BarMode, Layout, };
