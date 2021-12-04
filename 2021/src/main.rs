@@ -4,6 +4,7 @@ mod day01_21;
 mod day02_21;
 mod day03_21;
 mod day04_21;
+mod day05_21;
 mod tools;
 
 use plotly::common::{ErrorData, ErrorType, Marker, Title, Font};
