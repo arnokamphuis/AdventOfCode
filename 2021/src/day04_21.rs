@@ -26,41 +26,38 @@ impl Board {
                 for j in 0..5usize {
                     if self.numbers[i][j] == num {
                         self.marked[i][j] = true;
+                        if self.check(i, j) {
+                            self.finished = true;
+                            let mut summation = 0;
+                            for i in 0..5usize {
+                                for j in 0..5usize {
+                                    if !self.marked[i][j] {
+                                        summation += self.numbers[i][j];
+                                    }
+                                }
+                            }
+                            return Some(summation);
+                        }
                     }
                 }
             }
-        }
-
-        if self.check() {
-            self.finished = true;
-            let mut summation = 0;
-            for i in 0..5usize {
-                for j in 0..5usize {
-                    if !self.marked[i][j] {
-                        summation += self.numbers[i][j];
-                    }
-                }
-            }
-            return Some(summation);
         }
         None
     }
 
-    fn check(&self) -> bool {
-        for i in 0..5usize {
-            if (self.marked[i][0]
-                && self.marked[i][1]
-                && self.marked[i][2]
-                && self.marked[i][3]
-                && self.marked[i][4])
-                || (self.marked[0][i]
-                    && self.marked[1][i]
-                    && self.marked[2][i]
-                    && self.marked[3][i]
-                    && self.marked[4][i])
-            {
-                return true;
-            }
+    fn check(&self, i: usize, j: usize) -> bool {
+        if (self.marked[i][0]
+            && self.marked[i][1]
+            && self.marked[i][2]
+            && self.marked[i][3]
+            && self.marked[i][4])
+            || (self.marked[0][j]
+                && self.marked[1][j]
+                && self.marked[2][j]
+                && self.marked[3][j]
+                && self.marked[4][j])
+        {
+            return true;
         }
 
         false
