@@ -56,7 +56,7 @@ fn main() {
         ("Day 02 of 2021", day02_21::run, 500),
         ("Day 03 of 2021", day03_21::run, 500),
         ("Day 04 of 2021", day04_21::run, 500),
-        // ("Day 05 of 2021", day05_21::run, 50),
+        ("Day 05 of 2021", day05_21::run, 50),
         // ("Day 06 of 2021", day06_21::run, 50),
         // ("Day 07 of 2021", day07_21::run, 50),
         // ("Day 08 of 2021", day08_21::run, 50),
