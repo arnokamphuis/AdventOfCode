@@ -2,7 +2,7 @@
 name = "aoc2021"
 version = "0.1.0"
 authors = ["Arno Kamphuis <arno.kamphuis@hu.nl>"]
-edition = "2018"
+edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
@@ -18,6 +18,5 @@ regex = "1"
 itertools = "^0.9.0"
 petgraph = "0.5.1"
 modinverse = "^0.1.1"
-ruget = "0.4.2"
 plotly = "0.6.0"
 font8x8 = "0.2.7"
