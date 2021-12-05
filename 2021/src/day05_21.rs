@@ -1,5 +1,6 @@
 use super::tools;
 use std::time::Instant;
+// use tools::Image;
 
 #[allow(dead_code)]
 pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
@@ -32,10 +33,25 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
         })
         .collect();
 
+    // let minx = *xcoors.iter().min().unwrap();
+    // let miny = *ycoors.iter().min().unwrap();
     let maxx = *xcoors.iter().max().unwrap();
     let maxy = *ycoors.iter().max().unwrap();
-
     let mut field: Vec<Vec<usize>> = vec![vec![0; maxy + 1]; maxx + 1];
+
+    // let mut img = Image::new(maxx + 1 + minx, maxy + 1 + miny, 1);
+    // let mut iteration = 0;
+    // let mut plot_field = |field: &Vec<Vec<usize>>, iter| {
+    //     img.clear((255, 255, 255, 255));
+    //     field.iter().enumerate().for_each(|(i, row)| {
+    //         row.iter().enumerate().for_each(|(j, &col)| {
+    //             if col > 0 {
+    //                 img.set_pixel(i, j, ((20 * col).max(255) as u8, 0, 0, 255));
+    //             }
+    //         });
+    //     });
+    //     img.save_png(&format!("movie-day05/lines-{:05}.png", iter));
+    // };
 
     let hvlines: Vec<((usize, usize), (usize, usize))> = lines
         .iter()
@@ -58,6 +74,8 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
                 field[x][y] += 1;
             }
         }
+        // plot_field(&field, iteration);
+        // iteration += 1;
     }
     let res1 = field.iter().flatten().filter(|&&v| v > 1).count();
 
@@ -77,6 +95,8 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
             let y = (line.1 .1 as i32 + d * diry) as usize;
             field[x][y] += 1;
         }
+        // plot_field(&field, iteration);
+        // iteration += 1;
     }
     let res2 = field.iter().flatten().filter(|&&v| v > 1).count();
 
