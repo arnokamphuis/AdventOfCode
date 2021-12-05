@@ -1,5 +1,4 @@
 use super::tools;
-use std::cmp;
 use std::time::Instant;
 
 #[allow(dead_code)]
@@ -54,8 +53,8 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
     let start1 = Instant::now();
 
     for line in hvlines {
-        for x in cmp::min(line.0 .0, line.1 .0)..cmp::max(line.0 .0, line.1 .0) + 1 {
-            for y in cmp::min(line.0 .1, line.1 .1)..cmp::max(line.0 .1, line.1 .1) + 1 {
+        for x in line.0 .0.min(line.1 .0)..=line.0 .0.max(line.1 .0) {
+            for y in line.0 .1.min(line.1 .1)..=line.0 .1.max(line.1 .1) {
                 field[x][y] += 1;
             }
         }
@@ -73,7 +72,7 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
         let delta = line.0 .0 as i32 - line.1 .0 as i32;
         let dirx: i32 = if delta < 0 { -1 } else { 1 };
         let diry: i32 = if line.0 .1 < line.1 .1 { -1 } else { 1 };
-        for d in 0i32..delta.abs() + 1 {
+        for d in 0i32..=delta.abs() {
             let x = (line.1 .0 as i32 + d * dirx) as usize;
             let y = (line.1 .1 as i32 + d * diry) as usize;
             field[x][y] += 1;
