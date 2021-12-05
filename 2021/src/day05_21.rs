@@ -13,8 +13,11 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
     };
     let input = tools::get_input(String::from(input_file));
 
-    let mut xcoors: Vec<usize> = vec![];
-    let mut ycoors: Vec<usize> = vec![];
+    let mut minx = usize::MAX;
+    let mut miny = usize::MAX;
+    let mut maxx = usize::MIN;
+    let mut maxy = usize::MIN;
+
     let lines: Vec<((usize, usize), (usize, usize))> = input
         .iter()
         .map(|line| {
@@ -25,18 +28,14 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
             let mut totokens = tokens.next().unwrap().split(",");
             let t1 = totokens.next().unwrap().parse::<usize>().unwrap();
             let t2 = totokens.next().unwrap().parse::<usize>().unwrap();
-            xcoors.push(f1);
-            xcoors.push(t1);
-            ycoors.push(f2);
-            ycoors.push(t2);
+            minx = minx.min(f1).min(t1);
+            maxx = maxx.max(f1).max(t1);
+            miny = miny.min(f2).min(t2);
+            maxy = maxy.max(f2).max(t2);
             ((f1, f2), (t1, t2))
         })
         .collect();
 
-    // let minx = *xcoors.iter().min().unwrap();
-    // let miny = *ycoors.iter().min().unwrap();
-    let maxx = *xcoors.iter().max().unwrap();
-    let maxy = *ycoors.iter().max().unwrap();
     let mut field: Vec<Vec<usize>> = vec![vec![0; maxy + 1]; maxx + 1];
 
     // let mut img = Image::new(maxx + 1 + minx, maxy + 1 + miny, 1);
