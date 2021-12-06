@@ -12,12 +12,10 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
     };
     let input = tools::get_input(String::from(input_file));
 
-    let nums = input[0]
+    let mut countdowns = input[0]
         .split(",")
         .map(|v| v.parse::<usize>().unwrap())
-        .collect::<Vec<usize>>();
-
-    let mut countdowns: Vec<usize> = nums.iter().fold(vec![0;9], |mut cd, &n| { cd[n] += 1; cd});
+        .fold(vec![0;9], |mut cd, n| { cd[n] += 1; cd});
 
     let day = |cd: &mut Vec<usize> | {
         let zerocount = cd[0];
