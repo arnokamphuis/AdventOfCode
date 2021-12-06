@@ -17,28 +17,24 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
         .map(|v| v.parse::<usize>().unwrap())
         .collect::<Vec<usize>>();
 
-    let mut countdowns: Vec<usize> = vec![0; 9];
+    let mut countdowns: Vec<usize> = nums.iter().fold(vec![0;9], |mut cd, &n| { cd[n] += 1; cd});
 
-    nums.iter().for_each(|&n| {
-        countdowns[n] += 1;
-    });
+    let day = |cd: &mut Vec<usize> | {
+        let zerocount = cd[0];
+        for k in 1..=8 {
+            let count = cd[k];
+            cd[k - 1] = count;
+        }
+        cd[6] += zerocount;
+        cd[8] = zerocount;
+    };
 
     let after0 = Instant::now();
 
     let start1 = Instant::now();
 
     for _ in 0..80 {
-        let mut new_countdowns = vec![0; 9];
-        for k in 0..=8 {
-            let count = countdowns[k];
-            if k == 0 {
-                new_countdowns[6] += count;
-                new_countdowns[8] += count;
-            } else {
-                new_countdowns[k - 1] += count;
-            }
-        }
-        countdowns = new_countdowns;
+        day(&mut countdowns);
     }
 
     let res1: usize = countdowns.iter().sum();
@@ -51,17 +47,7 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
     let start2 = Instant::now();
 
     for _ in 80..256 {
-        let mut new_countdowns = vec![0; 9];
-        for k in 0..=8 {
-            let count = countdowns[k];
-            if k == 0 {
-                new_countdowns[6] += count;
-                new_countdowns[8] += count;
-            } else {
-                new_countdowns[k - 1] += count;
-            }
-        }
-        countdowns = new_countdowns;
+        day(&mut countdowns);
     }
 
     let res2: usize = countdowns.iter().sum();
