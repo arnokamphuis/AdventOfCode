@@ -20,8 +20,7 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
     let day = |cd: &mut Vec<usize> | {
         let zerocount = cd[0];
         for k in 1..=8 {
-            let count = cd[k];
-            cd[k - 1] = count;
+            cd[k - 1] = cd[k];
         }
         cd[6] += zerocount;
         cd[8] = zerocount;
