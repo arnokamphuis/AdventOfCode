@@ -20,13 +20,16 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
     let min = *positions.iter().min().unwrap();
     let max = *positions.iter().max().unwrap();
 
+    let fuel_1 = |p: i32, i: i32| -> i32 { (i-p).abs() as i32 };
+    let fuel_2 = |p: i32, i: i32| -> i32 { let f = (i-p).abs(); (f*(f+1)/2) as i32 };
+
     let after0 = Instant::now();
 
     let start1 = Instant::now();
 
-    let mut fuel_total: Vec<i32> = vec![0;(max-min+1).try_into().unwrap()];
+    let mut fuel_total: Vec<i32> = vec![0;(max-min+1) as usize];
     for i in min..=max {
-        fuel_total[i as usize] = positions.iter().map(|&p| (i-p).abs() as i32).sum::<i32>();
+        fuel_total[i as usize] = positions.iter().map(|&p| fuel_1(p,i) ).sum::<i32>();
     }
     let res1 = fuel_total.iter().min().unwrap();
 
@@ -37,9 +40,9 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
 
     let start2 = Instant::now();
 
-    fuel_total = vec![0;(max-min+1).try_into().unwrap()];
+    fuel_total = vec![0;(max-min+1) as usize];
     for i in min..=max {
-        fuel_total[i as usize] = positions.iter().map(|&p| {let f = (i-p).abs(); (f*(f+1)/2) as i32}).sum::<i32>();
+        fuel_total[i as usize] = positions.iter().map(|&p| fuel_2(p,i) ).sum::<i32>();
     }
     let res2 = fuel_total.iter().min().unwrap();
 
