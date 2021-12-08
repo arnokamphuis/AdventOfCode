@@ -10,6 +10,7 @@ mod day07_21;
 mod day08_21;
 mod tools;
 mod chars;
+mod maze;
 
 use plotly::common::{ErrorData, ErrorType, Marker, Title, Font};
 use plotly::layout::{Axis, BarMode, Layout, };
