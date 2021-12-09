@@ -2,6 +2,8 @@ use super::tools;
 use std::time::Instant;
 use queues::*;
 use std::collections::BTreeSet;
+use std::collections::HashMap;
+use itertools::Itertools;
 
 #[allow(dead_code)]
 pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
@@ -14,87 +16,39 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
     };
     let input = tools::get_input(String::from(input_file));
 
-    let heightmap: Vec<Vec<u8>> = input.iter().fold(vec![],|mut v, line| {
-        v.push(line.chars().fold(vec![], |mut lv, c| {lv.push(c.to_digit(10).unwrap() as u8); lv})); v
+    let heightmap: HashMap<(i32,i32),i32> = input.iter().enumerate().fold(HashMap::new(),|mut hm, (i,line)| {
+        line.chars().enumerate().for_each(|(j,c)| { hm.insert((i as i32, j as i32), c.to_digit(10).unwrap() as i32);} ); hm 
     });
-    
+
+    let mut lowpoints: Vec<(i32,i32)> = vec![];
+    let w = *heightmap.keys().map(|(_,y)| y).max().unwrap() as i32;
+    let h = *heightmap.keys().map(|(x,_)| x).max().unwrap() as i32;
+
     let after0 = Instant::now();
 
     let start1 = Instant::now();
 
-    let mut res1: u32 = 0;
-    let w = heightmap[0].len();
-    let h = heightmap.len();
-
-    let mut lowpoints: Vec<(usize,usize)> = vec![];
-
-    for i in 0..h {
-        for j in 0..w {
-            let mut count = 0;
-            let height = heightmap[i][j];
-            if i > 0 && i < (h-1) as usize && j > 0 && j < (w-1) as usize {
-                let dirs: [(i8,i8);4] = [(0,-1), (0,1), (1,0), (-1,0)];
+    let mut res1: i32 = 0;
+    for i in 0..=h {
+        for j in 0..=w {
+            if let Some(height) = heightmap.get(&(i,j)) {
+                let dirs: [(i32,i32);4] = [(0,-1), (0,1), (1,0), (-1,0)];
+                let mut count = 0;
                 for d in &dirs {
-                    count += if heightmap[(i as i8 + d.0) as usize][(j as i8 + d.1) as usize] > height { 1 } else { 0 }
+                    if let Some(nbheight) = heightmap.get(&(i+d.0, j+d.1)) {
+                        count += if nbheight > height { 1 } else { 0 };
+                    } else {
+                        count += 1;
+                    }
                 }
-            } else if i > 0 && i < (h-1) && j == 0 {
-                count += 1;
-                let dirs: [(i8,i8);3] = [(0,1), (1,0), (-1,0)];
-                for d in &dirs {
-                    count += if heightmap[(i as i8 + d.0) as usize][(j as i8 + d.1) as usize] > height { 1 } else { 0 }
-                }
-            } else if i > 0 && i < (h-1) && j == (w-1) as usize {
-                count += 1;
-                let dirs: [(i8,i8);3] = [(0,-1), (1,0), (-1,0)];
-                for d in &dirs {
-                    count += if heightmap[(i as i8 + d.0) as usize][(j as i8 + d.1) as usize] > height { 1 } else { 0 }
-                }
-            } else if j > 0 && j < (w-1) && i == 0 {
-                count += 1;
-                let dirs: [(i8,i8);3] = [(0,1), (0,-1), (1,0)];
-                for d in &dirs {
-                    count += if heightmap[(i as i8 + d.0) as usize][(j as i8 + d.1) as usize] > height { 1 } else { 0 }
-                }
-            } else if j > 0 && j < (w-1) && i == (h-1) as usize {
-                count += 1;
-                let dirs: [(i8,i8);3] = [(0,1), (0,-1), (-1,0)];
-                for d in &dirs {
-                    count += if heightmap[(i as i8 + d.0) as usize][(j as i8 + d.1) as usize] > height { 1 } else { 0 }
-                }
-            } else if j == 0 &&  i == 0 {
-                count += 2;
-                let dirs: [(i8,i8);2] = [(0,1), (1,0)];
-                for d in &dirs {
-                    count += if heightmap[(i as i8 + d.0) as usize][(j as i8 + d.1) as usize] > height { 1 } else { 0 }
-                }
-            } else if j == (w-1) as usize && i == 0 {
-                count += 2;
-                let dirs: [(i8,i8);2] = [(0,-1), (1,0)];
-                for d in &dirs {
-                    count += if heightmap[(i as i8 + d.0) as usize][(j as i8 + d.1) as usize] > height { 1 } else { 0 }
-                }
-            } else if j == (w-1) as usize && i == (h-1) as usize {
-                count += 2;
-                let dirs: [(i8,i8);2] = [(0,-1), (-1,0)];
-                for d in &dirs {
-                    count += if heightmap[(i as i8 + d.0) as usize][(j as i8 + d.1) as usize] > height { 1 } else { 0 }
-                }
-            } else if j == 0 && i == (h-1) as usize {
-                count += 2;
-                let dirs: [(i8,i8);2] = [(0,1), (-1,0)];
-                for d in &dirs {
-                    count += if heightmap[(i as i8 + d.0) as usize][(j as i8 + d.1) as usize] > height { 1 } else { 0 }
-                }
+                if count == 4 {
+                    lowpoints.push((i,j));
+                    res1 += height+1;
+                }         
             }
-            
-
-            if count == 4 {
-                lowpoints.push((i,j));
-                res1 += (height+1) as u32;
-            }
-
         }
     }
+
     let after1 = Instant::now();
     if print_result {
         println!("Part 1: {}", res1);
@@ -102,17 +56,18 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
 
     let start2 = Instant::now();
 
-    let inside = |(i,j): (i32,i32), hm: &Vec<Vec<u8>>| -> bool {
-        i >= 0 && i < h as i32 && j >= 0 && j < w as i32 && hm[i as usize][j as usize] < 9
+    let inside = |p: (i32,i32), hm: &HashMap<(i32,i32),i32>| -> bool {
+        if let Some(&h) = hm.get(&p) { h < 9 } else { false }
     };
 
-    let mut sizes: Vec<usize> = vec![];
-    for point in &lowpoints {
+    let res2 = lowpoints.iter().map(|point| {
         let mut q: Queue<(i32,i32)> = queue![];
         let mut visited: BTreeSet<(i32,i32)> = BTreeSet::new();
+
         let current = (point.0 as i32, point.1 as i32);
         assert_eq!(q.add(current), Ok(None));
         visited.insert(current);
+
         while let Ok(next) = q.remove() {
             let dirs: [(i32,i32);4] = [(0,-1), (0,1), (1,0), (-1,0)];
             for d in &dirs {
@@ -123,11 +78,12 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
                 }   
             }
         }
-        sizes.push(visited.len());
-    }
-
-    sizes.sort();
-    let res2 = sizes[sizes.len()-3..].to_vec().iter().fold(1, |v, s| v*s);
+        visited.len()
+    })
+    .sorted_by(|a, b| Ord::cmp(&b, &a))
+    .collect::<Vec<usize>>()[0..3]
+    .into_iter()
+    .fold(1, |v, s| v*s);
 
     let after2 = Instant::now();
     if print_result {

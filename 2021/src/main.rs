@@ -14,7 +14,7 @@ mod chars;
 // mod maze;
 
 use plotly::common::{ErrorData, ErrorType, Marker, Title, Font};
-use plotly::layout::{Axis, BarMode, Layout, };
+use plotly::layout::{Axis, BarMode, Layout, AxisType };
 use plotly::{Bar, NamedColor, Plot};
 
 fn create_graph(data: &Vec<(usize, (f32,f32,f32))>, errors: &Vec<(usize, (f64,f64,f64))>) {
@@ -41,7 +41,7 @@ fn create_graph(data: &Vec<(usize, (f32,f32,f32))>, errors: &Vec<(usize, (f64,f6
     let layout = Layout::new().bar_mode(BarMode::Group)
         .title(Title::new("Runtimes in ms for Advent of Code 2021").font(Font::new().color(NamedColor::Black).size(24).family("Droid Serif")))
         .x_axis(Axis::new().title(Title::new("Day").font(Font::new().color(NamedColor::Black).size(12).family("Droid Serif"))))
-        .y_axis(Axis::new().title(Title::new("Runtime in ms").font(Font::new().color(NamedColor::Black).size(12).family("Droid Serif"))).range(vec![0, 100]));
+        .y_axis(Axis::new().title(Title::new("Runtime in ms").font(Font::new().color(NamedColor::Black).size(12).family("Droid Serif"))).range(vec![0, 100]).type_(AxisType::Log));
 
     let mut plot = Plot::new();
     // plot.add_trace(trace1);
@@ -65,7 +65,7 @@ fn main() {
         ("Day 06 of 2021", day06_21::run, 500),
         ("Day 07 of 2021", day07_21::run, 500),
         ("Day 08 of 2021", day08_21::run, 50),
-        ("Day 09 of 2021", day09_21::run, 50),
+        ("Day 09 of 2021", day09_21::run, 500),
         // ("Day 10 of 2021", day10_21::run, 50),
         // ("Day 11 of 2021", day11_21::run, 50),
         // ("Day 12 of 2021", day12_21::run, 50),
