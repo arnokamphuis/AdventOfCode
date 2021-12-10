@@ -1,5 +1,6 @@
 use super::tools;
 use std::time::Instant;
+use std::collections::HashMap;
 
 #[allow(dead_code)]
 pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
@@ -12,40 +13,37 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
     };
     let input = tools::get_input(String::from(input_file));
 
-    let startchars = ['{', '<', '[', '('];
-    let endchars   = ['}', '>', ']', ')'];
+    let startchars        = [   '<',  '{', '[', '('];
+    let endchars          = [   '>',  '}', ']', ')'];
+    let scores_1: [u64;4] = [ 25137, 1197,  57,   3];
+    let scores_2: [u64;4] = [     4,    3,   2,   1];
+
+    let belongs:         HashMap<char,char> = startchars.iter().zip(endchars.iter()).fold(HashMap::new(), |mut map, (f,t)| { map.insert(*t,*f); map } );
+    let scores_1_lookup: HashMap<char,u64>  =   endchars.iter().zip(scores_1.iter()).fold(HashMap::new(), |mut map, (c,s)| { map.insert(*c,*s); map } );
+    let scores_2_lookup: HashMap<char,u64>  = startchars.iter().zip(scores_2.iter()).fold(HashMap::new(), |mut map, (c,s)| { map.insert(*c,*s); map } );
+    
     let after0 = Instant::now();
 
     let start1 = Instant::now();
 
-    let mut scoredlines: Vec<(String, u64)> = input.iter().map(|line| {
-        let mut q: Vec<char> = vec![];
-        let mut ok = true;
-        let mut score = 0;
-        line.chars().for_each(|c| {
-            if ok {
-                if startchars.contains(&c) {
-                    q.push(c);
-                } else {
-                    if let Some(sc)= q.pop() {
-                        if startchars.iter().position(|&f| f==sc).unwrap() != endchars.iter().position(|&f| f==c).unwrap() {
-                            score += match c {
-                                ')' => {     3 },
-                                ']' => {    57 },
-                                '}' => {  1197 },
-                                '>' => { 25137 },
-                                _   => {     0 }
-                            };
-                            ok = false;
-                        } 
+    let mut scoredlines: Vec<(&String, u64, Vec<char>)> = input.iter().map(|line| {
+        line
+            .chars()
+            .fold( (line, 0, vec![]), |(line, mut score, mut q), c| {
+                if score==0 {
+                    if startchars.contains(&c) {
+                        q.push(c);
+                    } else {
+                        if let Some(sc)= q.pop() {
+                            if belongs[&c] != sc { score += scores_1_lookup[&c]; } 
+                        }
                     }
                 }
-            }
-        });
-        (line.clone(),score)
+                (line, score, q)
+            })
     }).collect();
 
-    let res1: u64 = scoredlines.iter().map(|(_,score)| score).filter(|&score| *score > 0).sum();
+    let res1: u64 = scoredlines.iter().map(|(_,score,_)| score).filter(|&score| *score > 0).sum();
 
     let after1 = Instant::now();
     if print_result {
@@ -54,23 +52,10 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
 
     let start2 = Instant::now();
 
-    scoredlines.retain(|(_,score)| *score == 0);
-    let mut scores: Vec<u64> = scoredlines.iter().fold(vec![],|mut scores, (line,_)| {
-        let mut q: Vec<char> = vec![];
-
-        line.chars().for_each(|c| { if startchars.contains(&c) { q.push(c); } else { q.pop(); }});
-        scores.push(q.iter().rev().fold(0, |s, c| {
-            s * 5 + match c {
-                '(' => { 1 },
-                '[' => { 2 },
-                '{' => { 3 },
-                '<' => { 4 },
-                _   => { 0 }
-            }
-        }));
-        scores
+    scoredlines.retain(|(_,score,_)| *score == 0);
+    let mut scores: Vec<u64> = scoredlines.iter().fold(vec![],|mut scores, (_,_,q)| {
+        scores.push(q.iter().rev().fold(0, |s, c| { s * 5 + scores_2_lookup[&c] })); scores
     });
-
     scores.sort();
     let res2 = scores[ scores.len()/2 ];
 
