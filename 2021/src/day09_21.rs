@@ -4,7 +4,7 @@ use queues::*;
 use std::collections::BTreeSet;
 use std::collections::HashMap;
 use itertools::Itertools;
-use tools::Image;
+// use tools::Image;
 
 #[allow(dead_code)]
 pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
@@ -25,12 +25,12 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
     let w = *heightmap.keys().map(|(_,y)| y).max().unwrap() as i32;
     let h = *heightmap.keys().map(|(x,_)| x).max().unwrap() as i32;
 
-    let mut img: Image = Image::new(w as usize + 1, h as usize + 1, 10);
-    img.clear((0,0,0,255));
-    heightmap.iter().filter(|p| *p.1 == 9).for_each(|((x,y),_)| {
-        img.set_pixel(*x as usize, *y as usize, (0,0,255,255));
-    });
-    let mut imgcount = 0;
+    // let mut img: Image = Image::new(w as usize + 1, h as usize + 1, 10);
+    // img.clear((0,0,0,255));
+    // heightmap.iter().filter(|p| *p.1 == 9).for_each(|((x,y),_)| {
+    //     img.set_pixel(*x as usize, *y as usize, (0,0,255,255));
+    // });
+    // let mut imgcount = 0;
 
     let after0 = Instant::now();
 
@@ -76,9 +76,9 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
         assert_eq!(q.add(current), Ok(None));
         visited.insert(current);
 
-        img.set_pixel(point.0 as usize, point.1 as usize, (255,255,0,255));
-        img.save_png(&format!("images/day09-{:05}.png",imgcount));
-        imgcount += 1;
+        // img.set_pixel(point.0 as usize, point.1 as usize, (255,255,0,255));
+        // img.save_png(&format!("images/day09-{:05}.png",imgcount));
+        // imgcount += 1;
 
         while let Ok(next) = q.remove() {
             let dirs: [(i32,i32);4] = [(0,-1), (0,1), (1,0), (-1,0)];
@@ -87,11 +87,11 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
                 if inside(p, &heightmap) && !visited.contains(&p) {
                     assert_eq!(q.add(p), Ok(None));
                     visited.insert(p);
-                    let pointheight = heightmap.get(&p).unwrap();
-                    let color:u8 = (255*pointheight/8) as u8;
-                    img.set_pixel(p.0 as usize, p.1 as usize, (255,255-color,0,255));
-                    img.save_png(&format!("images/day09-{:05}.png",imgcount));
-                    imgcount += 1;
+                    // let pointheight = heightmap.get(&p).unwrap();
+                    // let color:u8 = (255*pointheight/8) as u8;
+                    // img.set_pixel(p.0 as usize, p.1 as usize, (255,255-color,0,255));
+                    // img.save_png(&format!("images/day09-{:05}.png",imgcount));
+                    // imgcount += 1;
                 }   
             }
         }
