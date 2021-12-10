@@ -18,9 +18,10 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
 
     let start1 = Instant::now();
 
-    let res1: u64 = input.iter().fold(0, |mut score, line| {
+    let mut scoredlines: Vec<(String, u64)> = input.iter().map(|line| {
         let mut q: Vec<char> = vec![];
         let mut ok = true;
+        let mut score = 0;
         line.chars().for_each(|c| {
             if ok {
                 if startchars.contains(&c) {
@@ -41,8 +42,10 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
                 }
             }
         });
-        score
-    });
+        (line.clone(),score)
+    }).collect();
+
+    let res1: u64 = scoredlines.iter().map(|(_,score)| score).filter(|&score| *score > 0).sum();
 
     let after1 = Instant::now();
     if print_result {
@@ -51,33 +54,20 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
 
     let start2 = Instant::now();
 
-    let mut scores: Vec<u64> = input.iter().fold(vec![],|mut scores, line| {
+    scoredlines.retain(|(_,score)| *score == 0);
+    let mut scores: Vec<u64> = scoredlines.iter().fold(vec![],|mut scores, (line,_)| {
         let mut q: Vec<char> = vec![];
 
-        if line.chars().fold(true, |mut ok, c| {
-            if ok {
-                if startchars.contains(&c) {
-                    q.push(c);
-                } else {
-                    if let Some(sc)= q.pop() {
-                        if startchars.iter().position(|&f| f==sc).unwrap() != endchars.iter().position(|&f| f==c).unwrap() {
-                            ok = false;
-                        }
-                    }
-                }
+        line.chars().for_each(|c| { if startchars.contains(&c) { q.push(c); } else { q.pop(); }});
+        scores.push(q.iter().rev().fold(0, |s, c| {
+            s * 5 + match c {
+                '(' => { 1 },
+                '[' => { 2 },
+                '{' => { 3 },
+                '<' => { 4 },
+                _   => { 0 }
             }
-            ok
-        }) {
-            scores.push(q.iter().rev().fold(0, |s, c| {
-                s * 5 + match c {
-                    '(' => { 1 },
-                    '[' => { 2 },
-                    '{' => { 3 },
-                    '<' => { 4 },
-                    _   => { 0 }
-                }
-            }));
-        }
+        }));
         scores
     });
 
