@@ -43,7 +43,7 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
             })
     }).collect();
 
-    let res1: u64 = scoredlines.iter().map(|(_,score,_)| score).filter(|&score| *score > 0).sum();
+    let res1: u64 = scoredlines.iter().map(|(_,score,_)| score).sum();
 
     let after1 = Instant::now();
     if print_result {
