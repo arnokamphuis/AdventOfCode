@@ -31,8 +31,7 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
 
         let mut flashed: BTreeSet<(i8,i8)> = BTreeSet::new();
         while flashed.len() != flashable.len() {
-            let new_flashable: BTreeSet<(i8,i8)> = 
-                flashable
+            flashable = flashable
                     .iter()
                     .fold(BTreeSet::new(), |mut map, o| {
                         if !flashed.contains(o) {
@@ -41,26 +40,25 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
                                 let no = (o.0 + d.0, o.1 + d.1);
                                 if let Some(oc) = octos.get_mut(&no) { 
                                     *oc += 1; 
-                                    map.insert(no);
+                                    if *oc > 9 { map.insert(no); }
                                 };
                             }
                         }
                         map
-                    });
-
-                new_flashable
+                    })
                     .iter()
-                    .filter(|&nf| *octos.get(&nf).unwrap() > 9 )
-                    .for_each(|&nf| { flashable.insert(nf); });
-            }
+                    .cloned().collect::<BTreeSet<(i8,i8)>>()
+                    .union(&flashable)
+                    .cloned().collect::<BTreeSet<(i8,i8)>>();
+        }
 
-            octos
-                .iter_mut()
-                .filter(|(_,&mut v)| { v > 9 })
-                .for_each(|(_,v)| { *v = 0 });
+        octos
+            .iter_mut()
+            .filter(|(_,&mut v)| { v > 9 })
+            .for_each(|(_,v)| { *v = 0 });
 
-            flashed.len()
-        };
+        flashed.len()
+    };
 
     let after0 = Instant::now();
 
