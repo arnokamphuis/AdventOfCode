@@ -1,6 +1,7 @@
 use super::tools;
 use std::time::Instant;
 use std::collections::{BTreeMap, BTreeSet};
+// use tools::Image;
 
 #[allow(dead_code)]
 pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
@@ -17,10 +18,20 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
         line.chars().enumerate().for_each(|(j,c)| { map.insert((i as i8,j as i8), c.to_digit(10).unwrap() as i8); }); map
     });
 
+    // let mut img = Image::new(12,12,10);
+    // img.clear((0,0,0,255));
+    // let mut img_count = 0;
+
     let dir = [(-1,-1),(-1,0),(-1,1),(0,-1),(0,1),(1,-1),(1,0),(1,1)];
 
     let day = |octos: &mut BTreeMap<(i8,i8),i8>| -> usize {
         octos.iter_mut().for_each(|(_,v)| {*v += 1;});
+
+        // img.clear((0,0,0,255));
+        // octos.iter().for_each(|((i,j),v)| {
+        //     let c = (255 * (*v as u16) / 16) as u8;
+        //     img.set_pixel(*i as usize + 1, *j as usize + 1, (c, c, c, 255));
+        // });
 
         let mut flashable: BTreeSet<(i8,i8)> = octos
             .iter()
@@ -41,8 +52,11 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
                                 if let Some(oc) = octos.get_mut(&no) { 
                                     *oc += 1; 
                                     if *oc > 9 { map.insert(no); }
+                                    // let c = (255 * ( (*oc).min(8) as u16) / 16) as u8;
+                                    // img.set_pixel(o.0 as usize + 1, o.1 as usize + 1, (c,c,c,255));
                                 };
                             }
+                            // img.set_pixel(o.0 as usize + 1, o.1 as usize + 1, (255,255,255,255));
                         }
                         map
                     })
@@ -50,6 +64,9 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
                     .cloned().collect::<BTreeSet<(i8,i8)>>()
                     .union(&flashable)
                     .cloned().collect::<BTreeSet<(i8,i8)>>();
+
+            // img.save_png(&format!("movie-day11/day11-{:05}.png", img_count));
+            // img_count += 1;
         }
 
         octos
@@ -81,6 +98,10 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
         step+=1;
     };
     
+    // for _ in 0..20 {
+    //     img.save_png(&format!("movie-day11/day11-{:05}.png", img_count));
+    //     img_count += 1;
+    // }
 
     let after2 = Instant::now();
     if print_result {
