@@ -1,30 +1,32 @@
 use super::tools;
 use std::time::Instant;
+use std::collections::HashMap;
+use std::collections::BTreeSet;
 
-fn find_paths(current_path: &Vec<String>, paths: &Vec<(String,String)>, part: u8, visited: Option<String>) -> u64 {
+fn find_paths(from: usize, to: usize, current_path: &Vec<usize>, edges: &HashMap<usize,Vec<usize>>, part: u8, visited: Option<usize>, lower_ids: &BTreeSet<usize>) -> u64 {
     let mut pathcount = 0;
 
     if let Some(last) = current_path.last() {
-        paths
+        edges[last]
             .iter()
-            .filter(|(f,t)| f == last && *t != "start".to_string())
-            .for_each(|(_,t)| {     
-                let lower = t.to_string() == t.to_lowercase();           
-                let already_visited = current_path.contains(t);
+            .filter(|&t| *t != from)
+            .for_each(|&t| {     
+                let lower = lower_ids.contains(&t);           
+                let already_visited = current_path.contains(&t);
 
-                if *t == String::from("end") {
+                if t == to {
                     pathcount += 1;
                 } else {
 
                     if !lower || !already_visited || (part==2 && already_visited && visited == None) {
                         let mut new_path = current_path.clone();
-                        new_path.push(t.clone());
+                        new_path.push(t);
                         
                         let mut new_visited = visited.clone();
                         if part == 2 && visited == None && already_visited && lower {
-                            new_visited = Some(t.to_string());
+                            new_visited = Some(t);
                         }
-                        pathcount += find_paths(&new_path, paths, part, new_visited);
+                        pathcount += find_paths(from, to, &new_path, edges, part, new_visited, lower_ids);
                     }
                 }
             });
@@ -43,21 +45,48 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
     };
     let input = tools::get_input(String::from(input_file));
 
-    let mut paths = input.iter().map(|line| {
+    let paths = input.iter().map(|line| {
         let mut tokens = line.split('-');
         let from = tokens.next().unwrap();
         let to = tokens.next().unwrap();
         (String::from(from),String::from(to))
     }).collect::<Vec<(String,String)>>();
 
-    paths.append(&mut paths.iter().map(|(f,t)| (t.clone(),f.clone())).collect::<Vec<(String,String)>>());
-    paths.retain(|(f,t)| (*f != String::from("end")) && (*t != String::from("start")));
+    let mut lower_ids: BTreeSet<usize> = BTreeSet::new();
+    let mut numbering: HashMap<String, usize> = HashMap::new();
+    paths.iter().for_each(|(f,t)| {
+        if !numbering.contains_key(f) { 
+            if f.to_lowercase() == f.to_string() { lower_ids.insert(numbering.len()); }
+            numbering.insert(f.to_string(), numbering.len()); 
+        }
+        if !numbering.contains_key(t) { 
+            if t.to_lowercase() == t.to_string() { lower_ids.insert(numbering.len()); }
+            numbering.insert(t.to_string(), numbering.len()); 
+        }
+    });
+
+    let start_id = numbering[&"start".to_string()];
+    let end_id = numbering[&"end".to_string()];
+
+    let edges = paths.iter().fold(HashMap::new(), |mut map, (f,t)| {
+        let f_id = numbering[f];
+        let t_id = numbering[t];
+
+        let edge = map.entry(f_id).or_insert(vec![]);
+        edge.push(t_id);
+
+        if !((t.to_string() == "end".to_string()) || (f.to_string() == "start".to_string())) {
+            let edge = map.entry(t_id).or_insert(vec![]);
+            edge.push(f_id);
+        }
+        map
+    });
 
     let after0 = Instant::now();
 
     let start1 = Instant::now();
 
-    let res1 = find_paths(&vec![String::from("start")], &paths, 1, None);
+    let res1 = find_paths(start_id, end_id, &vec![start_id], &edges, 1, None, &lower_ids);
 
     let after1 = Instant::now();
     if print_result {
@@ -66,7 +95,7 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
 
     let start2 = Instant::now();
 
-    let res2 = find_paths(&vec![String::from("start")], &paths, 2, None);
+    let res2 = find_paths(start_id, end_id, &vec![start_id], &edges, 2, None, &lower_ids);
 
     let after2 = Instant::now();
     if print_result {
