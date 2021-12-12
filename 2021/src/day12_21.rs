@@ -3,34 +3,34 @@ use std::time::Instant;
 use std::collections::HashMap;
 use std::collections::BTreeSet;
 
-fn find_paths(from: usize, to: usize, current_path: &Vec<usize>, edges: &HashMap<usize,Vec<usize>>, part: u8, visited: Option<usize>, lower_ids: &BTreeSet<usize>) -> u64 {
+fn find_paths(current: usize, from: usize, to: usize, blocked: &BTreeSet<usize>, edges: &HashMap<usize,Vec<usize>>, part: u8, visited: Option<usize>, lower_ids: &BTreeSet<usize>) -> u64 {
     let mut pathcount = 0;
 
-    if let Some(last) = current_path.last() {
-        edges[last]
-            .iter()
-            .filter(|&t| *t != from)
-            .for_each(|&t| {     
-                let lower = lower_ids.contains(&t);           
-                let already_visited = current_path.contains(&t);
+    edges[&current]
+        .iter()
+        .filter(|&t| *t != from)
+        .for_each(|&t| {     
+            let lower = lower_ids.contains(&t);           
+            let already_visited = blocked.contains(&t);
 
-                if t == to {
-                    pathcount += 1;
-                } else {
+            if t == to {
+                pathcount += 1;
+            } else {
 
-                    if !lower || !already_visited || (part==2 && already_visited && visited == None) {
-                        let mut new_path = current_path.clone();
-                        new_path.push(t);
-                        
-                        let mut new_visited = visited.clone();
-                        if part == 2 && visited == None && already_visited && lower {
-                            new_visited = Some(t);
-                        }
-                        pathcount += find_paths(from, to, &new_path, edges, part, new_visited, lower_ids);
+                if !lower || !already_visited || (part==2 && already_visited && visited == None) {
+                    let mut new_blocked = blocked.clone();
+                    if lower {
+                        new_blocked.insert(t);
                     }
+                    
+                    let mut new_visited = visited;
+                    if part == 2 && visited == None && already_visited && lower {
+                        new_visited = Some(t);
+                    }
+                    pathcount += find_paths(t, from, to, &new_blocked, edges, part, new_visited, lower_ids);
                 }
-            });
-    }
+            }
+        });
     pathcount
 }
 
@@ -86,7 +86,7 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
 
     let start1 = Instant::now();
 
-    let res1 = find_paths(start_id, end_id, &vec![start_id], &edges, 1, None, &lower_ids);
+    let res1 = find_paths(start_id, start_id, end_id, &BTreeSet::new(), &edges, 1, None, &lower_ids);
 
     let after1 = Instant::now();
     if print_result {
@@ -95,7 +95,7 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
 
     let start2 = Instant::now();
 
-    let res2 = find_paths(start_id, end_id, &vec![start_id], &edges, 2, None, &lower_ids);
+    let res2 = find_paths(start_id, start_id, end_id, &BTreeSet::new(), &edges, 2, None, &lower_ids);
 
     let after2 = Instant::now();
     if print_result {
