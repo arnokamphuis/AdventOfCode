@@ -16,20 +16,19 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
     let mut pixels: BTreeSet<(i64,i64)> = BTreeSet::new();
     let mut folds: Vec<(String, i64)> = vec![];
 
-    let mut lc = 0;
-    loop {
-        if input[lc] == "" { lc+=1; break; }
-        let coor = input[lc].split(",").map(|s| s.parse::<i64>().unwrap()).collect::<Vec<i64>>();
-        pixels.insert((coor[0], coor[1]));
-        lc += 1;
-    }
-
-    while lc < input.len() {
-        let axis = input[lc][11..].to_string();
-        let mut tokens = axis.split("=");
-        folds.push((tokens.next().unwrap().to_string().clone(), tokens.next().unwrap().parse::<i64>().unwrap())); 
-        lc += 1;
-    }
+    input
+        .iter()
+        .filter(|line| line.len()>0)
+        .for_each(|line| {
+            if line.starts_with('f') {
+                let axis = line[11..].to_string();
+                let mut tokens = axis.split("=");
+                folds.push((tokens.next().unwrap().to_string().clone(), tokens.next().unwrap().parse::<i64>().unwrap()));         
+            } else {
+                let coor = line.split(",").map(|s| s.parse::<i64>().unwrap()).collect::<Vec<i64>>();
+                pixels.insert((coor[0], coor[1]));        
+            }
+        });
 
     let fold = | pxls: &BTreeSet<(i64,i64)>, (axis, value): &(String, i64) | -> BTreeSet<(i64,i64)> {
         pxls
