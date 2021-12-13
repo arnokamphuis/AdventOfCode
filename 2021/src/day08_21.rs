@@ -1,5 +1,4 @@
 use super::tools;
-use permutohedron::heap_recursive;
 use std::collections::BTreeSet;
 use std::collections::HashMap;
 use std::time::Instant;
@@ -28,6 +27,15 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
     digits.insert(9, BTreeSet::from(['a', 'b', 'c', 'd', 'f', 'g']));
 
     let reverse_digits = digits.iter().fold(HashMap::new(), |mut m, (n,s)| {m.insert(s,n); m});
+
+    let mut possibilities: HashMap<char, BTreeSet<char>> = HashMap::new();
+    possibilities.insert('a', BTreeSet::from(['a', 'b', 'c', 'd', 'e', 'f', 'g']));
+    possibilities.insert('b', BTreeSet::from(['a', 'b', 'c', 'd', 'e', 'f', 'g']));
+    possibilities.insert('c', BTreeSet::from(['a', 'b', 'c', 'd', 'e', 'f', 'g']));
+    possibilities.insert('d', BTreeSet::from(['a', 'b', 'c', 'd', 'e', 'f', 'g']));
+    possibilities.insert('e', BTreeSet::from(['a', 'b', 'c', 'd', 'e', 'f', 'g']));
+    possibilities.insert('f', BTreeSet::from(['a', 'b', 'c', 'd', 'e', 'f', 'g']));
+    possibilities.insert('g', BTreeSet::from(['a', 'b', 'c', 'd', 'e', 'f', 'g']));
 
     let mut firsts: Vec<Vec<BTreeSet<char>>> = vec![];
     let mut seconds: Vec<Vec<BTreeSet<char>>> = vec![];
@@ -75,36 +83,77 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
 
     let start2 = Instant::now();
 
-    let mut permutations = vec![];
-    let mut data = ['a', 'b', 'c', 'd', 'e', 'f', 'g'];
-    heap_recursive(&mut data, |permutation| {
-        permutations.push(permutation.to_vec())
-    });
-
-    let res2:usize = firsts
+    let res2: usize = firsts
         .iter()
         .zip(seconds.iter())
         .map(|(first, second)| {
-            let mut found: Vec<char> = vec![];
-            'outer: for permutation in &permutations {
-                
-                let translation = data.iter().zip(permutation.iter()).fold(HashMap::new(), |mut hm, (&f,&t)| {hm.insert(f,t); hm});
+            let mut poss = possibilities.clone();
 
-                let mut ok = true;
-                for (_,d) in &digits {
-                    let newd = d.iter().map(|c| translation[c]).collect::<BTreeSet<_>>();
-                    if !first.contains(&newd) {
-                        ok = false;
-                    }
-                }
-                if ok {
-                    found = permutation.to_vec();
-                    break 'outer;
-                }
+            first.iter().filter(|f| f.len()==2).for_each(|f| {
+                if let Some(cc) = poss.get_mut(&'c') { cc.retain(|ch| f.contains(ch)); }
+                if let Some(cf) = poss.get_mut(&'f') { cf.retain(|ch| f.contains(ch)); }
+            });
 
+            first.iter().filter(|f| f.len()==3).for_each(|f| {
+                if let Some(ca) = poss.get_mut(&'a') { ca.retain(|ch| f.contains(ch)); }
+                let new_ca = poss[&'a'].difference(&poss[&'c']).cloned().collect(); 
+                if let Some(ca) = poss.get_mut(&'a') { *ca = new_ca }
+            });
+
+            for ch in ['b', 'c', 'd', 'e', 'f', 'g'] {
+                let new_set = poss[&ch].difference(&poss[&'a']).cloned().collect();
+                if let Some(set) = poss.get_mut(&ch) { *set = new_set }
             }
 
-            let translation = found.iter().zip(data.iter()).fold(HashMap::new(), |mut hm, (&f,&t)| {hm.insert(f,t); hm});
+            first.iter().filter(|f| f.len()==4).for_each(|f| {
+                let new_set = poss[&'b'].intersection(f).cloned().collect(); if let Some(s) = poss.get_mut(&'b') { *s = new_set }
+                let new_set = poss[&'c'].intersection(f).cloned().collect(); if let Some(s) = poss.get_mut(&'c') { *s = new_set }
+                let new_set = poss[&'d'].intersection(f).cloned().collect(); if let Some(s) = poss.get_mut(&'d') { *s = new_set }
+                let new_set = poss[&'f'].intersection(f).cloned().collect(); if let Some(s) = poss.get_mut(&'f') { *s = new_set }
+            });
+
+            let all = BTreeSet::from(['a', 'b', 'c', 'd', 'e', 'f', 'g']);
+            let mut inter: BTreeSet<char> = all.clone();
+            first.iter().filter(|f| f.len()==6).for_each(|f| {
+                inter = inter.intersection(f).cloned().collect();
+            });
+            let new_set: BTreeSet<char> = poss[&'c'].difference(&inter).cloned().collect(); if let Some(s) = poss.get_mut(&'c') { *s = new_set.clone() }
+            let new_set: BTreeSet<char> = poss[&'d'].difference(&inter).cloned().collect(); if let Some(s) = poss.get_mut(&'d') { *s = new_set.clone() }
+            let new_set: BTreeSet<char> = poss[&'e'].difference(&inter).cloned().collect(); if let Some(s) = poss.get_mut(&'e') { *s = new_set.clone() }
+
+
+            for ch in ['b', 'd', 'e', 'f', 'g'] {
+                let new_set = poss[&ch].difference(&poss[&'c']).cloned().collect();
+                if let Some(set) = poss.get_mut(&ch) { *set = new_set }
+            }
+
+            for ch in ['b', 'd', 'e', 'g'] {
+                let new_set = poss[&ch].difference(&poss[&'f']).cloned().collect();
+                if let Some(set) = poss.get_mut(&ch) { *set = new_set }
+            }
+
+            let mut inter: BTreeSet<char> = all.clone();
+            first.iter().filter(|f| f.len()==5).for_each(|f| {
+                inter = inter.intersection(f).cloned().collect();
+            });
+            for ch in ['a', 'c', 'd', 'f'] {
+                inter = inter.difference(&poss[&ch]).cloned().collect();
+            }
+            if let Some(s) = poss.get_mut(&'g') { *s = inter.clone() }
+
+            for ch in ['b', 'd', 'e'] {
+                let new_set = poss[&ch].difference(&poss[&'g']).cloned().collect();
+                if let Some(set) = poss.get_mut(&ch) { *set = new_set }
+            }
+
+            for ch in ['b', 'e'] {
+                let new_set = poss[&ch].difference(&poss[&'d']).cloned().collect();
+                if let Some(set) = poss.get_mut(&ch) { *set = new_set }
+            }
+
+            let translation: HashMap<char,char> = poss.iter().fold(HashMap::new(), |mut hm, (c,set)| {
+                hm.insert(set.clone().iter().cloned().collect::<Vec<char>>()[0], *c); hm
+            });
 
             second.iter().fold(0, |value, s| {
                 let news = s.iter().map(|d| translation[d]).collect::<BTreeSet<_>>();
