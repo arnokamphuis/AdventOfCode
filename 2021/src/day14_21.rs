@@ -26,9 +26,14 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
     });
 
     let count_letters = | counts: &HashMap<(char, char), usize> | -> HashMap<char, usize> {
-        let mut char_counts = counts.iter().map(|c| (c.0 .0, c.1)).fold(
-            HashMap::new(), |mut map: HashMap<char, usize>, (c, count)| { *map.entry(c).or_insert(0) += *count; map }
-        );
+        let mut char_counts = counts
+            .iter()
+            .map(|c| (c.0 .0, c.1))
+            .fold(
+                HashMap::new(), |mut map: HashMap<char, usize>, (c, count)| { 
+                    *map.entry(c).or_insert(0) += *count; 
+                    map 
+            });
         *char_counts.entry(last).or_insert(0) += 1;
         char_counts    
     };
