@@ -1,5 +1,4 @@
 use super::tools;
-use std::collections::BTreeSet;
 use std::collections::HashMap;
 use std::time::Instant;
 
@@ -26,16 +25,17 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
     });
 
     let count_letters = | counts: &HashMap<(char, char), usize> | -> HashMap<char, usize> {
-        let mut char_counts = counts
+        counts
             .iter()
             .map(|c| (c.0 .0, c.1))
             .fold(
                 HashMap::new(), |mut map: HashMap<char, usize>, (c, count)| { 
                     *map.entry(c).or_insert(0) += *count; 
                     map 
-            });
-        *char_counts.entry(last).or_insert(0) += 1;
-        char_counts    
+            })
+            .iter()
+            .map(|(&c,count)| (c, count + if c==last {1} else {0}) )
+            .collect::<HashMap<char, usize>>()
     };
 
     let step = | counts: &HashMap<(char, char), usize> | -> HashMap<(char, char), usize> {
@@ -61,8 +61,7 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
     (0..10).for_each(|_| { counts = step(&counts); });
 
     let char_counts = count_letters(&counts);
-    let res1 = char_counts.iter().map(|(_, c)| *c).max().unwrap()
-        - char_counts.iter().map(|(_, c)| *c).min().unwrap();
+    let res1 = char_counts.values().max().unwrap() - char_counts.values().min().unwrap();
 
     let after1 = Instant::now();
     if print_result {
@@ -74,8 +73,7 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
     (10..40).for_each(|_| { counts = step(&counts); });
 
     let char_counts = count_letters(&counts);
-    let res2 = char_counts.iter().map(|(_, c)| *c).max().unwrap()
-        - char_counts.iter().map(|(_, c)| *c).min().unwrap();
+    let res2 = char_counts.values().max().unwrap() - char_counts.values().min().unwrap();
 
     let after2 = Instant::now();
     if print_result {
