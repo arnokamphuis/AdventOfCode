@@ -16,10 +16,12 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
 
     let mut maze = input.iter().fold(Maze::new(), |mut maze, line| {maze.add_line(line); maze });
     let mut big_maze = maze.clone();
-    big_maze.grow(2);
-    big_maze.print();
+    big_maze.grow(5);
+    // big_maze.print();
     let (maxx,maxy) = maze.get_size();
-    println!("size: {} {}", maxx, maxy);
+    let (bigx,bigy) = big_maze.get_size();
+    // println!("size: {} {}", maxx, maxy);
+    // println!("big size: {} {}", bigx, bigy);
     let after0 = Instant::now();
 
     let start1 = Instant::now();
@@ -33,9 +35,10 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
 
     let start2 = Instant::now();
 
+    let res2 = big_maze.length_shortest((0,0), (bigx-1, bigy-1));
     let after2 = Instant::now();
     if print_result {
-        println!("Part 2: {}", 0);
+        println!("Part 2: {}", res2);
     }
 
     (
