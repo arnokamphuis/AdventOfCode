@@ -1,20 +1,20 @@
-use std::collections::BTreeMap;
+use std::collections::HashMap;
 use std::collections::BinaryHeap;
 use std::cmp::Ordering;
 
 #[derive(Clone)]
 pub struct Maze {
     size: (i64,i64),
-    map: BTreeMap<(i64,i64),i64>,
-    prev: BTreeMap<(i64,i64), ((i64,i64), i64)>,
+    map: HashMap<(i64,i64),i64>,
+    prev: HashMap<(i64,i64), ((i64,i64), i64)>,
 }
 
 impl Maze {
     pub fn new() -> Maze {
         Maze {
             size: (0,0),
-            map: BTreeMap::new(),
-            prev: BTreeMap::new(),
+            map: HashMap::new(),
+            prev: HashMap::new(),
         }
     }
 
@@ -45,9 +45,14 @@ impl Maze {
     }
 
     #[allow(dead_code)]
+    pub fn get_map(&self) -> HashMap<(i64,i64),i64> {
+        self.map.clone()
+    }
+
+    #[allow(dead_code)]
     pub fn grow(&mut self, factor: i64) {
         let original_map = self.map.clone();
-        let mut new_map: BTreeMap<(i64,i64),i64> = BTreeMap::new(); 
+        let mut new_map: HashMap<(i64,i64),i64> = HashMap::new(); 
 
         for x_factor in 0..factor {
             for y_factor in 0..factor {
@@ -69,7 +74,6 @@ impl Maze {
 
     pub fn length_shortest(&mut self, from: (i64,i64), to: (i64,i64)) -> i64 {
         let mut heap: BinaryHeap<State> = BinaryHeap::new();
-        let mut visited: Vec<(i64,i64)> = vec![];
         let state = State{ distance: 0, position: from };
         heap.push(state);
 
@@ -78,21 +82,17 @@ impl Maze {
                 if s.position == to {
                     return s.distance;
                 }
-                if !visited.contains(&s.position) {
-                    visited.push(s.position);
-
-                    let directions = [(-1,0), (0,-1), (1,0), (0,1)];
-                    for d in 0..4 {
-                        let new_pos = (s.position.0 + directions[d].0, s.position.1 + directions[d].1);
-                        if let Some(new_value) = self.map.get(&new_pos) {
-                            let new_distance = s.distance + new_value;
-                            if !self.prev.contains_key(&new_pos) || new_distance < self.prev.get(&new_pos).unwrap().1 {
-                                *(self.prev.entry(new_pos).or_insert(((0,0),0))) = (s.position, new_distance);
-                                heap.push(State{
-                                    distance: new_distance,
-                                    position: new_pos,
-                                });
-                            }
+                let directions = [(-1,0), (0,-1), (1,0), (0,1)];
+                for d in 0..4 {
+                    let new_pos = (s.position.0 + directions[d].0, s.position.1 + directions[d].1);
+                    if let Some(new_value) = self.map.get(&new_pos) {
+                        let new_distance = s.distance + new_value;
+                        if !self.prev.contains_key(&new_pos) || new_distance < self.prev.get(&new_pos).unwrap().1 {
+                            *(self.prev.entry(new_pos).or_insert(((0,0),0))) = (s.position, new_distance);
+                            heap.push(State{
+                                distance: new_distance,
+                                position: new_pos,
+                            });
                         }
                     }
                 }
@@ -117,27 +117,6 @@ impl Ord for State {
 }
 
 impl PartialOrd for State {
-    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
-        Some(self.cmp(other))
-    }
-}
-
-#[derive(Clone, Eq, PartialEq)]
-struct Node {
-    distance: u32,
-    item: u8,
-    done: Vec<u8>,
-}
-
-impl Ord for Node {
-    fn cmp(&self, other: &Self) -> Ordering {
-        other.distance.cmp(&self.distance).then(
-            self.done.len().cmp(&other.done.len())
-        )
-    }
-}
-
-impl PartialOrd for Node {
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
         Some(self.cmp(other))
     }
