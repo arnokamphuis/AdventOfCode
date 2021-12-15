@@ -1,5 +1,7 @@
 use super::tools;
+use super::maze;
 use std::time::Instant;
+use maze::Maze;
 
 #[allow(dead_code)]
 pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
@@ -12,13 +14,21 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
     };
     let input = tools::get_input(String::from(input_file));
 
+    let mut maze = input.iter().fold(Maze::new(), |mut maze, line| {maze.add_line(line); maze });
+    let mut big_maze = maze.clone();
+    big_maze.grow(2);
+    big_maze.print();
+    let (maxx,maxy) = maze.get_size();
+    println!("size: {} {}", maxx, maxy);
     let after0 = Instant::now();
 
     let start1 = Instant::now();
 
+    let res1 = maze.length_shortest((0,0), (maxx-1, maxy-1));
+
     let after1 = Instant::now();
     if print_result {
-        println!("Part 1: {}", 0);
+        println!("Part 1: {}", res1);
     }
 
     let start2 = Instant::now();

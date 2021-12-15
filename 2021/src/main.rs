@@ -18,7 +18,7 @@ mod day14_21;
 mod day15_21;
 mod tools;
 mod chars;
-// mod maze;
+mod maze;
 
 use plotly::common::{ErrorData, ErrorType, Marker, Title, Font};
 use plotly::layout::{Axis, BarMode, Layout, AxisType };
@@ -27,17 +27,17 @@ use plotly::{Bar, NamedColor, Plot};
 fn create_graph(data: &Vec<(usize, (f32,f32,f32))>, errors: &Vec<(usize, (f64,f64,f64))>) {
     let xlabels: Vec<String> = data.iter().map(|n| format!("day {}", n.0+1)).collect();
 
-    // let init_vec: Vec<f32> = data.iter().map(|n| n.1.0).collect();
+    let init_vec: Vec<f32> = data.iter().map(|n| n.1.0).collect();
     let part1_vec: Vec<f32> = data.iter().map(|n| n.1.1).collect();
     let part2_vec: Vec<f32> = data.iter().map(|n| n.1.2).collect();
 
-    // let init_error: Vec<f64> = errors.iter().map(|n| n.1.0).collect();
+    let init_error: Vec<f64> = errors.iter().map(|n| n.1.0).collect();
     let part1_error: Vec<f64> = errors.iter().map(|n| n.1.1).collect();
     let part2_error: Vec<f64> = errors.iter().map(|n| n.1.2).collect();
 
-    // let trace1 = Bar::new(xlabels.clone(), init_vec).name("Initialization")
-    //     .marker(Marker::new().color(NamedColor::Red))
-    //     .error_y(ErrorData::new(ErrorType::Data).array(init_error));
+    let trace1 = Bar::new(xlabels.clone(), init_vec).name("Initialization")
+        .marker(Marker::new().color(NamedColor::Red))
+        .error_y(ErrorData::new(ErrorType::Data).array(init_error));
     let trace2 = Bar::new(xlabels.clone(), part1_vec).name("Part 1")
         .marker(Marker::new().color(NamedColor::Blue))
         .error_y(ErrorData::new(ErrorType::Data).array(part1_error));
@@ -51,7 +51,7 @@ fn create_graph(data: &Vec<(usize, (f32,f32,f32))>, errors: &Vec<(usize, (f64,f6
         .y_axis(Axis::new().title(Title::new("Runtime in ms").font(Font::new().color(NamedColor::Black).size(12).family("Droid Serif"))).range(vec![0, 100]).type_(AxisType::Log));
 
     let mut plot = Plot::new();
-    // plot.add_trace(trace1);
+    plot.add_trace(trace1);
     plot.add_trace(trace2);
     plot.add_trace(trace3);
     plot.set_layout(layout);
