@@ -2,8 +2,13 @@ use super::tools;
 use std::time::Instant;
 
 fn parse_packet(packet: &Vec<bool>, start_pos: &mut usize) -> (u64, u64) {
-    let packetversion = packet[*start_pos+0..*start_pos+3].iter().fold(0, |n, &b| (n << 1) + b as u64);
-    let packettypeid = packet[*start_pos+3..*start_pos+6].iter().fold(0, |n, &b| (n << 1) + b as u64);
+
+    let to_number = | bits: &[bool] | -> u64 {
+        bits.iter().fold(0, |n, &b| (n << 1) + b as u64)
+    };
+
+    let packetversion = to_number(&packet[*start_pos+0..*start_pos+3]);
+    let packettypeid  = to_number(&packet[*start_pos+3..*start_pos+6]);
 
     let mut res = (packetversion,0);
 
@@ -12,7 +17,7 @@ fn parse_packet(packet: &Vec<bool>, start_pos: &mut usize) -> (u64, u64) {
             let mut pc = 0;
             let mut val = 0;
             loop {
-                val = packet[*start_pos+7+5*pc..*start_pos+11+5*pc].iter().fold(val, |n, &b| (n << 1) + b as u64);
+                val = (val << 4) + to_number(&packet[*start_pos+7+5*pc..*start_pos+11+5*pc]);
                 if !packet[*start_pos+6+5*pc] { break; }
                 pc += 1;
             }
@@ -23,7 +28,7 @@ fn parse_packet(packet: &Vec<bool>, start_pos: &mut usize) -> (u64, u64) {
             let mut values = vec![];
             match packet[*start_pos+6] {
                 false => { // total length
-                    let total_length = packet[*start_pos+7..*start_pos+22].iter().fold(0, |n, &b| (n << 1) + b as usize);
+                    let total_length = to_number(&packet[*start_pos+7..*start_pos+22]) as usize;
                     *start_pos += 22;
                     let from = *start_pos;
                     while *start_pos - from < total_length {
@@ -33,7 +38,7 @@ fn parse_packet(packet: &Vec<bool>, start_pos: &mut usize) -> (u64, u64) {
                     }
                 },
                 true => { //  subpackets
-                    let packet_count = packet[*start_pos+7..*start_pos+18].iter().fold(0, |n, &b| (n << 1) + b as u64);
+                    let packet_count = to_number(&packet[*start_pos+7..*start_pos+18]);
                     *start_pos += 18;
                     (0..packet_count).for_each(|_| {
                         let temp_res = parse_packet(packet, start_pos);
