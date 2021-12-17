@@ -52,7 +52,7 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
 
     let mut velocities: Vec<(i64,i64)> = vec![];
     for y_speed in y_velocities {
-        for x_speed in 0..=400 {
+        for x_speed in 0..=xmax {
             let mut y: i64   = 0;
             let mut vy: i64  = y_speed;
 
