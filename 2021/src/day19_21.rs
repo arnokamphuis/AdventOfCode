@@ -13,11 +13,23 @@ fn orient(mat: [[i32;3];3], p: [i32;3]) -> [i32;3] {
     res
 }
 
-#[derive(Debug)]
+fn back_orient(mat: [[i32;3];3], p: [i32;3]) -> [i32;3] {
+    let mut res = [0;3];
+    (0..3).for_each(|i| {
+        (0..3).for_each(|j| {
+            res[i] += mat[j][i] * p[j];
+        });
+    });
+    res
+}
+
+#[derive(Debug, Clone)]
 struct Scanner {
     id: usize,
     scans: Vec<[i32;3]>,
     orientation: [[i32;3];3],
+    displacement: [i32;3],
+    beacons: Vec<[i32;3]>,
 }
 
 impl Scanner {
@@ -26,22 +38,50 @@ impl Scanner {
             id: i,
             scans: vec![],
             orientation: [[1,0,0],[0,1,0],[0,0,1]],
+            displacement: [0,0,0],
+            beacons: vec![],
+
         }
     }
 
     pub fn add_scan(&mut self, line: &String) {
-        self.scans.push( line.split(",").map(|v| v.parse::<i32>().unwrap()).collect::<Vec<i32>>().to_arr() );
+        self.scans.push( line.split(",").enumerate().map(|(i,v)| (i,v.parse::<i32>().unwrap())).fold([0;3], |mut arr, (i,v)| {arr[i] = v; arr}) );
     }
 
-    pub fn overlapping(&self, other: &Scanner, orientation: [[i32;3];3]) -> bool {
-        let self_scans: BTreeSet<(i32,i32,i32)> = self.scans.iter().fold(BTreeSet::new(), |mut set, scan| {set.insert(scan); set });
-        let other_scans: BTreeSet<(i32,i32,i32)> = other.scans.iter().fold(BTreeSet::new(), |mut set, scan| {
-            set.insert( orient(orientation, scan) ); set
+    pub fn overlapping(&self, other: &mut Scanner, orientation: [[i32;3];3]) -> bool {
+        let other_scans: Vec<[i32;3]> = other.scans.iter().fold(vec![], |mut set, &scan| {
+            set.push( orient(orientation, scan) ); set
         });
 
-        let inter = self_scans.intersection(&other_scans).cloned.collect::<BTreeSet<[i32;3]>>();
-        println!("insection size {}", inter.len());
-        false
+        let mut diff_counter: HashMap<[i32;3],usize> = HashMap::new();
+
+        self.scans.iter().for_each(|scan1| {
+            other_scans.iter().for_each(|scan2| {
+                let diff: [i32;3] = [ scan1[0]-scan2[0], scan1[1]-scan2[1], scan1[2]-scan2[2] ];
+                *diff_counter.entry(diff).or_insert(0) += 1;
+            });
+        });
+
+        diff_counter.retain(|_,s| *s >= 12);
+        if diff_counter.len() > 0 {
+            let displacement = diff_counter.iter().map(|(d,_)| *d).collect::<Vec<[i32;3]>>()[0];
+            // println!("displacement {:?}", displacement);
+
+            self.scans.iter().for_each(|scan1| {
+                other_scans.iter().for_each(|scan2| {
+                    let diff: [i32;3] = [ scan1[0]-scan2[0], scan1[1]-scan2[1], scan1[2]-scan2[2] ];
+                    if diff[0] == displacement[0] && diff[1] == displacement[1] && diff[2] == displacement[2] {
+                        // println!("{} - {:?}  ###### {} - {:?}",self.id, scan1, other.id, scan2);
+                        other.beacons.push( back_orient(orientation, *scan2));
+                    }
+                });
+            });
+    
+
+            other.orientation = orientation;
+            other.displacement = displacement;
+        }
+        diff_counter.len() > 0
     }
 }
 
@@ -68,7 +108,7 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
             }
         });
 
-    println!("scanner count: {:?}", scanners);
+    // println!("scanner count: {:?}", scanners);
 
     let mult = | m1: &[[i32;3];3], m2: &[[i32;3];3] | -> [[i32;3];3] {
         let mut res = [[0;3];3];
@@ -87,7 +127,8 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
     let basis_a = vec![
         [[1, 0, 0], [0, 1, 0], [0, 0, 1]],
         [[0, 1, 0], [0, 0, 1], [1, 0, 0]],
-        [[0, 0, 1], [1, 0, 0], [0, 1, 0]]];    
+        [[0, 0, 1], [1, 0, 0], [0, 1, 0]],
+        ];    
 
     let basis_b = vec![
         [[ 1, 0, 0], [ 0, 1, 0], [ 0, 0, 1]],
@@ -109,36 +150,125 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
         }
     }
 
+    // for orient in &orientations {
+    //     println!("{:?}", orient);
+    // }
 
-    let mut known_scanners: Vec<usize> = vec![0];
-    for &ks in &known_scanners {
-        let known = scanners[ks];
-        for from_scanner in 0..scanners.len() {
-            if ks != from_scanner {
-                for orient in &orientations {
-                    if known.overlapping( scanners[from_scanner], orient ) {
-                        println!("{} {} overlapping", ks, from_scanner);
-                    }
-                }
-            }
-        }
-    }
-    
-    println!("{:?}", orientations.len());    
+
     let after0 = Instant::now();
 
     let start1 = Instant::now();
 
+    let mut known_scanners: BTreeSet<usize> = BTreeSet::new();
+    let mut known_overlap: BTreeSet<(usize,usize)> = BTreeSet::new();
+
+    known_scanners.insert(0);
+
+    while known_scanners.len() < scanners.len() {
+        // println!("---------------------------------------------------------------");
+        for &ks in &known_scanners {
+            let known = scanners[&ks].clone();
+            for from_scanner in 0..scanners.len() {
+                if !(known_overlap.contains(&(ks, from_scanner)) || known_overlap.contains(&(from_scanner, ks))) && ks != from_scanner {
+                    for orient in &orientations {
+                        if known.overlapping( scanners.get_mut(&from_scanner).unwrap(), *orient ) {
+                            known_overlap.insert((ks,from_scanner));
+                            // println!("{} {} overlapping", ks, from_scanner);
+                        }
+                    }
+                }
+            }
+        }
+        known_overlap.iter().for_each(|(i,j)| {
+            known_scanners.insert(*i); 
+            known_scanners.insert(*j); 
+        });
+    }
+
+    let mut beacons: BTreeSet<[i32;3]> = BTreeSet::new();
+    scanners[&0].scans.iter().for_each(|scan| { beacons.insert(*scan); } );
+
+    let mut scanner_positions: Vec<[i32;3]> = vec![];
+
+    (1..scanners.len()).for_each(|scanner_id| {
+        // println!("{} ============================================================", scanner_id);
+        let mut to = scanner_id;
+        let mut from = known_overlap.iter().filter(|(f,t)| *t == to).map(|(f,_)| *f).collect::<Vec<usize>>()[0];
+
+        let mut from_beacons: BTreeSet<[i32;3]> = BTreeSet::new();
+        let mat = scanners[&to].orientation;
+        let dis = scanners[&to].displacement;
+
+        let mut scanner_pos = dis;
+
+        scanners[&scanner_id].scans.iter().for_each(|beacon| {
+            let mut new_pos = orient(mat, *beacon);
+            (0..3).for_each(|i| { new_pos[i] += dis[i]; });
+            // println!("{:?}     .... converting..... {:?}", beacon, new_pos);
+            from_beacons.insert(new_pos);
+        });
+
+        while from != 0 {
+            to = from;
+            from = known_overlap.iter().filter(|(f,t)| *t == to).map(|(f,_)| *f).collect::<Vec<usize>>()[0];
+            // println!("from {} to {}", from, to);
+            let mut next_beacons: BTreeSet<[i32;3]> = BTreeSet::new();
+            let mat = scanners[&to].orientation;
+            let dis = scanners[&to].displacement;
+
+            scanner_pos = orient(mat, scanner_pos);
+            (0..3).for_each(|i| { scanner_pos[i] += dis[i]; });
+            if from == 0 {
+                // println!("scanner {} pos {:?} ", scanner_id, scanner_pos);
+                scanner_positions.push(scanner_pos);
+            }
+    
+            from_beacons.iter().for_each(|beacon| {
+                let mut new_pos = orient(mat, *beacon);
+                (0..3).for_each(|i| { new_pos[i] += dis[i]; });
+                // println!("{:?}     .... converting..... {:?}", beacon, new_pos);
+                next_beacons.insert(new_pos);
+            });
+            from_beacons = next_beacons;
+        }
+        // // if scanner_id == 4 {
+        //     from_beacons.iter().for_each(|beacon| {
+        //         println!("beacon: {:?}", beacon);
+        //     });
+        // // }
+        beacons = beacons.union(&from_beacons).cloned().collect();
+        // println!("beacons: {}", beacons.len());
+    });
+
+    // beacons.iter().for_each(|beacon| {
+    //     println!("beacon: {:?}", beacon);
+    // });
+
+    let res1 = beacons.len();
+    // println!("beacons: {}", beacons.len());
+    // scanners.iter().for_each(|(id,s)| {
+    //     println!("{} -> {:?}   + {:?}", s.id, s.orientation, s.displacement);
+    // });
+    // println!("{:?}", known_overlap);    
+
     let after1 = Instant::now();
     if print_result {
-        println!("Part 1: {}", 0);
+        println!("Part 1: {}", res1);
     }
 
     let start2 = Instant::now();
 
+    let mut max_dist: i32 = 0;
+    scanner_positions.iter().for_each(|sp1| {
+        scanner_positions.iter().for_each(|sp2| {
+            let dist = (sp1[0]-sp2[0]).abs() + (sp1[1]-sp2[1]).abs() + (sp1[2]-sp2[2]).abs();
+            max_dist = max_dist.max(dist);
+        });    
+    });
+
     let after2 = Instant::now();
     if print_result {
-        println!("Part 2: {}", 0);
+        println!("Part 2: {}", max_dist);
     }
 
     (
