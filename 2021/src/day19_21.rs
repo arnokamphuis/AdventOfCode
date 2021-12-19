@@ -2,6 +2,8 @@ use super::tools;
 use std::time::Instant;
 use std::collections::BTreeSet;
 use std::collections::HashMap;
+// use permutohedron::heap_recursive;
+
 
 fn orient(mat: [[i32;3];3], p: [i32;3]) -> [i32;3] {
     let mut res = [0;3];
@@ -25,7 +27,6 @@ fn back_orient(mat: [[i32;3];3], p: [i32;3]) -> [i32;3] {
 
 #[derive(Debug, Clone)]
 struct Scanner {
-    id: usize,
     scans: Vec<[i32;3]>,
     orientation: [[i32;3];3],
     displacement: [i32;3],
@@ -33,9 +34,8 @@ struct Scanner {
 }
 
 impl Scanner {
-    fn new(i: usize) -> Scanner {
+    fn new() -> Scanner {
         Scanner{
-            id: i,
             scans: vec![],
             orientation: [[1,0,0],[0,1,0],[0,0,1]],
             displacement: [0,0,0],
@@ -104,7 +104,7 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
             if line.starts_with("---") {
                 id = line[12..14].chars().filter(|&c| c!=' ').collect::<String>().parse::<usize>().unwrap();
             } else if line.len() > 0 {
-                scanners.entry(id).or_insert(Scanner::new(id)).add_scan(line);
+                scanners.entry(id).or_insert(Scanner::new()).add_scan(line);
             }
         });
 
@@ -124,6 +124,34 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
         res
     };
 
+    // let mut indices = [0, 1, 2];
+    // let mut permutations = Vec::new();
+    // heap_recursive(&mut indices, |permutation| {
+    //     permutations.push(permutation.to_vec())
+    // });
+
+
+    let mut orientations: BTreeSet<[[i32;3];3]> = BTreeSet::new();
+
+    // let identity = [
+    //     [1,0,0],
+    //     [0,1,0],
+    //     [0,0,1]
+    // ];
+    // (0..48).for_each(|d| {
+    //     let perm = &permutations[d/8];
+    //     let mut mat: [[i32;3];3] = [
+    //         [ identity[0][perm[0]], identity[0][perm[1]], identity[0][perm[2]] ],
+    //         [ identity[1][perm[0]], identity[1][perm[1]], identity[1][perm[2]] ],
+    //         [ identity[2][perm[0]], identity[2][perm[1]], identity[2][perm[2]] ],
+    //     ];
+
+    //     if d     % 2 == 1 { mat[0][0] *= -1; mat[1][0] *= -1; mat[2][0] *= -1; }
+    //     if (d/2) % 2 == 1 { mat[0][1] *= -1; mat[1][1] *= -1; mat[2][1] *= -1; }
+    //     if (d/4) % 2 == 1 { mat[0][2] *= -1; mat[1][2] *= -1; mat[2][2] *= -1; }
+    //     orientations.insert(mat);
+    // });
+
     let basis_a = vec![
         [[1, 0, 0], [0, 1, 0], [0, 0, 1]],
         [[0, 1, 0], [0, 0, 1], [1, 0, 0]],
@@ -141,7 +169,6 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
         [[ 0, 0,-1], [ 0,-1, 0], [-1, 0, 0]]];
 
 
-    let mut orientations: BTreeSet<[[i32;3];3]> = BTreeSet::new();
     for a in &basis_a {
         for b in &basis_b {
             for c in &basis_c {
@@ -193,7 +220,7 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
     (1..scanners.len()).for_each(|scanner_id| {
         // println!("{} ============================================================", scanner_id);
         let mut to = scanner_id;
-        let mut from = known_overlap.iter().filter(|(f,t)| *t == to).map(|(f,_)| *f).collect::<Vec<usize>>()[0];
+        let mut from = known_overlap.iter().filter(|(_,t)| *t == to).map(|(f,_)| *f).collect::<Vec<usize>>()[0];
 
         let mut from_beacons: BTreeSet<[i32;3]> = BTreeSet::new();
         let mat = scanners[&to].orientation;
@@ -210,7 +237,7 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
 
         while from != 0 {
             to = from;
-            from = known_overlap.iter().filter(|(f,t)| *t == to).map(|(f,_)| *f).collect::<Vec<usize>>()[0];
+            from = known_overlap.iter().filter(|(_,t)| *t == to).map(|(f,_)| *f).collect::<Vec<usize>>()[0];
             // println!("from {} to {}", from, to);
             let mut next_beacons: BTreeSet<[i32;3]> = BTreeSet::new();
             let mat = scanners[&to].orientation;
