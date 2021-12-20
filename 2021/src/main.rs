@@ -21,6 +21,7 @@ mod day16_21;
 mod day17_21;
 mod day18_21;
 mod day19_21;
+mod day20_21;
 mod tools;
 mod chars;
 mod maze;
@@ -89,8 +90,8 @@ fn main() {
         ("Day 16 of 2021", day16_21::run, 500),
         ("Day 17 of 2021", day17_21::run, 500),
         ("Day 18 of 2021", day18_21::run, 10),
-        ("Day 19 of 2021", day19_21::run, 500),
-        // ("Day 20 of 2021", day20_21::run, 50),
+        ("Day 19 of 2021", day19_21::run, 5),
+        ("Day 20 of 2021", day20_21::run, 50),
         // ("Day 21 of 2021", day21_21::run, 50),
         // ("Day 22 of 2021", day22_21::run, 50),
         // ("Day 23 of 2021", day23_21::run, 50),
