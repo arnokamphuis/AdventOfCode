@@ -133,11 +133,8 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
     let start1 = Instant::now();
 
     let mut known_scanners: BTreeSet<usize> = BTreeSet::new();
-    let mut known_overlap: BTreeSet<(usize,usize)> = BTreeSet::new();
 
     known_scanners.insert(0);
-
-
     let mut base = scanners.get(&0).unwrap().clone();
     base.beacons = base.scans.clone();
     
