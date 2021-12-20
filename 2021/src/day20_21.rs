@@ -1,6 +1,8 @@
 use super::tools;
 use std::time::Instant;
 use std::collections::HashMap;
+use tools::Image;
+
 
 #[allow(dead_code)]
 pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
@@ -45,7 +47,7 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
         let min_x = *img.keys().map(|(x,_)| *x).collect::<Vec<i64>>().iter().min().unwrap();
         let max_x = *img.keys().map(|(x,_)| *x).collect::<Vec<i64>>().iter().max().unwrap();
         let min_y = *img.keys().map(|(_,y)| *y).collect::<Vec<i64>>().iter().min().unwrap();
-        let max_y = *img.keys().map(|(_,y)| *y).collect::<Vec<i64>>().iter().max().unwrap();    
+        let max_y = *img.keys().map(|(_,y)| *y).collect::<Vec<i64>>().iter().max().unwrap();
 
         let mut new_image: HashMap<(i64,i64),bool> = HashMap::new();
         (min_x-1..=max_x+1).for_each(|x| {
@@ -56,12 +58,19 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
         new_image
     };
 
+    let mut scans: Vec<HashMap<(i64,i64), bool>> = vec![image.clone()];
+    let img_min_x: i64 = -50; let img_max_x: i64 = 150;
+    let img_min_y: i64 = -50; let img_max_y: i64 = 150;    
+
     let after0 = Instant::now();
 
     let start1 = Instant::now();
 
     (0..2).for_each(|iteration| {
         image = update(&image, iteration);
+        if print_result {
+            scans.push(image.clone());
+        }
     });
 
     let res1 = image.values().filter(|&v| *v).count();
@@ -75,6 +84,9 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
 
     (2..50).for_each(|iteration| {
         image = update(&image, iteration);
+        if print_result {
+            scans.push(image.clone());
+        }
     });
 
     let res2 = image.values().filter(|&v| *v).count();
@@ -82,6 +94,17 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
     let after2 = Instant::now();
     if print_result {
         println!("Part 2: {}", res2);
+    }
+
+    if print_result {
+        scans.iter().enumerate().for_each(|(iteration, scan)| {
+            let mut img = Image::new( (img_max_x - img_min_x + 2) as usize, (img_max_y - img_min_y + 2) as usize, 4);
+            img.clear( if iteration % 2 == 1 { (255,255,255,255) } else { (0,0,0,255) }  );
+            scan.iter().for_each(|((x,y), &b)| {
+                img.set_pixel( (x - img_min_x + 1) as usize, (y - img_min_y + 1) as usize, if b {(255,255,255,255)} else {(0,0,0,255)} );
+            });
+            img.save_png(&format!("images/day20-{:05}.png", iteration));
+        });
     }
 
     (
