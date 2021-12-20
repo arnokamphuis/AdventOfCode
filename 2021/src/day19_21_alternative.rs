@@ -18,6 +18,7 @@ struct Scanner {
     scans: Vec<[i32;3]>,
     orientation: [[i32;3];3],
     displacement: [i32;3],
+    beacons: Vec<[i32;3]>,
 }
 
 impl Scanner {
@@ -26,6 +27,7 @@ impl Scanner {
             scans: vec![],
             orientation: [[1,0,0],[0,1,0],[0,0,1]],
             displacement: [0,0,0],
+            beacons: vec![],
         }
     }
 
@@ -136,10 +138,12 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
     known_scanners.insert(0);
 
 
-    let mut base = scanners.get_mut(&0);
+    let mut base = scanners.get(&0).unwrap().clone();
+    base.beacons = base.scans.clone();
     
-    for from_scanner in 1..scanners.len() {
-        if !known_scanners.contains(from_scanner) {
+    while known_scanners.len() < scanners.len() {
+        for from_scanner in 1..scanners.len() {
+            if !known_scanners.contains(&from_scanner) {
                 for orient in &orientations {
                     if base.overlapping( scanners.get_mut(&from_scanner).unwrap(), *orient ) {
                         known_scanners.insert(from_scanner);
@@ -161,13 +165,16 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
 
     let start2 = Instant::now();
 
+    scanners.entry(0).and_modify(|e| { *e = base; });
+    let scanner_positions = scanners.iter().map(|(_, scanner)| scanner.displacement ).collect::<Vec<[i32;3]>>();
+
     let mut max_dist: i32 = 0;
-    // scanner_positions.iter().for_each(|sp1| {
-    //     scanner_positions.iter().for_each(|sp2| {
-    //         let dist = (sp1[0]-sp2[0]).abs() + (sp1[1]-sp2[1]).abs() + (sp1[2]-sp2[2]).abs();
-    //         max_dist = max_dist.max(dist);
-    //     });    
-    // });
+    scanner_positions.iter().for_each(|sp1| {
+        scanner_positions.iter().for_each(|sp2| {
+            let dist = (sp1[0]-sp2[0]).abs() + (sp1[1]-sp2[1]).abs() + (sp1[2]-sp2[2]).abs();
+            max_dist = max_dist.max(dist);
+        });    
+    });
 
     let after2 = Instant::now();
     if print_result {
