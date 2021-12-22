@@ -58,68 +58,41 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
 
     let start2 = Instant::now();
 
-    let mut x_coords: Vec<i64> = actions.iter().map(|action| vec![action.0[0][0],action.0[0][1]+1]).collect::<Vec<Vec<i64>>>().iter().flatten().map(|v|*v).collect();
-    let mut y_coords: Vec<i64> = actions.iter().map(|action| vec![action.0[1][0],action.0[1][1]+1]).collect::<Vec<Vec<i64>>>().iter().flatten().map(|v|*v).collect();
-    let mut z_coords: Vec<i64> = actions.iter().map(|action| vec![action.0[2][0],action.0[2][1]+1]).collect::<Vec<Vec<i64>>>().iter().flatten().map(|v|*v).collect();
+    let mut coords: Vec<Vec<i64>> = (0..3).fold(vec![], |mut sc, i| {
+        sc.push(actions.iter().map(|action| vec![action.0[i][0],action.0[i][1]+1]).collect::<Vec<Vec<i64>>>().iter().flatten().map(|v|*v).collect::<Vec<i64>>()); sc
+    });
 
-    x_coords.sort();
-    y_coords.sort();
-    z_coords.sort();
+    // let mut x_coords: Vec<i64> = actions.iter().map(|action| vec![action.0[0][0],action.0[0][1]+1]).collect::<Vec<Vec<i64>>>().iter().flatten().map(|v|*v).collect();
+    // let mut y_coords: Vec<i64> = actions.iter().map(|action| vec![action.0[1][0],action.0[1][1]+1]).collect::<Vec<Vec<i64>>>().iter().flatten().map(|v|*v).collect();
+    // let mut z_coords: Vec<i64> = actions.iter().map(|action| vec![action.0[2][0],action.0[2][1]+1]).collect::<Vec<Vec<i64>>>().iter().flatten().map(|v|*v).collect();
 
-    let mut index = 0;
-    loop { 
-        if x_coords[index+1] == x_coords[index] { x_coords.remove(index); } else { index += 1; }
-        if index+1 >= x_coords.len() { break; }
-    }
-    index = 0;
-    loop { 
-        if y_coords[index+1] == y_coords[index] { y_coords.remove(index); } else { index += 1; }
-        if index+1 >= y_coords.len() { break; }
-    }
-    index = 0;
-    loop { 
-        if z_coords[index+1] == z_coords[index] { z_coords.remove(index); } else { index += 1; }
-        if index+1 >= z_coords.len() { break; }
-    }
-
-    let mut x_compressed: HashMap<i64,i64> = HashMap::new();
-    let mut x_sizes: HashMap<i64,i64> = HashMap::new();
-    for i in 0..x_coords.len()-1 {
-        if x_coords[i+1] - x_coords[i] > 0 {
-            x_compressed.insert(x_coords[i], x_sizes.len() as i64);
-            x_sizes.insert(x_sizes.len() as i64, x_coords[i+1] - x_coords[i]);
+    let mut compressed: Vec<HashMap<i64,i64>> = vec![HashMap::new();3];
+    let mut sizes: Vec<HashMap<i64,i64>> = vec![HashMap::new();3];
+    (0..3).for_each(|i| { 
+        coords[i].sort();
+        let mut index = 0;
+        loop { 
+            if coords[i][index+1] == coords[i][index] { coords[i].remove(index); } else { index += 1; }
+            if index+1 >= coords[i].len() { break; }
         }
-    }
-    x_compressed.insert(x_coords[x_coords.len()-1], x_sizes.len() as i64);
-    x_sizes.insert(x_sizes.len() as i64,0);
 
-    let mut y_compressed: HashMap<i64,i64> = HashMap::new();
-    let mut y_sizes: HashMap<i64,i64> = HashMap::new();
-    for i in 0..y_coords.len()-1 {
-        if y_coords[i+1] - y_coords[i] > 0 {
-            y_compressed.insert(y_coords[i], y_sizes.len() as i64);
-            y_sizes.insert(y_sizes.len() as i64, y_coords[i+1] - y_coords[i]);
+        for index in 0..coords[i].len()-1 {
+            if coords[i][index+1] - coords[i][index] > 0 {
+                let ni = sizes[i].len() as i64;
+                compressed[i].insert(coords[i][index], ni);
+                sizes[i].insert(ni, coords[i][index+1] - coords[i][index]);
+            }
         }
-    }
-    y_compressed.insert(y_coords[y_coords.len()-1], y_sizes.len() as i64);
-    y_sizes.insert(y_sizes.len() as i64,0);
-
-    let mut z_compressed: HashMap<i64,i64> = HashMap::new();
-    let mut z_sizes: HashMap<i64,i64> = HashMap::new();
-    for i in 0..z_coords.len()-1 {
-        if z_coords[i+1] - z_coords[i] > 0 {
-            z_compressed.insert(z_coords[i], z_sizes.len() as i64);
-            z_sizes.insert(z_sizes.len() as i64, z_coords[i+1] - z_coords[i]);
-        }
-    }
-    z_compressed.insert(z_coords[z_coords.len()-1], z_sizes.len() as i64);
-    z_sizes.insert(z_sizes.len() as i64,0);
+        let ni = sizes[i].len() as i64;
+        compressed[i].insert(coords[i][coords[i].len()-1], ni);
+        sizes[i].insert(ni,0);
+    });
 
     let mut field2: HashMap<[i64;3],bool> = HashMap::new();
     actions.iter().for_each(|action| {
-        (x_compressed[&action.0[0][0]]..x_compressed[&(action.0[0][1]+1)]).for_each(|x| {
-            (y_compressed[&action.0[1][0]]..y_compressed[&(action.0[1][1]+1)]).for_each(|y| {
-                (z_compressed[&action.0[2][0]]..z_compressed[&(action.0[2][1]+1)]).for_each(|z| {
+        (compressed[0][&action.0[0][0]]..compressed[0][&(action.0[0][1]+1)]).for_each(|x| {
+            (compressed[1][&action.0[1][0]]..compressed[1][&(action.0[1][1]+1)]).for_each(|y| {
+                (compressed[2][&action.0[2][0]]..compressed[2][&(action.0[2][1]+1)]).for_each(|z| {
                     if action.1 {
                         *field2.entry([x,y,z]).or_insert(false) = true;                                
                     } else {
@@ -130,7 +103,7 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
         });
     });
     let res2 = field2.iter().fold(0, |count, (pos, _)| {
-        count + x_sizes[&pos[0]] * y_sizes[&pos[1]] * z_sizes[&pos[2]]
+        count + sizes[0][&pos[0]] * sizes[1][&pos[1]] * sizes[2][&pos[2]]
     });    
 
     let after2 = Instant::now();
