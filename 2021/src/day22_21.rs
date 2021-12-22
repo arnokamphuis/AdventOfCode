@@ -62,10 +62,6 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
         sc.push(actions.iter().map(|action| vec![action.0[i][0],action.0[i][1]+1]).collect::<Vec<Vec<i64>>>().iter().flatten().map(|v|*v).collect::<Vec<i64>>()); sc
     });
 
-    // let mut x_coords: Vec<i64> = actions.iter().map(|action| vec![action.0[0][0],action.0[0][1]+1]).collect::<Vec<Vec<i64>>>().iter().flatten().map(|v|*v).collect();
-    // let mut y_coords: Vec<i64> = actions.iter().map(|action| vec![action.0[1][0],action.0[1][1]+1]).collect::<Vec<Vec<i64>>>().iter().flatten().map(|v|*v).collect();
-    // let mut z_coords: Vec<i64> = actions.iter().map(|action| vec![action.0[2][0],action.0[2][1]+1]).collect::<Vec<Vec<i64>>>().iter().flatten().map(|v|*v).collect();
-
     let mut compressed: Vec<HashMap<i64,i64>> = vec![HashMap::new();3];
     let mut sizes: Vec<HashMap<i64,i64>> = vec![HashMap::new();3];
     (0..3).for_each(|i| { 
