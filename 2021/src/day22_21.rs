@@ -84,23 +84,21 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
         sizes[i].insert(ni,0);
     });
 
-    let mut field2: HashMap<[i64;3],bool> = HashMap::new();
+    let mut field2: Vec<Vec<Vec<bool>>> = vec![vec![vec![false;sizes[2].len()+1];sizes[1].len()+1];sizes[0].len()+1];
     actions.iter().for_each(|action| {
         (compressed[0][&action.0[0][0]]..compressed[0][&(action.0[0][1]+1)]).for_each(|x| {
             (compressed[1][&action.0[1][0]]..compressed[1][&(action.0[1][1]+1)]).for_each(|y| {
                 (compressed[2][&action.0[2][0]]..compressed[2][&(action.0[2][1]+1)]).for_each(|z| {
-                    if action.1 {
-                        *field2.entry([x,y,z]).or_insert(false) = true;                                
-                    } else {
-                        field2.remove(&[x,y,z]);
-                    }
+                    field2[x as usize][y as usize][z as usize] = action.1;
                 });
             });
         });
     });
-    let res2 = field2.iter().fold(0, |count, (pos, _)| {
-        count + sizes[0][&pos[0]] * sizes[1][&pos[1]] * sizes[2][&pos[2]]
-    });    
+    let res2 = field2.iter().enumerate().fold(0, |v, (x, vec2)| {
+        vec2.iter().enumerate().fold(v, |v2, (y,vec3)| {
+            vec3.iter().enumerate().fold(v2, |v3, (z,&b)| { v3 + if b { sizes[0][&(x as i64)]*sizes[1][&(y as i64)]*sizes[2][&(z as i64)] } else {0} })
+        })
+    });
 
     let after2 = Instant::now();
     if print_result {
