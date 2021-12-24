@@ -55,7 +55,7 @@ impl State {
             for (depth, c) in self.bottom[self.room_index(room)].iter().enumerate() {
                 if *c != '.' { return Some(depth-1); }
             }
-            return Some(3);
+            return Some(self.bottom[0].len()-1);
         }
         None
     }
