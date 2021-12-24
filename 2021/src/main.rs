@@ -25,6 +25,8 @@ mod day19_21_alternative;
 mod day20_21;
 mod day21_21;
 mod day22_21;
+mod day23_21;
+mod day24_21;
 mod tools;
 mod chars;
 mod maze;
@@ -97,9 +99,9 @@ fn main() {
         // ("Day 19 of 2021", day19_21::run, 5),
         ("Day 20 of 2021", day20_21::run, 50),
         ("Day 21 of 2021", day21_21::run, 500),
-        ("Day 22 of 2021", day22_21::run, 2),
-        // ("Day 23 of 2021", day23_21::run, 50),
-        // ("Day 24 of 2021", day24_21::run, 50),
+        ("Day 22 of 2021", day22_21::run, 5),
+        ("Day 23 of 2021", day23_21::run, 5),
+        ("Day 24 of 2021", day24_21::run, 5),
         // ("Day 25 of 2021", day25_21::run, 50),
     ];
 
@@ -164,7 +166,7 @@ fn main() {
             }
 
             let grand_total = (totals.0 + totals.1 + totals.2)/1_000_000_000f64;
-            println!("{} in {:>4.2} - init: {:>10.4} +/- {:>10.4}  s, p1: {:>10.4} +/- {:>10.4}  s, p2: {:>10.4} +/- {:>10.4}  s", 
+            println!("{} in {:>4.1} - init: {:>10.4} +/- {:>10.4}  s, p1: {:>10.4} +/- {:>10.4}  s, p2: {:>10.4} +/- {:>10.4}  s", 
                 "total:", grand_total, 
                 totals.0 as f64 / 1_000_000_000f64, 0, 
                 totals.1 as f64 / 1_000_000_000f64, 0, 
