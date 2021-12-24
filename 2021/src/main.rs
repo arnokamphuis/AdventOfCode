@@ -27,6 +27,7 @@ mod day21_21;
 mod day22_21;
 mod day23_21;
 mod day24_21;
+mod day25_21;
 mod tools;
 mod chars;
 mod maze;
@@ -102,7 +103,7 @@ fn main() {
         ("Day 22 of 2021", day22_21::run, 5),
         ("Day 23 of 2021", day23_21::run, 5),
         ("Day 24 of 2021", day24_21::run, 5),
-        // ("Day 25 of 2021", day25_21::run, 50),
+        ("Day 25 of 2021", day25_21::run, 500),
     ];
 
     let args: Vec<String> = env::args().collect();
