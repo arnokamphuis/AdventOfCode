@@ -6,18 +6,20 @@ use std::collections::HashMap;
 
 #[derive(Clone, Eq, PartialEq)]
 struct State {
-    energy : usize,
-    top    : [char; 11],
-    bottom : [[char;4]; 4],
+    energy      : usize,
+    top         : [char; 11],
+    bottom      : Vec<Vec<char>>,
+    bottom_size : usize,
 }
 
 impl State {
 
-    fn new() -> State {
+    fn new(s: usize) -> State {
         State {
             energy: 0,
             top: ['.'; 11],
-            bottom: [ ['A'; 4], ['B'; 4], ['C'; 4], ['D'; 4] ]
+            bottom: vec![ vec!['A'; 4], vec!['B'; 4], vec!['C'; 4], vec!['D'; 4] ],
+            bottom_size: s,
         }
     }
 
@@ -37,10 +39,6 @@ impl State {
 
     fn finished(&self) -> bool {
         self.is_done('A') && self.is_done('B') && self.is_done('C') && self.is_done('D') 
-    }
-
-    fn is_empty(&self, c: char) -> bool {
-        self.bottom[self.room_index(c)].iter().all(|&ch| ch=='.')
     }
 
     fn get_first(&self, room: char) -> Option<(usize, char)> {
@@ -68,40 +66,14 @@ impl State {
         [0, 1, 3, 5, 7, 9, 10].iter().filter(|&index| self.top[*index] == '.').map(|&v|v).collect::<Vec<usize>>()
     }
 
-    fn get_bottom_targets(&self) -> Vec<char> {
-        ['A', 'B', 'C', 'D'].iter().filter(|&ch| self.is_empty(*ch)).map(|&c|c).collect::<Vec<char>>()
-    }
-
-    fn move_room_to_room(&mut self, from_room: char, to_room: char) -> Option<usize> {
-        if from_room == to_room { return None; }
-
-        let from_pos = 2 * (1 + self.room_index(from_room));
-        let to_pos   = 2 * (1 + self.room_index(to_room));
-        let left     = from_pos.min(to_pos);
-        let right    = from_pos.max(to_pos);
-
-        if self.top[left..=right].iter().all(|&c| c=='.') {
-            if let Some((from_depth, from_ch)) = self.get_first(from_room) {
-                if from_ch != to_room { return None; }
-
-                if let Some(to_depth) = self.get_free_in_room(to_room) {
-                    self.bottom[self.room_index(from_room)][from_depth] = '.';
-                    self.bottom[self.room_index(to_room)][to_depth] = from_ch;
-                    return Some((from_depth + to_depth + 2 * (right - left)) * self.cost(from_ch));
-                }
-            }
-        }
-
-        None
-    }
-
     fn move_from_room(&mut self, room: char, to: usize) -> Option<usize> {
         if self.top[to] != '.' { return None; }
         let from_pos = 2 * (1 + self.room_index(room));
         if let Some((depth,ch)) = self.get_first(room) {
             if self.top[from_pos.min(to)+1..from_pos.max(to)].iter().all(|&c| c=='.') {
                 self.top[to] = ch;
-                self.bottom[self.room_index(room)][depth] = '.';
+                let room_index = self.room_index(room);
+                self.bottom[room_index][depth] = '.';
                 return Some( (1+depth + from_pos.max(to) - from_pos.min(to)) * self.cost(ch) );
             }
         }
@@ -118,7 +90,8 @@ impl State {
         if let Some(depth) = self.get_free_in_room(room) {
             if self.top[to_pos.min(from)+1..to_pos.max(from)].iter().all(|&c| c=='.') {
                 let ch = self.top[from];
-                self.bottom[self.room_index(room)][depth] = ch;
+                let room_index = self.room_index(room);
+                self.bottom[room_index][depth] = ch;
                 self.top[from] = '.';
                 return Some( (1+depth + to_pos.max(from) - to_pos.min(from)) * self.cost(ch) );
             }
@@ -144,32 +117,10 @@ impl PartialOrd for State {
     }
 }
 
-
-#[allow(dead_code)]
-pub fn run(_real: bool, print_result: bool) -> (u128, u128, u128) {
-    let start0 = Instant::now();
-
-    let after0 = Instant::now();
-
-
-    let start1 = Instant::now();
-    // solved by hand
-    let after1 = Instant::now();
-    if print_result {
-        println!("Part 1: {}", 15160);
-    }
-
-    let start2 = Instant::now();
-
-    let mut initial_state = State::new();
-    initial_state.bottom[0] = ['D', 'D', 'D', 'B'];
-    initial_state.bottom[1] = ['C', 'C', 'B', 'C'];
-    initial_state.bottom[2] = ['A', 'B', 'A', 'D'];
-    initial_state.bottom[3] = ['B', 'A', 'C', 'A'];
-
+fn solve(initial_state: State) -> usize {
     let mut least_energy = usize::MAX;
     let mut heap: BinaryHeap<State> = BinaryHeap::new();
-    let mut energies: HashMap<([char;11], [[char;4];4]), usize> = HashMap::new();
+    let mut energies: HashMap<([char;11], Vec<Vec<char>>), usize> = HashMap::new();
     heap.push(initial_state);
     loop {
         if let Some(s) = heap.pop() {
@@ -182,17 +133,18 @@ pub fn run(_real: bool, print_result: bool) -> (u128, u128, u128) {
             let top_targets = s.get_top_targets();
 
             let mut insert_next_state = | s: &State | {
-                if energies.contains_key(&(s.top, s.bottom)) {
-                    if let Some(prev_energy) = energies.get(&(s.top, s.bottom)) {
+                let amphi_state = (s.top, s.bottom.clone());
+                if energies.contains_key(&amphi_state) {
+                    if let Some(prev_energy) = energies.get(&amphi_state) {
                         if s.energy < *prev_energy {
-                            *energies.entry((s.top, s.bottom)).or_insert(0) = s.energy;
+                            *energies.entry(amphi_state.clone()).or_insert(0) = s.energy;
                             heap.push(s.clone());
                         }
                     } else {
                         panic!();
                     }
                 } else {
-                    energies.insert((s.top, s.bottom), s.energy);
+                    energies.insert((s.top, s.bottom.clone()), s.energy);
                     heap.push(s.clone());
                 }
             };
@@ -204,16 +156,6 @@ pub fn run(_real: bool, print_result: bool) -> (u128, u128, u128) {
                         next_state.energy += energy;
                         insert_next_state(&next_state);
                     } 
-                });
-            });
-
-            ['A', 'B', 'C', 'D'].iter().for_each(|from_room| {
-                s.get_bottom_targets().iter().for_each(|to_room| {
-                    let mut next_state = s.clone();
-                    if let Some(energy) = next_state.move_room_to_room(*from_room, *to_room) {
-                        next_state.energy += energy;
-                        insert_next_state(&next_state);
-                    }
                 });
             });
 
@@ -229,10 +171,43 @@ pub fn run(_real: bool, print_result: bool) -> (u128, u128, u128) {
         }
 
     }
+    least_energy
+}
+
+
+#[allow(dead_code)]
+pub fn run(_real: bool, print_result: bool) -> (u128, u128, u128) {
+    let start0 = Instant::now();
+
+    let after0 = Instant::now();
+
+
+    let start1 = Instant::now();
+
+    let mut initial_state = State::new(2);
+    initial_state.bottom[0] = vec!['D', 'B'];
+    initial_state.bottom[1] = vec!['C', 'C'];
+    initial_state.bottom[2] = vec!['A', 'D'];
+    initial_state.bottom[3] = vec!['B', 'A'];
+    let res1 = solve(initial_state.clone());
+
+    let after1 = Instant::now();
+    if print_result {
+        println!("Part 1: {}", res1);
+    }
+
+    let start2 = Instant::now();
+
+    let mut initial_state = State::new(4);
+    initial_state.bottom[0] = vec!['D', 'D', 'D', 'B'];
+    initial_state.bottom[1] = vec!['C', 'C', 'B', 'C'];
+    initial_state.bottom[2] = vec!['A', 'B', 'A', 'D'];
+    initial_state.bottom[3] = vec!['B', 'A', 'C', 'A'];
+    let res2 = solve(initial_state.clone());
 
     let after2 = Instant::now();
     if print_result {
-        println!("Part 2: {}", least_energy);
+        println!("Part 2: {}", res2);
     }
 
     (
