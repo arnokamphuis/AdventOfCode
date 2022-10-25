@@ -1,9 +1,11 @@
 extern crate plotly;
+extern crate itertools;
 use std::env;
 use std::fs::File;
 use std::io::Write;
 
 mod day01_15;
+mod day02_15;
 
 mod tools;
 
@@ -34,9 +36,10 @@ fn create_graph(data: &Vec<(usize, (f32,f32,f32))>, errors: &Vec<(usize, (f64,f6
         .error_y(ErrorData::new(ErrorType::Data).array(part2_error));
 
     let layout = Layout::new().bar_mode(BarMode::Group)
-        .title(Title::new("Runtimes in ms for Advent of Code 2021").font(Font::new().color(NamedColor::Black).size(24).family("Droid Serif")))
+        .title(Title::new("Runtimes in ms for Advent of Code 2015").font(Font::new().color(NamedColor::Black).size(24).family("Droid Serif")))
         .x_axis(Axis::new().title(Title::new("Day").font(Font::new().color(NamedColor::Black).size(12).family("Droid Serif"))))
-        .y_axis(Axis::new().title(Title::new("Runtime in ms").font(Font::new().color(NamedColor::Black).size(12).family("Droid Serif"))).range(vec![0, 100]).type_(AxisType::Log));
+        .y_axis(Axis::new().title(Title::new("Runtime in ms").font(Font::new().color(NamedColor::Black).size(12).family("Droid Serif"))).type_(AxisType::Log));
+        // .y_axis(Axis::new().title(Title::new("Runtime in ms").font(Font::new().color(NamedColor::Black).size(12).family("Droid Serif"))).range(vec![0, 100]).type_(AxisType::Log));
 
     let mut plot = Plot::new();
     plot.add_trace(trace1);
@@ -46,7 +49,7 @@ fn create_graph(data: &Vec<(usize, (f32,f32,f32))>, errors: &Vec<(usize, (f64,f6
 
 
     let html = plot.to_html();
-    let mut file = match File::open("images/runtimes.html") {
+    let mut file = match File::create("images/runtimes.html") {
         Err(why) => panic!("couldn't open runtimes.html: {}", why),
         Ok(file) => file,
     };
@@ -62,6 +65,7 @@ fn create_graph(data: &Vec<(usize, (f32,f32,f32))>, errors: &Vec<(usize, (f64,f6
 fn main() {
     let days: Vec<(&str, fn(bool, bool) -> (u128, u128, u128), usize)> = vec![
         ("Day 01 of 2015", day01_15::run, 500),
+        ("Day 02 of 2015", day02_15::run, 500),
     ];
 
     let args: Vec<String> = env::args().collect();
