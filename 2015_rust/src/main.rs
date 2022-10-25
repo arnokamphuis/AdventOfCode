@@ -1,5 +1,6 @@
 extern crate plotly;
 extern crate itertools;
+extern crate md5;
 use std::env;
 use std::fs::File;
 use std::io::Write;
@@ -7,6 +8,7 @@ use std::io::Write;
 mod day01_15;
 mod day02_15;
 mod day03_15;
+mod day04_15;
 
 mod tools;
 
@@ -68,6 +70,7 @@ fn main() {
         ("Day 01 of 2015", day01_15::run, 1000),
         ("Day 02 of 2015", day02_15::run, 1000),
         ("Day 03 of 2015", day03_15::run, 1000),
+        ("Day 04 of 2015", day04_15::run, 5),
     ];
 
     let args: Vec<String> = env::args().collect();
