@@ -6,6 +6,7 @@ use std::io::Write;
 
 mod day01_15;
 mod day02_15;
+mod day03_15;
 
 mod tools;
 
@@ -64,8 +65,9 @@ fn create_graph(data: &Vec<(usize, (f32,f32,f32))>, errors: &Vec<(usize, (f64,f6
 
 fn main() {
     let days: Vec<(&str, fn(bool, bool) -> (u128, u128, u128), usize)> = vec![
-        ("Day 01 of 2015", day01_15::run, 500),
-        ("Day 02 of 2015", day02_15::run, 500),
+        ("Day 01 of 2015", day01_15::run, 1000),
+        ("Day 02 of 2015", day02_15::run, 1000),
+        ("Day 03 of 2015", day03_15::run, 1000),
     ];
 
     let args: Vec<String> = env::args().collect();
