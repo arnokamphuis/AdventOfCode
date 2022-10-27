@@ -21,6 +21,7 @@ mod day10_15;
 mod day11_15;
 mod day12_15;
 mod day13_15;
+mod day14_15;
 
 mod tools;
 
@@ -79,19 +80,20 @@ fn create_graph(data: &Vec<(usize, (f32,f32,f32))>, errors: &Vec<(usize, (f64,f6
 
 fn main() {
     let days: Vec<(&str, fn(bool, bool) -> (u128, u128, u128), usize)> = vec![
-        ("Day 01 of 2015", day01_15::run, 1000),
-        ("Day 02 of 2015", day02_15::run, 1000),
-        ("Day 03 of 2015", day03_15::run, 1000),
+        ("Day 01 of 2015", day01_15::run, 100),
+        ("Day 02 of 2015", day02_15::run, 100),
+        ("Day 03 of 2015", day03_15::run, 100),
         ("Day 04 of 2015", day04_15::run, 2),
-        ("Day 05 of 2015", day05_15::run, 1000),
-        ("Day 06 of 2015", day06_15::run, 200),
-        ("Day 07 of 2015", day07_15::run, 200),
-        ("Day 08 of 2015", day08_15::run, 1000),
+        ("Day 05 of 2015", day05_15::run, 100),
+        ("Day 06 of 2015", day06_15::run, 100),
+        ("Day 07 of 2015", day07_15::run, 10),
+        ("Day 08 of 2015", day08_15::run, 100),
         ("Day 09 of 2015", day09_15::run, 100),
-        ("Day 10 of 2015", day10_15::run, 100),
-        ("Day 11 of 2015", day11_15::run, 100),
+        ("Day 10 of 2015", day10_15::run, 10),
+        ("Day 11 of 2015", day11_15::run, 10),
         ("Day 12 of 2015", day12_15::run, 100),
         ("Day 13 of 2015", day13_15::run, 10),
+        ("Day 14 of 2015", day14_15::run, 100),
     ];
 
     let args: Vec<String> = env::args().collect();
