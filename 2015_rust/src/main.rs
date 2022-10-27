@@ -20,6 +20,7 @@ mod day09_15;
 mod day10_15;
 mod day11_15;
 mod day12_15;
+mod day13_15;
 
 mod tools;
 
@@ -90,6 +91,7 @@ fn main() {
         ("Day 10 of 2015", day10_15::run, 100),
         ("Day 11 of 2015", day11_15::run, 100),
         ("Day 12 of 2015", day12_15::run, 100),
+        ("Day 13 of 2015", day13_15::run, 10),
     ];
 
     let args: Vec<String> = env::args().collect();
