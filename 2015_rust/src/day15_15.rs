@@ -64,7 +64,6 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
     let after0 = Instant::now();
 
     let start1 = Instant::now();
-
     let res1 = ts1.map(|current_spoons| {
         current_spoons
             .iter()
@@ -73,10 +72,10 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
                 ingredients.iter().map(|(_,props)| props.to_vec())
             )
             .map(|(f,v)| v.iter().map(|vi| f as i32 * vi).collect::<Vec<i32>>())
-            .fold(vec![0;4], |mut sum, val| { for i in 0..4 {sum[i] += val[i]; } sum })
-            .iter()
-            .fold(1,|prod, &v| prod * v.max(0))
-    }).max().unwrap();
+            .fold(vec![0;5], |mut sum, val| { for i in 0..5 {sum[i] += val[i]; } sum })
+        })
+        .map(|vec| {let mut prod = 1; for i in 0..4 { prod *= vec[i].max(0); } prod })
+        .max().unwrap();
 
     let after1 = Instant::now();
     if print_result {
@@ -96,7 +95,7 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
             .fold(vec![0;5], |mut sum, val| { for i in 0..5 {sum[i] += val[i]; } sum })
         })
         .filter(|vec| vec[4] == 500)
-        .map(|vec| {let mut prod = 1; for i in 0..4 { prod *= vec[i]; } prod })
+        .map(|vec| {let mut prod = 1; for i in 0..4 { prod *= vec[i].max(0); } prod })
         .max().unwrap();
 
     let after2 = Instant::now();
