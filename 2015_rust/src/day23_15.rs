@@ -58,10 +58,6 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
         
     };
 
-    // for ins in &program {
-    //     println!("{:?}", ins);
-    // }
-
     let after0 = Instant::now();
 
     let start1 = Instant::now();
