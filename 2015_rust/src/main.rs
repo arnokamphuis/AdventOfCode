@@ -32,6 +32,7 @@ mod day21_15;
 mod day22_15;
 mod day23_15;
 mod day24_15;
+mod day25_15;
 
 mod tools;
 
@@ -90,30 +91,31 @@ fn create_graph(data: &Vec<(usize, (f32,f32,f32))>, errors: &Vec<(usize, (f64,f6
 
 fn main() {
     let days: Vec<(&str, fn(bool, bool) -> (u128, u128, u128), usize)> = vec![
-        ("Day 01 of 2015", day01_15::run, 100),
-        ("Day 02 of 2015", day02_15::run, 100),
-        ("Day 03 of 2015", day03_15::run, 100),
+        ("Day 01 of 2015", day01_15::run, 10),
+        ("Day 02 of 2015", day02_15::run, 10),
+        ("Day 03 of 2015", day03_15::run, 10),
         ("Day 04 of 2015", day04_15::run, 2),
-        ("Day 05 of 2015", day05_15::run, 100),
-        ("Day 06 of 2015", day06_15::run, 100),
+        ("Day 05 of 2015", day05_15::run, 10),
+        ("Day 06 of 2015", day06_15::run, 10),
         ("Day 07 of 2015", day07_15::run, 10),
-        ("Day 08 of 2015", day08_15::run, 100),
-        ("Day 09 of 2015", day09_15::run, 100),
+        ("Day 08 of 2015", day08_15::run, 10),
+        ("Day 09 of 2015", day09_15::run, 10),
         ("Day 10 of 2015", day10_15::run, 10),
         ("Day 11 of 2015", day11_15::run, 10),
-        ("Day 12 of 2015", day12_15::run, 100),
-        ("Day 13 of 2015", day13_15::run, 10),
-        ("Day 14 of 2015", day14_15::run, 100),
-        ("Day 15 of 2015", day15_15::run, 100),
-        ("Day 16 of 2015", day16_15::run, 100),
-        ("Day 17 of 2015", day17_15::run, 100),
-        ("Day 18 of 2015", day18_15::run, 100),
+        ("Day 12 of 2015", day12_15::run, 10),
+        ("Day 13 of 2015", day13_15::run, 4),
+        ("Day 14 of 2015", day14_15::run, 10),
+        ("Day 15 of 2015", day15_15::run, 10),
+        ("Day 16 of 2015", day16_15::run, 10),
+        ("Day 17 of 2015", day17_15::run, 10),
+        ("Day 18 of 2015", day18_15::run, 4),
         ("Day 19 of 2015", day19_15::run, 10),
-        ("Day 20 of 2015", day20_15::run, 10),
-        ("Day 21 of 2015", day21_15::run, 100),
-        ("Day 22 of 2015", day22_15::run, 10),
-        ("Day 23 of 2015", day23_15::run, 100),
-        ("Day 24 of 2015", day24_15::run, 4),
+        ("Day 20 of 2015", day20_15::run, 4),
+        ("Day 21 of 2015", day21_15::run, 10),
+        ("Day 22 of 2015", day22_15::run, 4),
+        ("Day 23 of 2015", day23_15::run, 10),
+        ("Day 24 of 2015", day24_15::run, 2),
+        ("Day 25 of 2015", day25_15::run, 10),
     ];
 
     let args: Vec<String> = env::args().collect();
