@@ -16,23 +16,27 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
         .iter()
         .map(|line| {
             let plays = line.split_whitespace().map(|i| i.chars().nth(0).unwrap() as usize).collect::<Vec<usize>>();
-            (plays[0]-64, plays[1]-87)
+            (plays[0]-65, plays[1]-88)
         }).collect();
 
     let after0 = Instant::now();
 
     let start1 = Instant::now();
 
+    let diff = | p1, p2 | -> usize {
+        (p1 as i8 - p2 as i8).rem_euclid(3) as usize
+    };
+
     let score = | p1, p2 | -> usize {
-        match (p1,p2) {
-            (3,1) | (2,3) | (1,2) => 6,
-            (1,1) | (2,2) | (3,3) => 3,
+        match diff(p1,p2) {
+            2 => 6,
+            0 => 3,
             _ => 0,
         }
     }; 
 
     let res1 = rounds.iter().fold(0, |s, (p1,p2)| {
-        s + p2 + score(*p1,*p2)
+        s + 1 + p2 + score(*p1,*p2)
     });
 
     let after1 = Instant::now();
@@ -42,33 +46,11 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
 
     let start2 = Instant::now();
 
-    let choose_win = | p1 | -> usize {
-        match p1 {
-            3 => 1,
-            2 => 3,
-            1 => 2,
-            _ => panic!("oops")
-        }
-    };
-
-    let choose_draw = | p1 | -> usize {
-        p1
-    };
-
-    let choose_lose = | p1 | -> usize {
-        match p1 {
-            1 => 3,
-            3 => 2,
-            2 => 1,
-            _ => panic!("oops")
-        }
-    };
-
     let find_play = | p1, p2 | -> usize {
         match p2 {
-            1 => choose_lose(p1),
-            2 => choose_draw(p1),
-            3 => choose_win(p1),
+            0 => (p1 + 1) % 3,
+            1 => p1,
+            2 => (p1 as i8 - 1).rem_euclid(3) as usize,
             _ => panic!("oops")
         }
     };
@@ -77,7 +59,7 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
         .iter()
         .fold(0, |s, &(p1,p2)| {
             let p = find_play(p1,p2);
-            s + p + score(p1,p)
+            s + 1 + p + score(p1,p)
         });
 
     let after2 = Instant::now();
