@@ -14,8 +14,7 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
     let input = tools::get_input(String::from(input_file));
 
     let elfs = sorted(
-        [input, vec!["".to_string()]]
-            .concat()
+        input
             .iter()
             .fold(vec![vec![]], |mut v, line| {
                 match line.as_str() {
