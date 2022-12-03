@@ -13,14 +13,16 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
     };
     let input = tools::get_input(String::from(input_file));
 
-    let rucksacks: Vec<(BTreeSet<char>,BTreeSet<char>)> = input.iter().map(|line| {
+    // a rucksacks consists of (compartment1, compartment2, fullsack)
+    let rucksacks: Vec<(BTreeSet<char>,BTreeSet<char>,BTreeSet<char>)> = input.iter().map(|line| {
         (
             line[0..line.len()/2]
                 .chars()
                 .collect::<BTreeSet<char>>(),
             line[line.len()/2..]
                 .chars()
-                .collect::<BTreeSet<char>>()
+                .collect::<BTreeSet<char>>(),
+            line.chars().collect::<BTreeSet<char>>()
         )
     }).collect();
 
@@ -35,7 +37,7 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
 
     let res1: usize = rucksacks
         .iter()
-        .map(|(comp1, comp2)| {
+        .map(|(comp1, comp2, _)| {
             value(
                 comp1
                     .intersection(&comp2)
@@ -53,22 +55,15 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
 
     let start2 = Instant::now();
 
-    let fullsack = | (comp1, comp2): &(BTreeSet<char>, BTreeSet<char>) | -> BTreeSet<char> {
-        comp1
-            .union(&comp2)
-            .cloned()
-            .collect::<BTreeSet<char>>()
-    };
-
     let res2: usize = rucksacks
         .chunks(3)
         .map(|sacks| 
             value(
-                fullsack(&sacks[0])
-                    .intersection(&fullsack(&sacks[1]))
+                sacks[0].2
+                    .intersection(&sacks[1].2)
                     .cloned()
                     .collect::<BTreeSet<char>>()
-                    .intersection(&fullsack(&sacks[2]))
+                    .intersection(&sacks[2].2)
                     .cloned()
                     .collect::<Vec<char>>()[0]
                 ))
