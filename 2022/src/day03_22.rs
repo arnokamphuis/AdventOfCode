@@ -27,13 +27,16 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
     }).collect();
 
 
-    let intersect = | sets: Vec<&HashSet<char>> | -> HashSet<char> {
-        sets
+    let intersect = | sets: Vec<&HashSet<char>> | -> char {
+        *sets
             .iter()
             .skip(1)
             .fold(sets[0].clone(), |acc, hs| {
                 acc.intersection(hs).cloned().collect()
             })
+            .iter()
+            .next()
+            .unwrap()
     };
 
     let after0 = Instant::now();
@@ -47,7 +50,7 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
 
     let res1: usize = rucksacks
         .iter()
-        .map(|(comp1, comp2, _)| *intersect(vec![comp1, comp2]).iter().next().unwrap())
+        .map(|(comp1, comp2, _)| intersect(vec![comp1, comp2]))
         .map(|c| value(c))
         .sum();
 
@@ -60,7 +63,7 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
 
     let res2: usize = rucksacks
         .chunks(3)
-        .map(|sacks| *intersect(vec![&sacks[0].2, &sacks[1].2, &sacks[2].2]).iter().next().unwrap())
+        .map(|sacks| intersect(vec![&sacks[0].2, &sacks[1].2, &sacks[2].2]))
         .map(|c| value(c))
         .sum();
 
