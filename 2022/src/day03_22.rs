@@ -44,8 +44,10 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
     let start1 = Instant::now();
 
     let value = | c: char | -> usize {
-        let v = c as usize - 65;
-        if v > 26 { v - 31 } else { v + 27 } 
+        match c {
+            'A'..='Z' => c as usize - 'A' as usize + 27,
+            _         => c as usize - 'a' as usize +  1
+        }
     };
 
     let res1: usize = rucksacks
