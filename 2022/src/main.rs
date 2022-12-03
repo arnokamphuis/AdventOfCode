@@ -79,9 +79,9 @@ fn create_graph(data: &Vec<(usize, (f32,f32,f32))>, errors: &Vec<(usize, (f64,f6
 
 fn main() {
     let days: Vec<(&str, fn(bool, bool) -> (u128, u128, u128), usize)> = vec![
-        ("Day 01 of 2022", day01_22::run, 10),
-        ("Day 02 of 2022", day02_22::run, 10),
-        ("Day 03 of 2022", day03_22::run, 10),
+        ("Day 01 of 2022", day01_22::run, 500),
+        ("Day 02 of 2022", day02_22::run, 500),
+        ("Day 03 of 2022", day03_22::run, 500),
         ("Day 04 of 2022", day04_22::run, 10),
         ("Day 05 of 2022", day05_22::run, 10),
         ("Day 06 of 2022", day06_22::run, 10),
