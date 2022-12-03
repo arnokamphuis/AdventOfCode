@@ -1,6 +1,6 @@
 use super::tools;
 use std::time::Instant;
-use std::collections::BTreeSet;
+use std::collections::HashSet;
 
 #[allow(dead_code)]
 pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
@@ -14,17 +14,27 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
     let input = tools::get_input(String::from(input_file));
 
     // a rucksacks consists of (compartment1, compartment2, fullsack)
-    let rucksacks: Vec<(BTreeSet<char>,BTreeSet<char>,BTreeSet<char>)> = input.iter().map(|line| {
+    let rucksacks: Vec<(HashSet<char>,HashSet<char>,HashSet<char>)> = input.iter().map(|line| {
         (
             line[0..line.len()/2]
                 .chars()
-                .collect::<BTreeSet<char>>(),
+                .collect::<HashSet<char>>(),
             line[line.len()/2..]
                 .chars()
-                .collect::<BTreeSet<char>>(),
-            line.chars().collect::<BTreeSet<char>>()
+                .collect::<HashSet<char>>(),
+            line.chars().collect::<HashSet<char>>()
         )
     }).collect();
+
+
+    let intersect = | sets: Vec<&HashSet<char>> | -> HashSet<char> {
+        sets
+            .iter()
+            .skip(1)
+            .fold(sets[0].clone(), |acc, hs| {
+                acc.intersection(hs).cloned().collect()
+            })
+    };
 
     let after0 = Instant::now();
 
@@ -37,15 +47,8 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
 
     let res1: usize = rucksacks
         .iter()
-        .map(|(comp1, comp2, _)| {
-            value(
-                comp1
-                    .intersection(&comp2)
-                    .cloned()
-                    .collect::<Vec<char>>()[0]
-                )})
-        .collect::<Vec<usize>>()
-        .iter()
+        .map(|(comp1, comp2, _)| *intersect(vec![comp1, comp2]).iter().next().unwrap())
+        .map(|c| value(c))
         .sum();
 
     let after1 = Instant::now();
@@ -57,18 +60,8 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
 
     let res2: usize = rucksacks
         .chunks(3)
-        .map(|sacks| 
-            value(
-                sacks[0].2
-                    .intersection(&sacks[1].2)
-                    .cloned()
-                    .collect::<BTreeSet<char>>()
-                    .intersection(&sacks[2].2)
-                    .cloned()
-                    .collect::<Vec<char>>()[0]
-                ))
-        .collect::<Vec<usize>>()
-        .iter()
+        .map(|sacks| *intersect(vec![&sacks[0].2, &sacks[1].2, &sacks[2].2]).iter().next().unwrap())
+        .map(|c| value(c))
         .sum();
 
     let after2 = Instant::now();
