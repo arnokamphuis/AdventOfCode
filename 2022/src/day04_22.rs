@@ -21,11 +21,11 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
                     range
                         .split('-')
                         .map(|s| s.parse::<usize>().unwrap())
-                        .collect::<Vec<usize>>()
+                        .collect::<Vec<_>>()
                 })
-                .collect::<Vec<Vec<usize>>>()
+                .collect::<Vec<_>>()
         })
-        .collect::<Vec<Vec<Vec<usize>>>>();
+        .collect::<Vec<_>>();
 
     let contained = | first: &Vec<usize>, second: &Vec<usize> | -> bool {
         (first[0] <= second[0] && first[1] >= second[1]) || (first[0] >= second[0] && first[1] <= second[1]) 
@@ -33,7 +33,6 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
 
     let overlap = | first: &Vec<usize>, second: &Vec<usize> | -> bool {
         first[0].max(second[0]) <= first[1].min(second[1])
-        // (first[1] <= second[1] && first[1] >= second[0]) | (second[0] <= first[1] && second[1] >= first[0])
     };
         
     let after0 = Instant::now();
