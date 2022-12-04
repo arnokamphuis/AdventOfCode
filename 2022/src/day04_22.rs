@@ -32,7 +32,8 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
     };
 
     let overlap = | first: &Vec<usize>, second: &Vec<usize> | -> bool {
-        (first[1] <= second[1] && first[1] >= second[0]) | (second[0] <= first[1] && second[1] >= first[0])
+        first[0].max(second[0]) <= first[1].min(second[1])
+        // (first[1] <= second[1] && first[1] >= second[0]) | (second[0] <= first[1] && second[1] >= first[0])
     };
         
     let after0 = Instant::now();
