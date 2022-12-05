@@ -12,7 +12,6 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
     };
     let input = tools::get_input(String::from(input_file));
 
-    let n = if !real { 3 } else { 9 };
     let emptyline = input
         .iter()
         .enumerate()
@@ -20,14 +19,23 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
         .map(|(index,_)| index )
         .collect::<Vec<usize>>()[0];
 
+    let n = input[emptyline-1]
+        .trim()
+        .chars()
+        .rev()
+        .collect::<String>()[0..1]
+        .parse::<usize>()
+        .unwrap();
+
     let mut piles: Vec<Vec<char>> = vec![vec![];n];
     input[..emptyline-1].iter().for_each(|line| { 
-        (0..n).for_each(|i| {
-            let c = line.chars().nth(4*i+1).unwrap();
-            if c != ' ' {
-                piles[i].insert(0,c);
-            }
-        });
+        line
+            .as_bytes()
+            .chunks(4)
+            .map(|buf| unsafe { std::str::from_utf8_unchecked(buf) })
+            .map(|s| s.to_string().chars().nth(1).unwrap())
+            .enumerate()
+            .for_each(|(pile, c)| if c != ' ' { piles[pile].insert(0,c); });
     });
     let original_piles = piles.clone();
 
