@@ -10,15 +10,59 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
     } else {
         "./input/day05_22_real.txt"
     };
-    let _input = tools::get_input(String::from(input_file));
+    let input = tools::get_input(String::from(input_file));
+    let n = if !real { 3 } else { 9 };
+    let emptyline = input.iter().enumerate().filter(|(_,line)| line.len()==0).map(|(index,_)| index).collect::<Vec<usize>>()[0];
+
+    let mut piles: Vec<Vec<char>> = vec![vec![];n];
+    input[..emptyline-1].iter().for_each(|line| { 
+        for i in 0..n {
+            let c = line.chars().nth(4*i+1).unwrap();
+            if c != ' ' {
+                piles[i].insert(0,c);
+            }
+        }
+    });
+    println!("{:?}", piles);
+
+    let moves = input[emptyline+1..].iter().map(|line| { 
+        line
+            .splitn(6, [' '])
+            .filter(|part| !part.contains("o"))
+            .map(|s| s.to_string())
+            .map(|n| n.parse::<usize>().unwrap())
+            .collect::<Vec<usize>>()
+    }).collect::<Vec<_>>();
 
     let after0 = Instant::now();
 
     let start1 = Instant::now();
 
+    moves
+        .iter()
+        .for_each(|moveit| {
+            let amount = moveit[0];
+            let from   = moveit[1]-1;
+            let to     = moveit[2]-1;
+
+            let f_n = piles[from].len()-1;
+            (0..amount).for_each(|i| {
+                println!("moving 1 from {} to {}", from, to);
+                let c = piles[from].remove(f_n-i);
+                piles[to].push(c);
+                println!("{:?}", piles);
+            });
+            println!("");
+        });
+
+    let res1 = piles.iter().map(|pile| {
+        let index = pile.len()-1;
+        pile[index]
+    }).collect::<String>();
+
     let after1 = Instant::now();
     if print_result {
-        println!("Part 1: {}", 0);
+        println!("Part 1: {}", res1);
     }
 
     let start2 = Instant::now();
