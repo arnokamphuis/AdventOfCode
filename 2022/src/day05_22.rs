@@ -12,20 +12,14 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
     };
     let input = tools::get_input(String::from(input_file));
 
-    let emptyline = input
-        .iter()
-        .enumerate()
-        .filter(|(_,line)| line.len() == 0 )
-        .map(|(index,_)| index )
-        .collect::<Vec<usize>>()[0];
+    let emptyline = input.iter().position(|s| s.len() == 0).unwrap();
 
     let n = input[emptyline-1]
-        .trim()
-        .chars()
+        .split_whitespace()
         .rev()
-        .collect::<String>()[0..1]
-        .parse::<usize>()
-        .unwrap();
+        .map(str::parse::<usize>)
+        .map(Result::unwrap)
+        .collect::<Vec<_>>()[0];
 
     let mut piles: Vec<Vec<char>> = vec![vec![];n];
     input[..emptyline-1].iter().for_each(|line| { 
