@@ -23,7 +23,7 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
             }
         }
     });
-    println!("{:?}", piles);
+    let original_piles = piles.clone();
 
     let moves = input[emptyline+1..].iter().map(|line| { 
         line
@@ -47,12 +47,9 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
 
             let f_n = piles[from].len()-1;
             (0..amount).for_each(|i| {
-                println!("moving 1 from {} to {}", from, to);
                 let c = piles[from].remove(f_n-i);
                 piles[to].push(c);
-                println!("{:?}", piles);
             });
-            println!("");
         });
 
     let res1 = piles.iter().map(|pile| {
@@ -67,9 +64,29 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
 
     let start2 = Instant::now();
 
+    piles = original_piles.clone();
+    moves
+        .iter()
+        .for_each(|moveit| {
+            let amount = moveit[0];
+            let from   = moveit[1]-1;
+            let to     = moveit[2]-1;
+
+            let f_n = piles[from].len()-1;
+            (0..amount).for_each(|_| {
+                let c = piles[from].remove(f_n-amount+1);
+                piles[to].push(c);
+            });
+        });
+
+    let res2 = piles.iter().map(|pile| {
+        let index = pile.len()-1;
+        pile[index]
+    }).collect::<String>();
+
     let after2 = Instant::now();
     if print_result {
-        println!("Part 2: {}", 0);
+        println!("Part 2: {}", res2);
     }
 
     (
