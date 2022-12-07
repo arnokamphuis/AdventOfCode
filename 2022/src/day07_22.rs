@@ -14,9 +14,8 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
     let input = tools::get_input(String::from(input_file));
 
     let mut list_mode = false;
-    let mut current_dir = "".to_string();
-    let mut parent: HashMap<String,String> = HashMap::new();
-    let mut files: HashMap<String, Vec<(usize,String)>> = HashMap::new();
+    let mut path: Vec<String> = vec![];
+    let mut all_sizes: HashMap<String,usize> = HashMap::new();
 
     for line in &input {
         if line.contains("$") {
@@ -24,63 +23,46 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
             let cmd = line[2..].split_whitespace().map(|s| s.to_string()).collect::<Vec<String>>();
             match cmd[0].as_str() {
                 "cd" => {
-                    if cmd[1] == "/".to_string() {
-                        if !files.contains_key(&cmd[1]) {
-                            files.insert(cmd[1].clone(),vec![]);
-                            parent.insert(cmd[1].clone(), current_dir.clone());
-                        }
-                        current_dir = cmd[1].to_string();
-                    } else if cmd[1] == ".." {
-                        current_dir = parent[&current_dir].clone();
+                    if cmd[1] == ".." {
+                        path.pop();
                     } else {
-                        if !files.contains_key(&cmd[1]) {
-                            files.insert(cmd[1].clone(),vec![]);
-                            parent.insert(cmd[1].clone(), current_dir.clone());
-                        }
-                        current_dir = cmd[1].to_string();
+                        path.push(cmd[1].clone());
                     }
-            },
+                },
                 "ls" => { list_mode = true; },
                 _ => panic!()
             }
         } else if list_mode {
             let file = line.split_whitespace().map(|s| s.to_string()).collect::<Vec<String>>();
-            if file[0].chars().nth(0).unwrap().is_numeric() {
+            if !file[0].eq("dir") {
                 let size = file[0].parse::<usize>().unwrap();
-                let name = file[1].to_string();
-
-                files.get_mut(&current_dir).unwrap().push((size,name.clone()));
-            } else {
-                // let name = file[1].to_string();
+                (0..path.len()).for_each(|i| {
+                    *all_sizes.entry(path[..=i].join("/")).or_insert_with(|| 0) += size;
+                });
             }
-            // dirs.entry(current_dir).or_insert() Node::F((size, name.to_string()))
-
-        } else {
-            panic!();
         }
     }
-
-    println!("dirs: {:?}", parent);
-    println!("files: {:?}", files);
 
     let after0 = Instant::now();
 
     let start1 = Instant::now();
 
-    let sizes = files.iter().map(|(dir, f)| (dir.clone(), 
-        f.iter().fold(0, |acc, (s,_)| acc + s))).collect::<Vec<(String,usize)>>();
-    println!("sizes: {:?}", sizes);
+    let res1: usize = all_sizes.iter().map(|(_,&size)| size).filter(|&size| size <= 100_000).sum();
 
     let after1 = Instant::now();
     if print_result {
-        println!("Part 1: {}", 0);
+        println!("Part 1: {}", res1);
     }
 
     let start2 = Instant::now();
 
+    let need_to_free = all_sizes["/"] -  (70_000_000 - 30_000_000);
+
+    let res2: usize = all_sizes.iter().map(|(_,&size)| size).filter(|&size| size >= need_to_free).min().unwrap();
+
     let after2 = Instant::now();
     if print_result {
-        println!("Part 2: {}", 0);
+        println!("Part 2: {}", res2);
     }
 
     (
