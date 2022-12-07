@@ -9,6 +9,7 @@ mod day03a_22;
 mod day04_22;
 mod day05_22;
 mod day06_22;
+// mod day07a_22;
 mod day07_22;
 mod day08_22;
 mod day09_22;
@@ -87,6 +88,7 @@ fn main() {
         ("Day 04 of 2022", day04_22::run, 5000),
         ("Day 05 of 2022", day05_22::run, 5000),
         ("Day 06 of 2022", day06_22::run, 5000),
+        // ("Day 07 of 2022", day07a_22::run, 5000),
         ("Day 07 of 2022", day07_22::run, 5000),
         ("Day 08 of 2022", day08_22::run, 10),
         ("Day 09 of 2022", day09_22::run, 10),
