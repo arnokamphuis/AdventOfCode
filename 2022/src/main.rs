@@ -90,7 +90,7 @@ fn main() {
         ("Day 06 of 2022", day06_22::run, 5000),
         // ("Day 07 of 2022", day07a_22::run, 5000),
         ("Day 07 of 2022", day07_22::run, 5000),
-        ("Day 08 of 2022", day08_22::run, 10),
+        ("Day 08 of 2022", day08_22::run, 5000),
         ("Day 09 of 2022", day09_22::run, 10),
         ("Day 10 of 2022", day10_22::run, 10),
         ("Day 11 of 2022", day11_22::run, 10),
