@@ -1,8 +1,9 @@
 use super::tools;
 use std::time::Instant;
 use std::collections::{HashMap, HashSet};
+use tools::Image;
 
-fn play_rope(rope_length: usize, visited: &mut HashSet<[i32;2]>, commands: &Vec<String>) {
+fn play_rope(rope_length: usize, visited: &mut HashSet<[i32;2]>, commands: &Vec<String>, make_movie: bool) {
     let mut rope: Vec<[i32;2]> = vec![[0,0];rope_length];
     visited.clear();
     visited.insert([0,0]);
@@ -29,6 +30,10 @@ fn play_rope(rope_length: usize, visited: &mut HashSet<[i32;2]>, commands: &Vec<
         }
     };
 
+    let img_size = 720i32;
+    let img_hsize = img_size/2;
+    let mut img: Image = Image::new(img_size as usize,img_size as usize,1);
+    let mut counter: usize = 0;
     commands.iter().for_each(|line| {
         let directions: Vec<&str> = line.split_whitespace().collect();
         let d = directions[0].chars().nth(0).unwrap();
@@ -43,6 +48,30 @@ fn play_rope(rope_length: usize, visited: &mut HashSet<[i32;2]>, commands: &Vec<
                 update_knot(&h, &mut rope[i]);                
             }
             visited.insert(rope[rope_length-1]);
+
+            if make_movie {
+                img.clear((0,0,0,255));
+                visited
+                    .iter()
+                    .for_each(|pos| 
+                        img
+                            .set_pixel(
+                                (pos[0]+img_hsize) as usize, (pos[1]+img_hsize) as usize, 
+                                (0,255,0,125))
+                        );
+                rope
+                    .iter()
+                    .skip(1)
+                    .for_each(|knot| 
+                        img
+                            .set_pixel(
+                                (knot[0]+img_hsize) as usize, (knot[1]+img_hsize) as usize, 
+                                (0,255,255,255))
+                        );
+                img.set_pixel((rope[0][0]+img_hsize) as usize, (rope[0][1]+img_hsize) as usize, (255,0,0,255));
+                img.save_png(&format!("images/day09_22/rope_{:05}.png",counter));
+                counter += 1;
+            }
         });
     });
 }
@@ -64,7 +93,7 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
 
     let start1 = Instant::now();
 
-    play_rope(2, &mut visited, &input);
+    play_rope(2, &mut visited, &input, false);
     let res1 = visited.len();
 
     let after1 = Instant::now();
@@ -74,7 +103,7 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
 
     let start2 = Instant::now();
 
-    play_rope(10, &mut visited, &input);
+    play_rope(10, &mut visited, &input, true);
     let res2 = visited.len();
 
     let after2 = Instant::now();
