@@ -3,7 +3,7 @@ use std::time::Instant;
 use std::collections::{HashMap, HashSet};
 use tools::Image;
 
-fn play_rope(rope_length: usize, visited: &mut HashSet<[i32;2]>, commands: &Vec<String>, make_movie: bool) {
+fn play_rope(rope_length: usize, visited: &mut HashSet<[i32;2]>, commands: &Vec<String>, make_movie: bool, stop_when_tail_move: bool) -> bool {
     let mut rope: Vec<[i32;2]> = vec![[0,0];rope_length];
     visited.clear();
     visited.insert([0,0]);
@@ -34,13 +34,12 @@ fn play_rope(rope_length: usize, visited: &mut HashSet<[i32;2]>, commands: &Vec<
     let img_hsize = img_size/2;
     let mut img: Image = Image::new(img_size as usize,img_size as usize,1);
     let mut counter: usize = 0;
-    commands.iter().for_each(|line| {
+    'outer: for line in commands {
         let directions: Vec<&str> = line.split_whitespace().collect();
         let d = directions[0].chars().nth(0).unwrap();
         let n = directions[1].parse::<i32>().unwrap();
 
-        (0..n).for_each(|_| {
-            
+        for _ in 0..n {
             rope[0][0] += dirs[&d].0;
             rope[0][1] += dirs[&d].1;
             for i in 1..rope_length {
@@ -48,6 +47,8 @@ fn play_rope(rope_length: usize, visited: &mut HashSet<[i32;2]>, commands: &Vec<
                 update_knot(&h, &mut rope[i]);                
             }
             visited.insert(rope[rope_length-1]);
+
+            if stop_when_tail_move && visited.len() > 1 { break 'outer; }
 
             if make_movie {
                 img.clear((0,0,0,255));
@@ -72,8 +73,10 @@ fn play_rope(rope_length: usize, visited: &mut HashSet<[i32;2]>, commands: &Vec<
                 img.save_png(&format!("images/day09_22/rope_{:05}.png",counter));
                 counter += 1;
             }
-        });
-    });
+        }
+    }
+
+    !stop_when_tail_move || stop_when_tail_move && visited.len() != 1 
 }
 
 #[allow(dead_code)]
@@ -93,7 +96,7 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
 
     let start1 = Instant::now();
 
-    play_rope(2, &mut visited, &input, false);
+    play_rope(2, &mut visited, &input, false, false);
     let res1 = visited.len();
 
     let after1 = Instant::now();
@@ -103,12 +106,23 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
 
     let start2 = Instant::now();
 
-    play_rope(10, &mut visited, &input, true);
+    play_rope(10, &mut visited, &input, false, false);
     let res2 = visited.len();
 
     let after2 = Instant::now();
+
     if print_result {
         println!("Part 2: {}", res2);
+    }
+
+    let mut rl = 1;
+    while play_rope(rl, &mut visited, &input, false, true) {
+        rl += 1;
+    }
+    let res3 = rl;
+
+    if print_result {
+        println!("Part 3: {}", res3);
     }
 
     (
