@@ -41,6 +41,7 @@ pub fn get_commands_from_line(line: &String) -> BTreeMap<i64, i64> {
 }
 
 #[allow(dead_code)]
+#[derive(Clone)]
 pub struct Image {
     data: Vec<u8>,
     width: usize,
