@@ -1,5 +1,6 @@
 ffmpeg -framerate 30 -i visible_%05d.png -s:v 720x720 -c:v libx264 -profile:v high -crf 20 -pix_fmt yuv420p day08-part1-30fps.mp4
 ffmpeg -framerate 30 -i place_%05d.png -s:v 720x720 -c:v libx264 -profile:v high -crf 20 -pix_fmt yuv420p day08-part2-30fps.mp4
+ffmpeg -framerate 5 -i crt_%05d.png -s:v 1600x240 -c:v libx264 -profile:v high -crf 20 -pix_fmt yuv420p day10-part2-5fps.mp4
 
 
 ffmpeg -framerate 1200 -i rope_%05d.png -s:v 720x720 -c:v libx264 -profile:v high -crf 20 -pix_fmt yuv420p day09-1200fps.mp4
