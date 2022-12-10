@@ -1,5 +1,6 @@
 use super::tools;
 use std::time::Instant;
+// use tools::Image;
 
 #[allow(dead_code)]
 pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
@@ -86,6 +87,21 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
     pixels.iter().for_each(|(c,_)| {
         crt[ *c / 40 ][ *c % 40 ] = '█';
     });
+
+
+    /*******************************************************************/
+    // let mut img: Image = Image::new(40,6,80);
+    // img.clear((0,0,0,255));
+    // let mut counter = 0;
+    // for i in 0..6 { for j in 0..40 {
+    //     img.set_pixel( j, i, (0, if crt[i][j]==' ' { 0 } else { 255 },0,255));
+    //     if !(j+1 >= 40 && i==5) {
+    //         img.set_pixel( (j+1)%40, i + if j+1 >= 40 {1} else {0}, (0, 100 ,0,255));
+    //     }
+    //     img.save_png(&format!("images/day10_22/crt_{:05}.png", counter));
+    //     counter += 1;
+    // }}
+    /*******************************************************************/
 
     if print_result {
         for i in 0..6 { for j in 0..40 { print!("{}", crt[i][j]); } println!(""); }
