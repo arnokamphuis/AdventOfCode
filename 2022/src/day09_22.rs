@@ -115,15 +115,15 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
         println!("Part 2: {}", res2);
     }
 
-    let mut rl = 1;
-    while play_rope(rl, &mut visited, &input, false, true) {
-        rl += 1;
-    }
-    let res3 = rl;
+    // let mut rl = 1;
+    // while play_rope(rl, &mut visited, &input, false, true) {
+    //     rl += 1;
+    // }
+    // let res3 = rl;
 
-    if print_result {
-        println!("Part 3: {}", res3);
-    }
+    // if print_result {
+    //     println!("Part 3: {}", res3);
+    // }
 
     (
         after0.duration_since(start0).as_nanos(),
