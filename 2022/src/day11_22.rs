@@ -20,17 +20,15 @@ struct Monkey {
 
 impl Monkey {
     fn from(lines: &Vec<String>) -> Monkey {
-        
        Monkey {
-        items: lines[1][18..].split(", ").map(|s| s.parse::<i64>().unwrap()).collect(),
-        op: if lines[2][23..24].chars().nth(0).unwrap() == '*' { Operation::Times } else { Operation::Plus },
-        opfactor: lines[2][25..].parse::<i64>().unwrap_or(-1),
-        divisible: lines[3][21..].parse::<i64>().unwrap(),
-        true_monkey: lines[4].split_whitespace().rev().next().unwrap().parse::<usize>().unwrap(),
+        items:        lines[1][18..].split(", ").map(|s| s.parse::<i64>().unwrap()).collect(),
+        op:        if lines[2][23..24].chars().nth(0).unwrap() == '*' { Operation::Times } else { Operation::Plus },
+        opfactor:     lines[2][25..].parse::<i64>().unwrap_or(-1),
+        divisible:    lines[3][21..].parse::<i64>().unwrap(),
+        true_monkey:  lines[4].split_whitespace().rev().next().unwrap().parse::<usize>().unwrap(),
         false_monkey: lines[5].split_whitespace().rev().next().unwrap().parse::<usize>().unwrap(),
        } 
     }
-
 }
 
 fn do_monkey_business(monkeys: &mut Vec<Monkey>, runs: usize, part: usize) -> usize {
@@ -81,7 +79,10 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
     };
     let input = tools::get_input(String::from(input_file));
 
-    let initial_monkeys = input.chunks(7).map(|lines| Monkey::from(&lines.to_vec())).collect::<Vec<Monkey>>();
+    let initial_monkeys = input
+        .chunks(7)
+        .map(|lines| Monkey::from(&lines.to_vec()))
+        .collect::<Vec<Monkey>>();
     let mut monkeys = initial_monkeys.clone();
 
     let after0 = Instant::now();
