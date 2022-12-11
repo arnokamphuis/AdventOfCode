@@ -34,6 +34,7 @@ impl Monkey {
 }
 
 fn do_monkey_business(monkeys: &mut Vec<Monkey>, runs: usize, part: usize) -> usize {
+    // https://en.wikipedia.org/wiki/Least_common_multiple
     let mut least_common_multiple = 1;
     monkeys.iter().for_each(|monkey| {
         least_common_multiple *= monkey.divisible;
@@ -88,31 +89,6 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
     let start1 = Instant::now();
 
     let res1 = do_monkey_business(&mut monkeys, 20, 1);
-    // let mut inspections: Vec<usize> = vec![0; monkeys.len()];
-    // (0..20).for_each(|_| {
-    //     for m in 0..monkeys.len() {
-    //         let items = monkeys[m].items.clone();
-    //         monkeys[m].items.clear();
-    //         items.iter().for_each(|&item| {
-    //             let mut new_item = item;
-    //             inspections[m] += 1;
-    //             let factor = if monkeys[m].opfactor == -1 { new_item } else { monkeys[m].opfactor };
-    //             new_item = match monkeys[m].op {
-    //                 Operation::Plus => { new_item + factor }
-    //                 Operation::Times => { new_item * factor }
-    //             };
-    //             new_item = (new_item as f64 / 3.0).floor() as i64;
-    //             let target = if new_item % monkeys[m].divisible == 0 {
-    //                 monkeys[m].true_monkey
-    //             } else {
-    //                 monkeys[m].false_monkey
-    //             };
-    //             monkeys[target].items.push(new_item);
-    //         });
-    //     }
-    // });
-    // println!("{:?}", sorted(&inspections).rev().collect::<Vec<_>>());
-    // let res1 = sorted(&inspections).rev().take(2).fold(1, |acc, v| acc*v);
 
     let after1 = Instant::now();
     if print_result {
@@ -123,38 +99,6 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
 
     monkeys = initial_monkeys.clone();
     let res2 = do_monkey_business(&mut monkeys, 10000, 2);
-
-    // let mut least_common_multiple = 1;
-    // monkeys.iter().for_each(|monkey| {
-    //     least_common_multiple *= monkey.divisible;
-    // });
-
-    // inspections = vec![0; monkeys.len()];
-    // (0..10000).for_each(|_| {
-    //     for m in 0..monkeys.len() {
-    //         let items = monkeys[m].items.clone();
-    //         monkeys[m].items.clear();
-    //         // println!("{} length items: {}", m, items.len());
-    //         items.iter().for_each(|&item| {
-    //             let mut new_item = item;
-    //             inspections[m] += 1;
-    //             let factor = if monkeys[m].opfactor == -1 { new_item } else { monkeys[m].opfactor };
-    //             new_item = match monkeys[m].op {
-    //                 Operation::Plus => { new_item + factor }
-    //                 Operation::Times => { new_item * factor }
-    //             };
-    //             new_item %= least_common_multiple;
-    //             let target = if new_item % monkeys[m].divisible == 0 {
-    //                 monkeys[m].true_monkey
-    //             } else {
-    //                 monkeys[m].false_monkey
-    //             };
-    //             monkeys[target].items.push(new_item);
-    //         });
-    //     }
-    // });
-    // println!("{:?}", &inspections);//sorted(&inspections).rev().collect::<Vec<_>>());
-    // let res2 = sorted(&inspections).rev().take(2).fold(1, |acc, v| acc*v);
 
     let after2 = Instant::now();
     if print_result {
