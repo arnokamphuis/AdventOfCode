@@ -6,15 +6,16 @@ use priority_queue::DoublePriorityQueue;
 fn find_path(map: &HashMap<(i16,i16), i8>, s: &Vec<(i16, i16)>, e: (i16, i16)) -> i16 {
     let mut q = DoublePriorityQueue::new();
     let mut visited: Vec<(i16,i16)> = vec![];
-    q.push(e,0);
-    visited.push(e);
+    for &start in s {
+        q.push(start,0);
+    }
 
     let dir = vec![(-1,0), (1,0), (0,-1), (0,1)];
 
     while !q.is_empty() {
         let next = q.pop_min().unwrap();
         
-        if s.contains(&next.0) { return next.1; }
+        if next.0 == e { return next.1; }
         
         visited.push(next.0);
 
@@ -24,7 +25,7 @@ fn find_path(map: &HashMap<(i16,i16), i8>, s: &Vec<(i16, i16)>, e: (i16, i16)) -
             let mut p = next.0;
             p.0 += d.0; p.1 += d.1;
             if let Some(height) = map.get(&p) {
-                if (height - current_height) >= -1 && !visited.contains(&p) {
+                if (height - current_height) <= 1 && !visited.contains(&p) {
                     q.push(p, next.1 + 1);
                 }
             }
