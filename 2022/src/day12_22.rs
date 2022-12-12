@@ -4,40 +4,34 @@ use std::collections::HashMap;
 use priority_queue::DoublePriorityQueue;
 
 fn find_path(map: &HashMap<(i16,i16), i8>, s: &Vec<(i16, i16)>, e: (i16, i16)) -> i16 {
-    let mut minimum = i16::MAX;
+    let mut q = DoublePriorityQueue::new();
+    let mut visited: Vec<(i16,i16)> = vec![];
+    q.push(e,0);
+    visited.push(e);
 
-    for start in s {
-        let mut q = DoublePriorityQueue::new();
-        let mut visited: Vec<(i16,i16)> = vec![];
-        q.push(*start,0);
-        visited.push(*start);
+    let dir = vec![(-1,0), (1,0), (0,-1), (0,1)];
 
-        let dir = vec![(-1,0), (1,0), (0,-1), (0,1)];
+    while !q.is_empty() {
+        let next = q.pop_min().unwrap();
+        
+        if s.contains(&next.0) { return next.1; }
+        
+        visited.push(next.0);
 
-        'inner: while !q.is_empty() {
-            let next = q.pop_min().unwrap();
-            
-            if next.0 == e { minimum = minimum.min(next.1); break 'inner; }
-            
-            if next.1 > minimum { break 'inner; }
+        let current_height = map.get(&next.0).unwrap();
 
-            visited.push(next.0);
-
-            let current_height = map.get(&next.0).unwrap();
-
-            dir.iter().for_each(|d| {
-                let mut p = next.0;
-                p.0 += d.0; p.1 += d.1;
-                if let Some(height) = map.get(&p) {
-                    if (height - current_height) <= 1 && !visited.contains(&p) {
-                        q.push(p, next.1 + 1);
-                    }
+        dir.iter().for_each(|d| {
+            let mut p = next.0;
+            p.0 += d.0; p.1 += d.1;
+            if let Some(height) = map.get(&p) {
+                if (height - current_height) >= -1 && !visited.contains(&p) {
+                    q.push(p, next.1 + 1);
                 }
-            });
+            }
+        });
 
-        }
     }
-    minimum
+    i16::MAX
 }
 
 #[allow(dead_code)]
