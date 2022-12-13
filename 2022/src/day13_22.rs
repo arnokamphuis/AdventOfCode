@@ -89,32 +89,28 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
         "./input/day13_22_real.txt"
     };
     let input = tools::get_input(String::from(input_file));
-    let mut packets: Vec<&String> = vec![];
 
     let after0 = Instant::now();
 
     let start1 = Instant::now();
 
-    let mut pair_count = 0;
-    let nr_pairs = (input.len() as f32/3.0).ceil() as usize;
-    let mut correct = 0;
-
-    while pair_count < nr_pairs {
-        packets.push(&input[&pair_count * 3 + 0]);
-        packets.push(&input[&pair_count * 3 + 1]);
-        if compare(&vec![&input[&pair_count * 3 + 0], &input[pair_count * 3 + 1]]) == Ordering::Less {
-            correct += pair_count+1;
-        }
-        pair_count += 1;
-    }
+    let res1 = input
+        .iter()
+        .filter(|line| line.len()!=0)
+        .collect::<Vec<&String>>()
+        .chunks(2)
+        .enumerate()
+        .filter(|(_,ps)| compare(&ps.to_vec()) == Ordering::Less  )
+        .fold(0, |acc, (i,_)| acc + i + 1);
     
     let after1 = Instant::now();
     if print_result {
-        println!("Part 1: {}", correct);
+        println!("Part 1: {}", res1);
     }
 
     let start2 = Instant::now();
 
+    let mut packets: Vec<&String> = input.iter().filter(|line| line.len()!=0).collect::<Vec<&String>>();
     let extra_packet1 = "[2]".to_string();
     let extra_packet2 = "[6]".to_string();
     packets.push(&extra_packet1);
