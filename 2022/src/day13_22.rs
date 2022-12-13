@@ -36,7 +36,7 @@ fn create_vec_from_string(s: &String) -> Vec<String> {
     res
 }
 
-fn compare_arrays(arr: &Vec<&String>) -> Ordering {
+fn compare(arr: &Vec<&String>) -> Ordering {
     let is_array = | s: &String | -> bool {
         s.chars().nth(0).unwrap() == '['
     };
@@ -49,7 +49,7 @@ fn compare_arrays(arr: &Vec<&String>) -> Ordering {
         let v2 = create_vec_from_string(s2);
         let mut index = 0;
         while index < v1.len() && index < v2.len() {
-            let res = compare_arrays(&vec![&v1[index], &v2[index]]);
+            let res = compare(&vec![&v1[index], &v2[index]]);
             if res != Ordering::Equal {
                 return res; 
             }
@@ -64,10 +64,10 @@ fn compare_arrays(arr: &Vec<&String>) -> Ordering {
         }
     } else if is_array(s1) && !is_array(s2) {
         let new_s2 = &format!("[{}]", s2);
-        return compare_arrays(&vec![s1, new_s2]);
+        return compare(&vec![s1, new_s2]);
     } else if !is_array(s1) && is_array(s2) {
         let new_s1 = &format!("[{}]", s1);
-        return compare_arrays(&vec![new_s1, s2]);
+        return compare(&vec![new_s1, s2]);
     } else {
         if s1.parse::<usize>().unwrap() > s2.parse::<usize>().unwrap() {
             return Ordering::Greater;
@@ -77,15 +77,6 @@ fn compare_arrays(arr: &Vec<&String>) -> Ordering {
             return Ordering::Equal;
         }
     }
-}
-
-fn compare(lines: [&String;2]) -> Ordering {
-    compare_arrays(
-        &lines
-            .iter()
-            .map(|&l| l)
-            .collect::<Vec<&String>>()
-        )
 }
 
 #[allow(dead_code)]
@@ -111,7 +102,7 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
     while pair_count < nr_pairs {
         packets.push(&input[&pair_count * 3 + 0]);
         packets.push(&input[&pair_count * 3 + 1]);
-        if compare([&input[&pair_count * 3 + 0], &input[pair_count * 3 + 1]]) == Ordering::Less {
+        if compare(&vec![&input[&pair_count * 3 + 0], &input[pair_count * 3 + 1]]) == Ordering::Less {
             correct += pair_count+1;
         }
         pair_count += 1;
@@ -129,7 +120,7 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
     packets.push(&extra_packet1);
     packets.push(&extra_packet2);
 
-    packets.sort_by(|a,b| compare([a,b]) );
+    packets.sort_by(|a,b| compare(&vec![&a,&b]) );
 
     let res2 = packets
         .iter()
