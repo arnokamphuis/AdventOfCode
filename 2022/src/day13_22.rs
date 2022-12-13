@@ -1,6 +1,7 @@
 use super::tools;
 use std::time::Instant;
 use std::cmp::Ordering;
+use itertools::Itertools;
 
 fn create_vec_from_string(s: &String) -> Vec<String> {
     let mut res: Vec<String> = vec![];
@@ -116,10 +117,9 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
     packets.push(&extra_packet1);
     packets.push(&extra_packet2);
 
-    packets.sort_by(|a,b| compare(&vec![&a,&b]) );
-
     let res2 = packets
         .iter()
+        .sorted_by(|a,b| compare(&vec![&a,&b]) )
         .enumerate()
         .filter(|(_,s)| s.as_str() == "[2]" || s.as_str() == "[6]")
         .fold(1, |acc, (i,_)| acc * (i+1));
