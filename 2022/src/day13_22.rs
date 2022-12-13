@@ -1,19 +1,91 @@
 use super::tools;
 use std::time::Instant;
+use std::cmp::Ordering;
 
-fn compare_vecs(v: &Vec<Vec<String>>) {
-    println!("{:?}", v);
-    
+fn create_vec_from_string(s: &String) -> Vec<String> {
+    let mut res: Vec<String> = vec![];
+    let l = s.chars().collect::<Vec<char>>();
+    let mut pos = 0;
+    let mut start_array = 0;
+    let mut brace_counter = 0;
+    for i in 1..l.len() {
+        if l[i] == '[' {
+            if brace_counter == 0 {
+                start_array = i;
+            }
+            brace_counter += 1;
+            pos = i;
+        } else if l[i] == ']' {
+            if brace_counter == 1 {
+                res.push(s[start_array..=i].to_string());
+                pos = i;
+            } else if brace_counter == 0 {
+                if i-pos > 1 {
+                    res.push(format!("{}", s[pos+1..i].chars().collect::<String>()));
+                    pos = i;    
+                }
+            }
+            brace_counter -= 1;            
+        } else if l[i] == ',' && brace_counter == 0 {
+            if i-pos > 1 {
+                res.push(format!("{}", s[pos+1..i].chars().collect::<String>()));
+            }
+            pos = i;
+        }
+    }
+    res
 }
 
-fn compare(lines: [&String;2]) -> bool {
-    let mut list_depth = [0usize, 0usize];
-    let mut index = [0usize, 0usize];
-    let items = lines.iter().map(|l| l[1..l.len()-1].split(",").map(|s| s.to_string()).collect::<Vec<String>>()).collect::<Vec<_>>();
+fn compare_arrays(arr: &Vec<&String>) -> i8 {
+    let is_array = | s: &String | -> bool {
+        s.chars().nth(0).unwrap() == '['
+    };
 
-    compare_vecs(&items);
-    println!("");
-    true
+    let s1 = &arr[0];
+    let s2 = &arr[1];
+
+    if is_array(s1) && is_array(s2) {
+        let v1 = create_vec_from_string(s1);
+        let v2 = create_vec_from_string(s2);
+        let mut index = 0;
+        while index < v1.len() && index < v2.len() {
+            let res = compare_arrays(&vec![&v1[index], &v2[index]]);
+            if res == -1 || res == 1 {
+                return res; 
+            }
+            index += 1;
+        }
+        if index == v1.len() && index < v2.len() {
+            return -1;
+        } else if index == v2.len() && index < v1.len() {
+            return 1;
+        } else {
+            return 0;
+        }
+    } else if is_array(s1) && !is_array(s2) {
+        let new_s2 = &format!("[{}]", s2);
+        return compare_arrays(&vec![s1, new_s2]);
+    } else if !is_array(s1) && is_array(s2) {
+        let new_s1 = &format!("[{}]", s1);
+        return compare_arrays(&vec![new_s1, s2]);
+    } else {
+        if s1.parse::<usize>().unwrap() > s2.parse::<usize>().unwrap() {
+            return 1;
+        } else if s1.parse::<usize>().unwrap() < s2.parse::<usize>().unwrap() {
+            return -1;
+        } else {
+            return 0;
+        }
+    }
+}
+
+fn compare(lines: [&String;2]) -> i8 {
+    compare_arrays(
+        &lines
+            .iter()
+            .map(|&l| l)
+            .collect::<Vec<&String>>()
+        )
 }
 
 #[allow(dead_code)]
@@ -26,6 +98,7 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
         "./input/day13_22_real.txt"
     };
     let input = tools::get_input(String::from(input_file));
+    let mut packets: Vec<&String> = vec![];
 
     let after0 = Instant::now();
 
@@ -36,7 +109,9 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
     let mut correct = 0;
 
     while pair_count < nr_pairs {
-        if compare([&input[&pair_count * 3 + 0], &input[pair_count * 3 + 1]]) {
+        packets.push(&input[&pair_count * 3 + 0]);
+        packets.push(&input[&pair_count * 3 + 1]);
+        if compare([&input[&pair_count * 3 + 0], &input[pair_count * 3 + 1]]) == -1 {
             correct += pair_count+1;
         }
         pair_count += 1;
@@ -49,9 +124,29 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
 
     let start2 = Instant::now();
 
+    let extra_packet1 = "[2]".to_string();
+    let extra_packet2 = "[6]".to_string();
+    packets.push(&extra_packet1);
+    packets.push(&extra_packet2);
+
+    packets.sort_by(| a, b | {
+        match compare([a,b]) {
+            -1 => Ordering::Less,
+             0 => Ordering::Equal,
+             1 => Ordering::Greater,
+             _ => panic!()
+        }
+    });
+
+    let res2 = packets
+        .iter()
+        .enumerate()
+        .filter(|(_,s)| s.as_str() == "[2]" || s.as_str() == "[6]")
+        .fold(1, |acc, (i,_)| acc * (i+1));
+
     let after2 = Instant::now();
     if print_result {
-        println!("Part 2: {}", 0);
+        println!("Part 2: {}", res2);
     }
 
     (
