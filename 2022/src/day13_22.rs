@@ -22,14 +22,14 @@ fn create_vec_from_string(s: &String) -> Vec<String> {
                 pos = i;
             } else if brace_counter == 0 {
                 if i-pos > 1 {
-                    res.push(format!("{}", s[pos+1..i].chars().collect::<String>()));
+                    res.push(s[pos+1..i].chars().collect::<String>());
                     pos = i;    
                 }
             }
             brace_counter -= 1;            
         } else if l[i] == ',' && brace_counter == 0 {
             if i-pos > 1 {
-                res.push(format!("{}", s[pos+1..i].chars().collect::<String>()));
+                res.push(s[pos+1..i].chars().collect::<String>());
             }
             pos = i;
         }
