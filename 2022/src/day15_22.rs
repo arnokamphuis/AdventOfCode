@@ -19,27 +19,6 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
         words[1].split(", ").map(|s| s[2..].parse::<i64>().unwrap()).collect::<Vec<i64>>() )
     }).collect::<Vec<_>>();
 
-    let after0 = Instant::now();
-
-    let start1 = Instant::now();
-
-    let scan_line = if !real { 10 } else { 2000000 };
-    let beacons_on_scanline = sensors
-        .iter()
-        .filter(|(_,b)| b[1] == scan_line)
-        .map(|(_,b)| b)
-        .collect::<HashSet<_>>();
-
-    let beacon_distance = | y_val: i64 | -> Vec<_> {
-        sensors
-            .iter()
-            .map(|(s,b)| { (s, (s[0]-b[0]).abs() + (s[1]-b[1]).abs()) } )
-            .filter(|(s,d)| { d > &(y_val-s[1]).abs() })
-            .map(|(s,d)| (s,d-(y_val-s[1]).abs()))
-            .map(|(s,d)| (s[0]-d, s[0]+d))
-            .collect::<Vec<_>>()
-    };
-
     let range_union = | sets: &Vec<(i64,i64)> | -> Vec<(i64,i64)> {
         let mut sorted_sets = sets.clone();
         sorted_sets.sort_by(|a,b| a.0.cmp(&b.0));
@@ -57,6 +36,27 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
         res
     };
 
+    let beacon_distance = | y_val: i64 | -> Vec<_> {
+        sensors
+            .iter()
+            .map(|(s,b)| { (s, (s[0]-b[0]).abs() + (s[1]-b[1]).abs()) } )
+            .filter(|(s,d)| { d > &(y_val-s[1]).abs() })
+            .map(|(s,d)| (s,d-(y_val-s[1]).abs()))
+            .map(|(s,d)| (s[0]-d, s[0]+d))
+            .collect::<Vec<_>>()
+    };
+
+    let after0 = Instant::now();
+
+    let start1 = Instant::now();
+
+    let scan_line = if !real { 10 } else { 2000000 };
+    let beacons_on_scanline = sensors
+        .iter()
+        .filter(|(_,b)| b[1] == scan_line)
+        .map(|(_,b)| b)
+        .collect::<HashSet<_>>();
+
     let impossible_range = range_union(&beacon_distance(scan_line));   
     let res1 = impossible_range
         .iter()
@@ -71,10 +71,16 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
 
     let max_range = if !real { 20 } else { 4_000_000 };
 
-    let coordinate = (0..max_range)
+    let mut found = false;
+    let coordinate = (0..max_range).rev()
         .map(|y| {
-            let ru = range_union(&beacon_distance(y));
-            (ru.len(), ru[0].1 + 1, y)
+            if !(found) {
+                let ru = range_union(&beacon_distance(y));
+                if ru.len() > 1 { found = true; }
+                (ru.len(), ru[0].1 + 1, y)
+            } else {
+                (0,0,0)
+            }
         })
         .filter(|(l,_,_)| l > &1 )
         .map(|(_,x,y)| (x,y) )
