@@ -20,7 +20,8 @@ mod day12_22;
 mod day13_22;
 mod day14_22;
 // mod day14_22_movie;
-mod day15_22;
+// mod day15_22;
+mod day15_22_alt;
 mod day16_22;
 mod day17_22;
 mod day18_22;
@@ -96,12 +97,13 @@ fn main() {
         ("Day 09 of 2022", day09_22::run, 500),
         ("Day 10 of 2022", day10_22::run, 500),
         ("Day 11 of 2022", day11_22::run, 500),
-        ("Day 12 of 2022", day12_22::run, 500),
+        ("Day 12 of 2022", day12_22::run, 50),
         // ("Day 12 of 2022", day12_22_movie::run, 500),
         ("Day 13 of 2022", day13_22::run, 500),
         ("Day 14 of 2022", day14_22::run, 50),
         // ("Day 14 of 2022", day14_22_movie::run, 50),
-        ("Day 15 of 2022", day15_22::run, 10),
+        // ("Day 15 of 2022", day15_22::run, 10),
+        ("Day 15 of 2022", day15_22_alt::run, 50),
         ("Day 16 of 2022", day16_22::run, 10),
         ("Day 17 of 2022", day17_22::run, 10),
         ("Day 18 of 2022", day18_22::run, 10),
