@@ -76,13 +76,12 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
 
     let max_range = if !real { 20 } else { 4_000_000 };
 
-    let valid = | x: i64, y: i64, sd: &Vec<(&Vec<i64>,i64)> | -> bool {
-        for (s,d) in sd {
-            let dxy = (x-s[0]).abs() + (y-s[1]).abs();
-            if dxy <= *d {
+    let valid = | p: (i64,i64) | -> bool {
+        for (s,d) in &sensor_distance {
+            if ((p.0 - s[0]).abs() + (p.1 - s[1]).abs()) <= *d {
                 return false;
             }
-        }
+        };
         true
     };
 
@@ -94,7 +93,7 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
                 let x = s[0]+(dx*signx);
                 let y = s[1]+(dy*signy);
                 if 0 <= x && x <= max_range &&  0 <= y && y <= max_range {
-                    if valid(x,y,&sensor_distance) {
+                    if valid((x,y)) {
                         res2 = x * 4_000_000 + y;
                         break 'outer;
                     }
