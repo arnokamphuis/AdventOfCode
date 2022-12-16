@@ -2,37 +2,12 @@ use super::tools;
 use std::time::Instant;
 use std::collections::HashMap;
 
-#[derive(Eq, Hash, PartialEq, Clone, Debug)]
-struct State {
-    pos: usize,
-    open: usize,
-    time: usize,
-    elephant: bool,
-}
-
-impl State {
-    #[allow(dead_code)]
-    fn print(self: &State, nr_valves: usize) {
-        println!("State\n  valve: {}\n  time: {}", self.pos, 30 - self.time);
-        print!("  open: [ ");
-        for valve in 0..nr_valves {
-            if (self.open & 1<<valve) != 0 {
-                print!("{} ", valve);
-            } else {
-                print!(". ");
-            }
-        }
-        println!("]");
-    }
-}
-
-
 #[derive(Clone, Debug)]
 struct TunnelNetwork {
     initial_valve: usize,
     tunnels: Vec<Vec<usize>>,
     flow_rates: Vec<usize>,
-    states: HashMap<State, usize>,
+    states: HashMap<u128, usize>,
     max_time: usize,
 }
 
@@ -47,15 +22,13 @@ impl TunnelNetwork {
             }
         }
     
-        let cs = State {
-            pos: valve,
-            open: current_open,
-            time: time,
-            elephant: elephant_active,
-        };
+        let state: u128 = (current_open as u128) +
+            ( (valve as u128)           << 64+32 ) +
+            ( (time as u128)            << 64+16 ) +
+            ( (elephant_active as u128) << 64+8 );
 
-        if self.states.contains_key(&cs) {
-            return self.states[&cs];
+        if self.states.contains_key(&state) {
+            return self.states[&state];
         }
     
         let mut res = 0;
@@ -74,7 +47,7 @@ impl TunnelNetwork {
                 self.find_max_flow(time+1, next_valve, current_open, elephant_active) );
         }
     
-        self.states.insert(cs, res);
+        self.states.insert(state, res);
         res    
     }
 }
