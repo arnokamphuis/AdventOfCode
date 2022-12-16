@@ -7,7 +7,7 @@ struct TunnelNetwork {
     initial_valve: usize,
     tunnels: Vec<Vec<usize>>,
     flow_rates: Vec<usize>,
-    states: HashMap<u128, usize>,
+    states: HashMap<usize, usize>,
     max_time: usize,
 }
 
@@ -21,28 +21,27 @@ impl TunnelNetwork {
                 return 0;
             }
         }
-    
-        let state: u128 = (current_open as u128) +
-            ( (valve as u128)           << 64+32 ) +
-            ( (time as u128)            << 64+16 ) +
-            ( (elephant_active as u128) << 64+8 );
+
+        let valve_index = valve as usize;
+
+        let state = current_open * self.flow_rates.len() * 31 * 2 + valve_index * 31 * 2 + (time as usize) * 2 + (elephant_active as usize);
 
         if self.states.contains_key(&state) {
             return self.states[&state];
         }
     
-        let mut res = 0;
+        let mut res: usize = 0;
     
         let valve_not_open = (current_open & (1 << valve)) == 0;
-        if valve_not_open && self.flow_rates[valve]>0 {
+        if valve_not_open && self.flow_rates[valve_index]>0 {
             let new_open = current_open | (1 << valve);
             res = res.max( 
-                (self.max_time-time) * self.flow_rates[valve] + 
+                ((self.max_time-time) as usize) * self.flow_rates[valve_index] + 
                 self.find_max_flow(time+1, valve, new_open, elephant_active) 
             );
         }
     
-        for next_valve in self.tunnels[valve].clone() {
+        for next_valve in self.tunnels[valve_index].clone() {
             res = res.max( 
                 self.find_max_flow(time+1, next_valve, current_open, elephant_active) );
         }
@@ -69,7 +68,7 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
     input.iter().for_each(|line| {
         let words  = line.split_whitespace().collect::<Vec<&str>>();
         let valve  = words[1].to_string();
-        index_map.insert(valve.clone(),flow_rates.len());
+        index_map.insert(valve.clone(),flow_rates.len() as usize);
 
         let rate   = words[4][5..].strip_suffix(";").unwrap().parse::<usize>().unwrap();
         flow_rates.push(rate);
@@ -87,7 +86,7 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
                 s.to_string()
             }}).for_each(|tunnel| { 
                 let to = index_map[&tunnel];
-                tunnels[valve].push(to);
+                tunnels[valve as usize].push(to);
             });
     });
     
