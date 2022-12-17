@@ -106,7 +106,7 @@ impl Cave {
         self.next_rock();
         self.reset();
 
-        let mut previous: HashMap<(usize, usize, usize),(usize, usize)> = HashMap::new();
+        let mut previous: HashMap<usize,(usize, usize)> = HashMap::new();
 
         while self.rock_counter <= target {
             let jet = self.next_jet();
@@ -118,18 +118,10 @@ impl Cave {
             } else {
                 self.solidify_rock();
 
-                if self.rock_counter > 2022 { // part 2
-                    let history = self.field
-                        .iter()
-                        .last()
-                        .unwrap()
-                        .iter()
-                        .enumerate()
-                        .fold(0usize, |acc, (i,&v)| acc + v as usize * (1 << i) );
+                if self.rock_counter > 2022 { // for part 2
+                    let key = self.current_jet_index * 5 + self.rock_counter % 5;
 
                     let height = self.get_height(false);
-                    let key: (usize, usize, usize) = (self.current_jet_index as usize, self.rock_counter as usize % self.rocks.len(), history);
-
                     if let Some((prev_rock_counter, old_height)) = previous.get(&key) {
                         let delta_rocks = self.rock_counter - prev_rock_counter;
                         let delta_height = height - old_height;
@@ -216,7 +208,8 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
     let start1 = Instant::now();
 
     let res1 = cave.step(2022);
-    // let res1 = cave.get_height(true);
+
+    assert!( res1 == if !real { 3068 } else { 3059 } );
 
     let after1 = Instant::now();
     if print_result {
@@ -226,8 +219,9 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
     let start2 = Instant::now();
 
     let res2 = cave2.step(1000000000000);
-    // let res2 = cave2.get_height(true);
 
+    assert!( res2 == if !real { 1514285714288 } else { 1500874635587 } );
+    
     let after2 = Instant::now();
     if print_result {
         println!("Part 2: {}", res2);
