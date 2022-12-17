@@ -105,7 +105,7 @@ fn main() {
         // ("Day 15 of 2022", day15_22::run, 10),
         ("Day 15 of 2022", day15_22_alt::run, 50),
         ("Day 16 of 2022", day16_22::run, 10),
-        ("Day 17 of 2022", day17_22::run, 10),
+        ("Day 17 of 2022", day17_22::run, 50),
         ("Day 18 of 2022", day18_22::run, 10),
         ("Day 19 of 2022", day19_22::run, 10),
         ("Day 20 of 2022", day20_22::run, 10),

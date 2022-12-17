@@ -55,11 +55,11 @@ impl Cave {
     fn get_height(&self, total: bool) -> usize {
         self.field.iter().position(|row| {
             row.iter().all(|&x| x == 0)
-        }).unwrap() + if total { self.added_height_in_cycles + 2 } else { 0 }
+        }).unwrap() - 1 + if total { self.added_height_in_cycles } else { 0 }
     }
 
     fn reset(&mut self) {
-        let h = self.get_height(false);
+        let h = self.get_height(false) + 1;
         while h < self.field.len() {
             self.field.remove(h);
         }
@@ -80,7 +80,7 @@ impl Cave {
 
         let res = self.current_rock().iter().rev().enumerate().map(|(i,rr)| {
             {
-                let y_index = ((self.top+i) as i64 + delta_y) as usize;
+                let y_index = ((self.top+i) as i64 + delta_y) as usize;                
                 rr.iter().enumerate().all(|(j,&rc)| {
                         let x_index = ((self.left+j) as i64 + delta_x) as usize;
                         rc==0 || self.field[y_index][x_index]==0 
@@ -102,13 +102,13 @@ impl Cave {
         });
     }
 
-    fn step(&mut self, target: usize) {
+    fn step(&mut self, target: usize) -> usize {
         self.next_rock();
         self.reset();
 
         let mut previous: HashMap<(usize, usize, usize),(usize, usize)> = HashMap::new();
 
-        while self.rock_counter < target {
+        while self.rock_counter <= target {
             let jet = self.next_jet();
             if !self.collide(jet as i64, 0) {
                 self.left = (self.left as i16 + jet) as usize;
@@ -117,10 +117,8 @@ impl Cave {
                 self.top -= 1;
             } else {
                 self.solidify_rock();
-                self.next_rock();
-                self.reset();
 
-                if self.rock_counter >= 2020 { // part 2
+                if self.rock_counter > 2022 { // part 2
                     let history = self.field
                         .iter()
                         .last()
@@ -128,7 +126,6 @@ impl Cave {
                         .iter()
                         .enumerate()
                         .fold(0usize, |acc, (i,&v)| acc + v as usize * (1 << i) );
-
 
                     let height = self.get_height(false);
                     let key: (usize, usize, usize) = (self.current_jet_index as usize, self.rock_counter as usize % self.rocks.len(), history);
@@ -143,9 +140,12 @@ impl Cave {
                     }
                     previous.insert(key, (self.rock_counter, height));
                 }
+                self.next_rock();
+                self.reset();
             }
 
         }
+        self.get_height(true)
     }
 
     #[allow(dead_code)]
@@ -159,13 +159,14 @@ impl Cave {
                 }
             });
         });
-        for (i,row) in field.iter().enumerate().rev(){
 
+        let skip = field.len() - self.get_height(false)-1;
+        for (i,row) in field.iter().enumerate().rev().skip(skip) {
             print!("{} \t| ", i);
             row.iter().for_each(|v| print!("{}", match v {
                 0 => ".",
                 1 => "#",
-                2 => "@",
+                2 => "#",
                 _ => " "
             } ));
             println!("");
@@ -210,15 +211,12 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
 
     let mut cave2 = cave.clone();
 
-    // println!("height: {}",cave.get_height(false));
-
     let after0 = Instant::now();
 
     let start1 = Instant::now();
 
-
-    cave.step(2022);
-    let res1 = cave.get_height(true);
+    let res1 = cave.step(2022);
+    // let res1 = cave.get_height(true);
 
     let after1 = Instant::now();
     if print_result {
@@ -227,8 +225,8 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
 
     let start2 = Instant::now();
 
-    cave2.step(1000000000000);
-    let res2 = cave2.get_height(true) - 1;
+    let res2 = cave2.step(1000000000000);
+    // let res2 = cave2.get_height(true);
 
     let after2 = Instant::now();
     if print_result {
