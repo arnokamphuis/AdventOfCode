@@ -60,10 +60,11 @@ impl Cave {
 
     fn reset(&mut self) {
         let h = self.get_height(false) + 1;
-        while h < self.field.len() {
+        let needed = h+3+self.current_rock().len();
+        while needed < self.field.len() {
             self.field.remove(h);
         }
-        for _ in self.field.len()..h+3+self.current_rock().len() {
+        for _ in self.field.len()..needed {
             self.field.push(vec![0,0,0,0,0,0,0]);
         }
         self.left = 2;
