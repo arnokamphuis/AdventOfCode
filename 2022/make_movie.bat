@@ -7,5 +7,9 @@ ffmpeg -framerate 120 -i search-part2-%05d.png -s:v 1344x328 -c:v libx264 -profi
 
 ffmpeg -framerate 240 -i search_%05d.png -s:v 1344x720 -c:v libx264 -profile:v high -crf 20 -pix_fmt yuv420p day12-240fps.mp4
 
+
+ffmpeg -framerate 240 -i field_part1_%05d.png -s:v 600x800 -c:v libx264 -profile:v high -crf 20 -pix_fmt yuv420p day22-part1-240fps.mp4
+ffmpeg -framerate 240 -i field_part2_%05d.png -s:v 600x800 -c:v libx264 -profile:v high -crf 20 -pix_fmt yuv420p day22-part2-240fps.mp4
+
 ffmpeg -framerate 1200 -i rope_%05d.png -s:v 720x720 -c:v libx264 -profile:v high -crf 20 -pix_fmt yuv420p day09-1200fps.mp4
 ffmpeg -i day09-30fps.mp4 -vf "fps=30,scale=720:-1:flags=lanczos,split[s0][s1];[s0]palettegen[p];[s1][p]paletteuse" -loop 0 day09-30fps.gif
