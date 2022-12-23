@@ -33,7 +33,7 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
         }
     };
 
-    let print_elves = | elves: &HashSet<(i64,i64)> | {
+    let _print_elves = | elves: &HashSet<(i64,i64)> | {
         let min_field = elves.iter().fold((i64::MAX, i64::MAX), |acc, elf| (acc.0.min(elf.0), acc.1.min(elf.1)));
         let max_field = elves.iter().fold((i64::MIN, i64::MIN), |acc, elf| (acc.0.max(elf.0), acc.1.max(elf.1)));
         for y in min_field.1..=max_field.1 {
@@ -50,7 +50,7 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
         let mut no_option: HashSet<(i64,i64)> = HashSet::new();
         for elf in elves {
             let mut found = false;
-            if !all_eight.iter().all(|delta| !elves.contains( &(elf.0 + delta.0, elf.1 + delta.1) )  ) {
+            if all_eight.iter().any(|delta| elves.contains( &(elf.0 + delta.0, elf.1 + delta.1) )  ) {
                 'inner: for ta in test_actions {
                     if ta.0.iter().all(|delta| !elves.contains( &(elf.0 + delta.0, elf.1 + delta.1) )  ) {
                         let new_pos = (elf.0 + ta.1.0, elf.1 + ta.1.1);
@@ -63,9 +63,7 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
                         break 'inner;
                     }
                 }
-            } else {
-                no_option.insert(*elf);
-            }
+            } 
             if !found {
                 no_option.insert(*elf);
             }
@@ -113,7 +111,7 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
     let start2 = Instant::now();
 
     let mut res2 = 0;
-    let mut moved = true;
+    let mut moved;
     for r in 11.. {
         (moved, elves) = round(&elves, &mut test_actions);
         rotate_actions(&mut test_actions);

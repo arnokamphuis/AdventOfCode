@@ -1,6 +1,6 @@
 use super::tools;
 use std::time::Instant;
-use std::collections::{HashSet, VecDeque};
+use std::collections::{HashSet};
 use priority_queue::PriorityQueue;
 
 #[derive(Clone, Debug)]
@@ -21,7 +21,6 @@ fn find_max_geode(
         a[0] as u64 + a[1] as u64 * 10 + a[2] as u64 * 100 + a[3] as u64 * 1000
     };
 
-    let mut depth = 0;
     pq.push((time_left, [0,0,0,0], [1,0,0,0], None, [0,0,0,0]), prio([0,0,0,0]) );
     while let Some((s,_)) = pq.pop() {
 

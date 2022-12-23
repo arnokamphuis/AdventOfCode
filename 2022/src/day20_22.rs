@@ -47,9 +47,6 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
     };
     let input = tools::get_input(String::from(input_file));
     let original = input.iter().map(|line| line.parse::<i64>().unwrap()).collect::<Vec<i64>>();
-    let n = original.len();
-
-    let mut dq = original.iter().enumerate().map(|(i,v)| (i as i64, *v)).collect::<VecDeque<_>>();
 
     let after0 = Instant::now();
 

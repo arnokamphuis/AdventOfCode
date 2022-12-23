@@ -42,10 +42,7 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
                     instructions.push(Inst::Rotate(c));
                 }
             }
-            if num > 0 {
-                instructions.push(Inst::Walk(num));
-                num = 0;
-            }    
+            instructions.push(Inst::Walk(num));
         }
     });
 
@@ -65,7 +62,7 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
             if part == 1 {
                 let nd = (-d.0, -d.1);
                 let mut pos = (cp.0 + nd.0, cp.1 + nd.1);
-                while let Some(free_or_not) = field.get(&pos) {
+                while let Some(_free_or_not) = field.get(&pos) {
                     pos = (pos.0+nd.0, pos.1+nd.1);
                 }
                 pos = (pos.0-nd.0, pos.1-nd.1);
