@@ -32,6 +32,7 @@ mod day20_22;
 mod day21_22;
 mod day22_22;
 // mod day22_22_movie;
+// mod day23_22_movie;
 mod day23_22;
 mod day24_22;
 mod day25_22;
@@ -118,6 +119,7 @@ fn main() {
         ("Day 22 of 2022", day22_22::run, 10),
         // ("Day 22 of 2022", day22_22_movie::run, 10),
         ("Day 23 of 2022", day23_22::run, 10),
+        // ("Day 23 of 2022", day23_22_movie::run, 10),
         ("Day 24 of 2022", day24_22::run, 10),
         ("Day 25 of 2022", day25_22::run, 10),
     ];
