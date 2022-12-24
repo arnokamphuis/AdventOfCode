@@ -59,6 +59,14 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
         }
     };
 
+    let colors = blizzards.iter().map(|b| match b.1 {
+        [-1, 0] => (255,255,0,255),
+        [ 1, 0] => (255,0,255,255),
+        [ 0,-1] => (0,255,255,255),
+        [ 0, 1] => (100,100,100,255),
+        _ => panic!(),
+    }).collect::<Vec<(u8,u8,u8,u8)>>();
+
     let inside = | p: [i64;2] | -> bool { 
         (0..2).all(|i| p[i] > 0 && p[i] < max[i]) || p == start || p == goal
     };
@@ -111,7 +119,7 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
     let mut img = Image::new(max[0] as usize + 1, max[1] as usize + 1, 8);
 
     let clear = | img: &mut Image | {
-        img.clear((150,150,150,255));
+        img.clear((250,250,250,255));
         (0..=max[0]).for_each(|x| { img.set_pixel(x as usize, 0, (0,0,0,255)); img.set_pixel(x as usize, max[1] as usize, (0,0,0,255)); } );
         (0..=max[1]).for_each(|y| { img.set_pixel(0, y as usize, (0,0,0,255)); img.set_pixel(max[0] as usize, y as usize, (0,0,0,255)); } );
         img.set_pixel( start[0] as usize, start[1] as usize, (255,0,0,255));
@@ -120,15 +128,15 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
 
     let mut draw_scene = | img: &mut Image, path_element: &(i64, [i64;2]), path: &Vec<(i64, [i64;2])>, counter: &mut usize | {
         let bs = update_blizzards(path_element.0, &blizzards, &mut history);
-        bs.iter().for_each(|p| {
-            img.set_pixel( p[0] as usize, p[1] as usize, (255,255,255,255));            
+        bs.iter().enumerate().for_each(|(i,p)| {
+            img.set_pixel( p[0] as usize, p[1] as usize, colors[i]);            
         });
 
         path.iter().filter(|&(t,_)| *t < path_element.0).for_each(|&(_,pos)| {
-            img.set_pixel( pos[0] as usize, pos[1] as usize, (0,255,255,100));            
+            img.set_pixel( pos[0] as usize, pos[1] as usize, (10,10,10,100));            
         });
 
-        img.set_pixel( path_element.1[0] as usize, path_element.1[1] as usize, (0,0,255,255));            
+        img.set_pixel( path_element.1[0] as usize, path_element.1[1] as usize, (20,20,20,255));            
         img.save_png(&format!("images/day24_22/blizzards_{:05}.png", counter)); *counter += 1;    
     };
 
