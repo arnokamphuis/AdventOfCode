@@ -15,9 +15,10 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
     };
     let input = tools::get_input(String::from(input_file));
 
-    let start = [ 1i64, 0i64];
-    let goal  = [ input[0].len() as i64 - 2, input.len() as i64 - 1 ];
-    let max   = [ input[0].len() as i64 - 1, input.len() as i64 - 1 ];
+    let start  = [ 1i64, 0i64];
+    let goal   = [ input[0].len() as i64 - 2, input.len() as i64 - 1 ];
+    let max    = [ input[0].len() as i64 - 1, input.len() as i64 - 1 ];
+    let period = (max[0]-1) * (max[1]-1);
 
     let blizzards: Vec<([i64;2],[i64;2])> = input
         .iter()
@@ -44,14 +45,15 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
 
     let mut history: HashMap<i64, Vec<[i64;2]>> = HashMap::new();
     let update_blizzards = | t: i64, blzds: &Vec<([i64;2],[i64;2])>, history: &mut HashMap<i64, Vec<[i64;2]>> | -> Vec<[i64;2]> {
-        if history.contains_key(&t) {
-            return history[&t].clone();
+        let t_rep = t % period;
+        if history.contains_key(&t_rep) {
+            return history[&t_rep].clone();
         } else {
-            let v: Vec<[i64;2]> = blzds.iter().map(|blzd| {
-                [ (blzd.0[0] + blzd.1[0] * t - 1).rem_euclid( max[0] - 1) + 1,
-                (blzd.0[1] + blzd.1[1] * t - 1).rem_euclid( max[1] - 1) + 1 ]
-            }).collect();
-            history.insert(t,v.clone());
+            let v: Vec<[i64;2]> = blzds.iter().map(|blzd| { [ 
+                (blzd.0[0] + blzd.1[0] * t_rep - 1).rem_euclid( max[0] - 1) + 1,
+                (blzd.0[1] + blzd.1[1] * t_rep - 1).rem_euclid( max[1] - 1) + 1
+            ]}).collect();
+            history.insert(t_rep,v.clone());
             v
         }
     };
