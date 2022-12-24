@@ -2,6 +2,7 @@ use super::tools;
 use std::time::Instant;
 use priority_queue::PriorityQueue;
 use std::cmp::Reverse;
+use std::collections::HashMap;
 
 #[allow(dead_code)]
 pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
@@ -41,18 +42,18 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
         .map(|&t| t)
         .collect::<Vec<([i64;2],[i64;2])>>();
 
-    let update_blizzards = | t: i64, blzds: &Vec<([i64;2],[i64;2])> | -> Vec<[i64;2]> {
-        blzds.iter().map(|blzd| {
-            let mut p = blzd.0;
-            let v = blzd.1;
-
-            (0..2).for_each(|i| {
-                p[i] += v[i] * t;
-                p[i] = (p[i]-1).rem_euclid(max[i]-1)+1;
-            });
-
-            p
-        }).collect()
+    let mut history: HashMap<i64, Vec<[i64;2]>> = HashMap::new();
+    let update_blizzards = | t: i64, blzds: &Vec<([i64;2],[i64;2])>, history: &mut HashMap<i64, Vec<[i64;2]>> | -> Vec<[i64;2]> {
+        if history.contains_key(&t) {
+            return history[&t].clone();
+        } else {
+            let v: Vec<[i64;2]> = blzds.iter().map(|blzd| {
+                [ (blzd.0[0] + blzd.1[0] * t - 1).rem_euclid( max[0] - 1) + 1,
+                (blzd.0[1] + blzd.1[1] * t - 1).rem_euclid( max[1] - 1) + 1 ]
+            }).collect();
+            history.insert(t,v.clone());
+            v
+        }
     };
 
     let inside = | p: [i64;2] | -> bool { 
@@ -61,13 +62,13 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
 
     let directions = [ [-1i64, 0i64], [ 1i64, 0i64], [0i64, -1i64], [0i64, 1i64], [0i64, 0i64] ];
 
-    let find = | start_pos: [i64;2], end_pos: [i64;2], time_offset: i64 | -> i64 {
+    let find = | start_pos: [i64;2], end_pos: [i64;2], time_offset: i64, history: &mut HashMap<i64, Vec<[i64;2]>> | -> i64 {
         let state = (time_offset, start_pos);
         let mut pq = PriorityQueue::new();
         pq.push( state, Reverse(time_offset) );
         while let Some(((t,pos), _prio)) = pq.pop() {
             if pos == end_pos { return t; }
-            let positions = update_blizzards(t+1, &blizzards);
+            let positions = update_blizzards(t+1, &blizzards, history);
             for dir in &directions {
                 let next_pos = [pos[0] + dir[0], pos[1] + dir[1]];
                 if inside(next_pos) && !positions.contains(&next_pos) {
@@ -83,7 +84,7 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
 
     let start1 = Instant::now();
 
-    let res1 = find(start,goal,0);
+    let res1 = find(start,goal,0, &mut history);
 
     let after1 = Instant::now();
     if print_result {
@@ -92,7 +93,7 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
 
     let start2 = Instant::now();
 
-    let res2 = find(start,goal, find(goal,start,res1));
+    let res2 = find(start,goal, find(goal,start,res1, &mut history), &mut history);
 
     let after2 = Instant::now();
     if print_result {
