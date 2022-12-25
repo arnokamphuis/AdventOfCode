@@ -1,131 +1,111 @@
 use super::tools;
 use std::time::Instant;
-use std::collections::HashMap;
-// use std::collections::{HashSet, VecDeque};
+// use std::collections::HashMap;
+use std::collections::{HashSet, VecDeque};
+// use std::collections::{VecDeque};
 
 #[derive(Clone, Debug)]
 struct Blueprint {
     costs: [[u32; 4]; 4],
 }
 
-fn find_max_geode(
-    bp: &Blueprint,
-    time_left: i8,
-    purse: [u32; 4],
-    robots: [u32; 4],
-    mem: &mut HashMap<(i8, [u32; 4], [u32; 4]), u32>,
-) -> u32 {
+fn find_max_geode(bp: &Blueprint, time_left: i8, purse: [u32; 4], robots: [u32; 4]) -> u32 {
     let mut ans = 0;
 
-    // for _ in 0..time_left {
-    //     print!(" ");
-    // }
-    // println!("-> {:?}", (time_left, purse, robots));
-    // println!("START find_max_geode: {:?}", (time_left, purse, robots));
+    let mut seen: HashSet<(i8, [u32; 4], [u32; 4])> = HashSet::new();
 
-    if time_left == 0 {
-        // println!("------------------ returning from {:?}", (time_left, purse, robots));
-        return purse[3];
-    }
+    let cost_ore = bp.costs.iter().map(|c| c[0]).max().unwrap();
 
-    // println!("=========== FINDING NEXT ROBOT TO PRODUCE ===========");
+    let mut dq: VecDeque<(i8, [u32;4], [u32;4])> = VecDeque::new();
+    let key = (time_left, purse, robots);
+    dq.push_back(key);
 
-    (0..4)
-        .filter(|&robot| (0..4).all(|resource| purse[resource] >= bp.costs[robot][resource]))
-        .filter(|&robot| robots[robot] < bp.costs.iter().map(|v| v[robot]).max().unwrap())
-        .for_each(|robot| {
-            // println!("   - - - - ROBOT {} - - - - ", robot);
-            let mut next_purse = purse.clone();
-            (0..4).for_each(|resource| {
-                next_purse[resource] -= bp.costs[robot][resource];
-            });
+    while let Some(state) = dq.pop_front() {
+        ans = ans.max(state.1[3]);
 
-            let mut next_robots = robots.clone();
-            next_robots[robot] += 1;
+        if state.0 > 0 {
+            let mut reduced_state = state;
 
-            let t = (0..4).map(|rbt| {
+            // if there are more ore robots than costs for ore, no extra robots needed
+            if reduced_state.2[0] >= cost_ore {
+                reduced_state.2[0] = cost_ore;
+            }
 
-                if let Some(tt) = (0..4)
-                    .filter(|&resource| bp.costs[rbt][resource] > 0)
-                    .map(|resource| 
-                        if next_robots[resource] > 0 {
-                            (
-                                1.0f32 + (bp.costs[rbt][resource] as f32 - next_purse[resource] as f32 - robots[resource] as f32) / next_robots[resource] as f32
-                            ).ceil() as i64
-                        } else {
-                            i64::MAX
-                        }
-                    )
-                    .filter(|&v| v>0)
-                    .max() {
-                        // println!("***** next t for rbt {} = {}", rbt, tt);
-                        tt        
-                    } else {
-                        i64::MAX
-                    }
-            }).min().unwrap().max(1);
-        
-            // println!("    found t = {} as next event", t);
-            
-            if t <= time_left as i64 {
+            // costs obsidian robots is ore and clay. If there is more clay robots than clay costs, reduce them
+            if reduced_state.2[1] >= bp.costs[2][1] {
+                reduced_state.2[1] = bp.costs[2][1];
+            }
 
-                // println!("next t: {} with robot {}", t, robot);
-                (0..4).for_each(|resource| {
-                    next_purse[resource] += t as u32 * robots[resource];
+            // costs geode robots is ore and obsidian. If there is more obsidian robots than obsidian costs, reduce them
+            if reduced_state.2[2] >= bp.costs[3][2] {
+                reduced_state.2[2] = bp.costs[3][2];
+            }
+
+            // if purse for ore is larger than costs needed to pay for all future ore than purse is reduced
+            if reduced_state.1[0] >= time_left as u32 * cost_ore - reduced_state.2[0] * (time_left as u32 - 1) {
+                reduced_state.1[0] = time_left as u32 * cost_ore - reduced_state.2[0] * (time_left as u32 - 1);
+            }
+
+            // if purse for clay is larger than costs needed to pay for all future clay than purse is reduced            
+            if reduced_state.1[1] >= time_left as u32 * bp.costs[2][1] - reduced_state.2[1] * (time_left as u32 - 1) {
+                reduced_state.1[1] = time_left as u32 * bp.costs[2][1] - reduced_state.2[1] * (time_left as u32 - 1);
+            }
+
+            // if purse for obsidian is larger than costs needed to pay for all future obsidian than purse is reduced
+            if reduced_state.1[2] >= time_left as u32 * bp.costs[3][2] - reduced_state.2[2] * (time_left as u32 - 1) {
+                reduced_state.1[2] = time_left as u32 * bp.costs[3][2] - reduced_state.2[2] * (time_left as u32 - 1);
+            }
+
+            if !seen.contains(&reduced_state) {
+                seen.insert(reduced_state);
+
+                reduced_state.0 -= 1;
+
+                let mut new_state = reduced_state;
+                reduced_state.2.iter().enumerate().for_each(|(resource,robot_count)| {
+                    new_state.1[resource] += robot_count;
                 });
+                dq.push_back(new_state);
 
-                // println!("    going into recursion with {:?}", (time_left - t as i8, next_purse, next_robots));
-
-                ans = ans.max(find_max_geode(
-                    bp,
-                    time_left - t as i8,
-                    next_purse,
-                    next_robots,
-                    mem,
-                ));
-            }
-        });
-
-
-    let t = (0..4).map(|rbt| {
-        if let Some(tt) = (0..4)
-            .filter(|&resource| bp.costs[rbt][resource] > 0)
-            .map(|resource| 
-                if robots[resource] > 0 {
-                    (
-                        1.0f32 + (bp.costs[rbt][resource] as f32 - purse[resource] as f32 - robots[resource] as f32) / robots[resource] as f32
-                    ).ceil() as i64
-                } else {
-                    i64::MAX
+                if reduced_state.1[0] >= bp.costs[0][0] { // buy ore robot
+                    let mut new_state = reduced_state;
+                    reduced_state.2.iter().enumerate().for_each(|(resource,robot_count)| {
+                        new_state.1[resource] += robot_count - bp.costs[0][resource];
+                    });
+                    new_state.2[0] += 1;
+                    dq.push_back(new_state);
                 }
-            )
-            .filter(|&v| v>0)
-            .max() {
-                tt        
-            } else {
-                i64::MAX
+
+                if reduced_state.1[0] >= bp.costs[1][0] { // buy clay robot
+                    let mut new_state = reduced_state;
+                    reduced_state.2.iter().enumerate().for_each(|(resource,robot_count)| {
+                        new_state.1[resource] += robot_count - bp.costs[1][resource];
+                    });
+                    new_state.2[1] += 1;
+                    dq.push_back(new_state);
+                }
+
+                if reduced_state.1[0] >= bp.costs[2][0] && reduced_state.1[1] >= bp.costs[2][1] { // buy clay robot
+                    let mut new_state = reduced_state;
+                    reduced_state.2.iter().enumerate().for_each(|(resource,robot_count)| {
+                        new_state.1[resource] += robot_count - bp.costs[2][resource];
+                    });
+                    new_state.2[2] += 1;
+                    dq.push_back(new_state);
+                }
+
+                if reduced_state.1[0] >= bp.costs[3][0] && reduced_state.1[2] >= bp.costs[3][2] { // buy clay robot
+                    let mut new_state = reduced_state;
+                    reduced_state.2.iter().enumerate().for_each(|(resource,robot_count)| {
+                        new_state.1[resource] += robot_count - bp.costs[3][resource];
+                    });
+                    new_state.2[3] += 1;
+                    dq.push_back(new_state);
+                }
             }
-    }).min().unwrap().max(1);
-
-    if t <= time_left as i64 {
-        // println!("next t: {}  with no robot", t);
-        let mut next_purse = purse.clone();
-        (0..4).for_each(|resource| {
-            next_purse[resource] += t as u32 * robots[resource];
-        });
-
-        // println!("    going into recursion with {:?}", (time_left - t as i8, next_purse, robots));
-
-        ans = ans.max(find_max_geode(
-            bp,
-            time_left - t as i8,
-            next_purse,
-            robots,
-            mem,
-        ));
+        }
     }
-    
-    // println!("DONE with ans: {}   --- {:?}", ans, (time_left, purse, robots));
+
     ans
 }
 
@@ -166,14 +146,7 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
         .iter()
         .enumerate()
         .map(|(index, bp)| {
-            let mut mem: HashMap<(i8, [u32; 4], [u32; 4]), u32> =
-                HashMap::new();
-
-            println!("BLUEPRINT: {:?}", bp);
-
-            let ans = find_max_geode(&bp, 24, [0, 0, 0, 0], [1, 0, 0, 0], &mut mem);
-            println!("ans: {}", ans);
-            (index as u32 + 1) * ans
+            (index as u32 + 1) * find_max_geode(&bp, 24, [0, 0, 0, 0], [1, 0, 0, 0])
         })
         .sum::<u32>();
     
@@ -184,16 +157,13 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
 
     let start2 = Instant::now();
 
-    let res2 = 0;
-    // let res2 = blueprints
-    //     .iter()
-    //     .take(3)
-    //     .map(|bp| {
-    //         let mut mem: HashMap<(i8, [u32; 4], [u32; 4]), u32> =
-    //             HashMap::new();
-    //         find_max_geode(&bp, 32, [0, 0, 0, 0], [1, 0, 0, 0], &mut mem)
-    //     })
-    //     .fold(1, |acc, v| acc*v);
+    let res2 = blueprints
+        .iter()
+        .take(3)
+        .map(|bp| {
+            find_max_geode(&bp, 32, [0, 0, 0, 0], [1, 0, 0, 0])
+        })
+        .fold(1, |acc, v| acc*v);
 
     let after2 = Instant::now();
     if print_result {

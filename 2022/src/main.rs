@@ -26,8 +26,8 @@ mod day16_22;
 mod day17_22;
 mod day18_22;
 // mod day19_22_recursive;
-// mod day19_22_fast;
-mod day19_22;
+mod day19_22_fast;
+// mod day19_22;
 mod day20_22;
 mod day21_22;
 mod day22_22;
@@ -113,8 +113,8 @@ fn main() {
         ("Day 17 of 2022", day17_22::run, 50),
         ("Day 18 of 2022", day18_22::run, 500),
         // ("Day 19 of 2022", day19_22_recursive::run, 1),
-        // ("Day 19 of 2022", day19_22_fast::run, 10),
-        ("Day 19 of 2022", day19_22::run, 10),
+        ("Day 19 of 2022", day19_22_fast::run, 3),
+        // ("Day 19 of 2022", day19_22::run, 10),
         ("Day 20 of 2022", day20_22::run, 10),
         ("Day 21 of 2022", day21_22::run, 10),
         ("Day 22 of 2022", day22_22::run, 10),
