@@ -9,7 +9,7 @@ SESSION = session_file.readlines()[0].strip()
 
 useragent = 'https://github.com/arnokamphuis/AdventOfCode/blob/master/prepare.py'
 parser = argparse.ArgumentParser(description='Read input')
-parser.add_argument('--year', type=int, default=22)
+parser.add_argument('--year', type=int, default=23)
 parser.add_argument('--day', type=int, default=1)
 args = parser.parse_args()
 
