@@ -29,7 +29,7 @@ real_input_file = open("day{:02d}-{}/day{:02d}-real.txt".format(day,args.year,da
 real_input_file.write(real_output)
 real_input_file.close()
 
-test_input_file = open('day{:02d}-{}/day{:02d}-text.txt'.format(day,args.year,day), "w+")
+test_input_file = open('day{:02d}-{}/day{:02d}-test.txt'.format(day,args.year,day), "w+")
 test_input_file.write("")
 test_input_file.close()
 
