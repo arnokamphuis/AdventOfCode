@@ -3,6 +3,10 @@
 import sys
 runtype = sys.argv[1]
 runpart = int(sys.argv[2])
+if len(sys.argv) > 3:
+    runs = int(sys.argv[3])
+else:
+    runs = 1
 
 text_file = open("day01-{}.txt".format(runtype), "r")
 
@@ -36,8 +40,12 @@ def part2():
     return res
 
 if runpart == 1 or runpart == 0:
-    print("Part 1: {}".format(part1()))
+    for run in range(runs):
+        resp1 = part1()
+    print("Part 1: {}".format(resp1))
 
 if runpart == 2 or runpart == 0:
-    print("Part 2: {}".format(part2()))
+    for run in range(runs):
+        resp2 = part2()
+    print("Part 2: {}".format(resp2))
     
