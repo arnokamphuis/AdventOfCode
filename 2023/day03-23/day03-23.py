@@ -22,121 +22,56 @@ C = len(lines)
 R = len(lines[0])
 
 
-def get_value(grid, x, y):
-    if x < 0 or x >= len(grid):
-        return '.'
-    if y < 0 or y >= len(grid[0]):
-        return '.'
-    return grid[x][y]
-
-def create_value(grid,s):
-    i = 0
-    res = 0
-    for digit in s:
-        v = get_value(grid, digit[0], digit[1])
-        res += pow(10,i) * int(v)
-        i += 1
-    return res
-
-def find_value(grid, coord):
-    x,y = coord
-    res = int(get_value(grid, x, y))
-
-    x,y = coord
-    offset = 0
-    while get_value(grid, x, y-1).isdigit():
-        y -= 1
-        offset += 1
-        res += pow(10,offset) * int(get_value(grid, x, y))
-
-    x,y = coord
-    while get_value(grid, x, y+1).isdigit():
-        y += 1
-        res = 10 * res + int(get_value(grid, x, y))
-
-    return res
-
 def part1():
+    res = 0
+    for i in range(R):
+        current_number = 0
+        ispart = False
+        for j in range(C+1):
+            if j < C and lines[i][j].isdigit():
+                current_number = current_number * 10 + int(lines[i][j])
 
-    numbers = []
-    digit_coordinates = set()
-    for i in range(C):
-        for j in range(R):
-            if lines[i][j].isdigit():
-                digit_coordinates.add((i,j))
-
-    while len(digit_coordinates) > 0:
-        num = set()
-        x,y = digit_coordinates.pop()
-        # print(x,y)
-        num.add((x,y))
-        dy = 1
-        if (x,y+dy) in digit_coordinates:
-            while (x,y+dy) in digit_coordinates:
-                num.add((x,y+dy))
-                digit_coordinates.remove((x,y+dy))
-                dy += 1
-        else:
-            dy = -1
-            while (x,y+dy) in digit_coordinates:
-                num.add((x,y+dy))
-                digit_coordinates.remove((x,y+dy))
-                dy -= 1
-        numbers.append(num)
-
-    partnumbers = []
-    for num in numbers:
-        for x,y in num:
-            for d in delta:
-                v = get_value(lines, x+d[0], y+d[1])
-                if not (v.isdigit() or v == '.') and num not in partnumbers:
-                    partnumbers.append(num)
-
-    real_parts = [ create_value(lines, part) for part in partnumbers ]
-
-    return reduce( lambda x,y: x + y, real_parts)
+                for d in delta:
+                    x = i + d[0]
+                    y = j + d[1]
+                    if x >= 0 and x < R and y >= 0 and y < C:
+                        if not lines[x][y].isdigit() and lines[x][y] != '.':
+                            ispart = True
+            else:
+                if ispart:
+                    res += current_number
+                current_number = 0
+                ispart = False
+    return res
 
 def part2():
     res = 0
+    gear_numbers = defaultdict(list)
     for i in range(R):
-        for j in range(C):            
-            found = 0
-            coordinates_found = []
-            if lines[i][j] == '*':
+        current_number = 0
+        isgear = set()
+        for j in range(C+1):
+            if i<R and j < C and lines[i][j].isdigit():
+                current_number = current_number * 10 + int(lines[i][j])
 
-                if get_value(lines, i-1, j-1).isdigit() and get_value(lines, i-1, j) == '.' and get_value(lines, i-1, j+1).isdigit():
-                    coordinates_found.append((i-1,j-1))
-                    coordinates_found.append((i-1,j+1))
-                else:
-                    if get_value(lines, i-1, j).isdigit():
-                        coordinates_found.append((i-1,j))
-                    elif get_value(lines, i-1, j-1).isdigit():
-                        coordinates_found.append((i-1,j-1))
-                    else:
-                        if get_value(lines, i-1, j+1).isdigit():
-                            coordinates_found.append((i-1,j+1))
-                        
-                if get_value(lines, i+1, j-1).isdigit() and get_value(lines, i+1, j) == '.' and get_value(lines, i+1, j+1).isdigit():
-                    coordinates_found.append((i+1,j-1))
-                    coordinates_found.append((i+1,j+1))
-                else:
-                    if get_value(lines, i+1, j).isdigit():
-                        coordinates_found.append((i+1,j))
-                    elif get_value(lines, i+1, j-1).isdigit():
-                        coordinates_found.append((i+1,j-1))
-                    else:
-                        if get_value(lines, i+1, j+1).isdigit():
-                            coordinates_found.append((i+1,j+1))
-                
-                if get_value(lines, i, j-1).isdigit():
-                    coordinates_found.append((i,j-1))
-                if get_value(lines, i, j+1).isdigit():
-                    coordinates_found.append((i,j+1))
+                for d in delta:
+                    x = i + d[0]
+                    y = j + d[1]
+                    if x >= 0 and x < R and y >= 0 and y < C:
+                        if lines[x][y] == '*':
+                            isgear.add((x,y))
 
-                if len(coordinates_found)==2:
-                    gear_power = find_value(lines, coordinates_found[0]) * find_value(lines, coordinates_found[1])
-                    res += gear_power
-    return res
+            else:
+                if len(isgear)>0:
+                    for gear in isgear:
+                        gear_numbers[gear].append(current_number)
+                current_number = 0
+                isgear = set()
+
+    return reduce(
+        lambda x,y: x+y, 
+        [gear[0]*gear[1] for gear in gear_numbers.values() if len(gear) == 2]
+    )
 
 if runpart == 1 or runpart == 0:
     for run in range(runs):
