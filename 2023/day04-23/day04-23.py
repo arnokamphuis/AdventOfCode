@@ -29,14 +29,14 @@ for id_, cards_ in lines:
 
 def part1():
     return reduce(
-        lambda x, y: x + pow(2,y-1), 
+        lambda x, y: x + 2**(y-1), 
         filter( lambda x: x > 0, winningcount.values()), 
         0)
 
 def part2():
     for id, won in winningcount.items():
-        for i in range(1,won+1):
-            count[id+i] += count[id]
+        for i in range(won):
+            count[id+i+1] += count[id]
     return sum(count.values())
 
 if runpart == 1 or runpart == 0:
