@@ -22,7 +22,8 @@ for id_, cards_ in lines:
     wcards, ycards = cards_.split(" | ")
     winning = set(wcards.split())
     yours = set(ycards.split())
-    wc = len(winning) - len(winning - yours)
+    wc = len(yours & winning)
+
     count[id] = 1
     winningcount[id] = wc
 
