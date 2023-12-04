@@ -1,3 +1,4 @@
+from math import prod
 from collections import defaultdict
 from functools import reduce
 import sys
@@ -38,18 +39,15 @@ def part1():
     )
 
 def part2():
-    return reduce(
-        lambda x, y: x + y,
-        [ reduce(
-            lambda x, y: x * y,
+    return sum([
+        prod ( 
             reduce(
                 lambda x, y: { color: max(x.get(color,0), y.get(color,0)) for color in x },
                 [ dict([ (color, int(count)) for count, color in turn]) for turn in turns],
                 { "red": 0, "green": 0, "blue": 0 }
-                ).values(),
-            1) for id_, turns in lines
-        ], 0
-    )
+            ).values() 
+        ) for _, turns in lines    
+    ])
 
 if runpart == 1 or runpart == 0:
     for run in range(runs):
