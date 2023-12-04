@@ -35,10 +35,9 @@ def part1():
 
 def part2():
     for id, won in winningcount.items():
-        for n in range(1,won+1):
-            if id+n in count.keys():
-                count[id+n] += count[id]
-    return reduce( lambda x, y: x + y, count.values(), 0)
+        for i in range(1,won+1):
+            count[id+i] += count[id]
+    return sum(count.values())
 
 if runpart == 1 or runpart == 0:
     for run in range(runs):
