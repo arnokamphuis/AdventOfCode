@@ -68,10 +68,13 @@ def part2():
                 current_number = 0
                 isgear = set()
 
-    return reduce(
-        lambda x,y: x+y, 
-        [gear[0]*gear[1] for gear in gear_numbers.values() if len(gear) == 2]
-    )
+    return sum(
+        map(lambda g: g[0]*g[1], 
+            filter(lambda g: len(g) == 2, 
+                   gear_numbers.values()
+                   )
+            )
+        )
 
 if runpart == 1 or runpart == 0:
     for run in range(runs):
