@@ -14,8 +14,9 @@ text_file = open("day08-{}.txt".format(runtype), "r")
 
 lines = [line.strip() for line in text_file.readlines()]
 moves = [ 0 if c == 'L' else 1 for c in lines[0].strip() ]
-nodes = lines[2:]
+n = len(moves)
 
+nodes = lines[2:]
 
 def least_common_multiple(xs):
   ans = 1
@@ -31,37 +32,27 @@ for node in nodes:
 def part1():
     target = "ZZZ"
     current = "AAA"
-    cycles = 0
     move = 0
     while current != target:
-        current = graph[current][moves[move]]
+        current = graph[current][moves[ move % n ]]
         move += 1
-        if move == len(moves):
-            move = 0
-            cycles += 1 
-    return move + cycles * len(moves)
+    return move
 
 def part2():
     all_A_nodes = [node for node in graph.keys() if node[2] == 'A']
     cycle_lengths = []
 
     for anode in all_A_nodes:
-        previous_z = 0
         move = 0
-        cycles = 0
         current = anode
         while True:
-            if current[2] == 'Z' and previous_z == 0:
-                previous_z = move + cycles * len(moves)
-            elif current[2] == 'Z' and previous_z != 0:
-                cycle_lengths.append(move + cycles * len(moves) - previous_z)
+            end = current[2]
+            if end == 'Z':
+                cycle_lengths.append(move)
                 break
-
-            current = graph[current][moves[move]]
-            move += 1
-            if move == len(moves):
-                move = 0
-                cycles += 1 
+            else:
+                current = graph[current][moves[ move % n ]]
+                move += 1
     return least_common_multiple(cycle_lengths)
 
 if runpart == 1 or runpart == 0:
