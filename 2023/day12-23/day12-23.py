@@ -1,8 +1,6 @@
-from copy import deepcopy
 # read command-line parameters and based on that read the input file
 from collections import defaultdict
 import sys
-from itertools import permutations
 runtype = sys.argv[1]
 runpart = int(sys.argv[2])
 if len(sys.argv) > 3:
