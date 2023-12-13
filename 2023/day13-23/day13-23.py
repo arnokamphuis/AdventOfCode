@@ -14,73 +14,25 @@ fields = [[[c for c in row] for row in map] for map in
     [block.split('\n') for block in 
     [block for block in text_file.read().split('\n\n')]]]
 
-def calculate_mirror_score(field):
+def calculate_mirror_score(field, target):
     res = 0
     R = len(field)
     C = len(field[0])
-    mirrors = []
 
-    vertical_mirrors = []
     for c in range(1,C):
-        if all([field[r][c-1-cc] == field[r][c+cc] for r in range(R) for cc in range(0,min(C-c,c))]):
-            vertical_mirrors.append((c,C))
-            mirrors.append(("col",c))
+        if sum([len(smudge) for smudge in [[((r,c-1-cc), (r,c+cc)) for r in range(R) if field[r][c-1-cc] != field[r][c+cc]] for cc in range(0,min(C-c,c))]]) == target:
             res += c
 
-    horizonal_mirrors = []
     for r in range(1,R):
-        if all([field[r-1-rr][c] == field[r+rr][c] for c in range(C) for rr in range(0,min(R-r,r))]):
-            horizonal_mirrors.append((r,R))
-            mirrors.append(("row",r))
-            res += 100 * r
-
-    return res, mirrors
+        if sum([len(smudge) for smudge in [[((r-1-rr,c), (r+rr,c)) for c in range(C) if field[r-1-rr][c] != field[r+rr][c]] for rr in range(0,min(R-r,r))]]) == target:
+            res += r * 100
+    return res
 
 def part1():
-    res = 0
-    for findex, field in enumerate(fields):
-        ans, mirrors = calculate_mirror_score(field)
-        res += ans
-    return res
+    return sum([calculate_mirror_score(field, 0) for field in fields])
 
 def part2():
-    res = 0
-    for findex, field in enumerate(fields):
-        R = len(field)
-        C = len(field[0])
-
-        all_smudges = []
-        for c in range(1,C):
-            smudges = [[((r,c-1-cc), (r,c+cc)) for r in range(R) if field[r][c-1-cc] != field[r][c+cc]] for cc in range(0,min(C-c,c))]
-            count_smudges = sum([len(smudge) for smudge in smudges])
-            if count_smudges == 1:
-                smudges = list(filter(lambda smudge: len(smudge) == 1, smudges))[0][0]
-                all_smudges.append(smudges)
-
-        for r in range(1,R):
-            smudges = [[((r-1-rr,c), (r+rr,c)) for c in range(C) if field[r-1-rr][c] != field[r+rr][c]] for rr in range(0,min(R-r,r))]
-            count_smudges = sum([len(smudge) for smudge in smudges])
-            if count_smudges == 1:
-                smudges = list(filter(lambda smudge: len(smudge) == 1, smudges))[0][0]
-                all_smudges.append(smudges)
-
-        pre_ans, pre_mirrors = calculate_mirror_score(field)
-
-        for smudges in all_smudges:
-            from_r, from_c = smudges[0]
-            to_r, to_c = smudges[1]
-            field[to_r][to_c] = field[from_r][from_c]
-
-        post_ans, post_mirrors = calculate_mirror_score(field)
-
-        for post_mirror in post_mirrors:
-            if post_mirror not in pre_mirrors:
-                if post_mirror[0] == "row":
-                    res += 100 * post_mirror[1]
-                elif post_mirror[0] == "col":
-                    res += post_mirror[1]
-
-    return res
+    return sum([calculate_mirror_score(field, 1) for field in fields])
 
 if runpart == 1 or runpart == 0:
     for run in range(runs):
