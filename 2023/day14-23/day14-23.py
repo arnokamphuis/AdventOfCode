@@ -16,6 +16,7 @@ R = len(lines)
 C = len(lines[0])
 
 def move(rocks, dir):
+    rocks = deepcopy(rocks)
     (dr, dc) = dir
 
     fR = 0 if dr == -1 else R-1
@@ -72,7 +73,8 @@ def part2():
     cycle = 0
     while True:
         for dir in dirs:
-            rocks = move(deepcopy(rocks), dir)
+            # rocks = move(deepcopy(rocks), dir)
+            rocks = move(rocks, dir)
         cycle += 1
 
         if rocks in previous:
@@ -83,7 +85,8 @@ def part2():
             remaining = remaining % cycle_length
             for j in range(0,remaining):
                 for dir in dirs:
-                    rocks = move(deepcopy(rocks), dir)
+                    # rocks = move(deepcopy(rocks), dir)
+                    rocks = move(rocks, dir)
                 cycle += 1
             break
         previous.append(rocks)
