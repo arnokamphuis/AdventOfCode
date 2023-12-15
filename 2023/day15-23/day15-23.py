@@ -24,9 +24,8 @@ def part2():
     box = [[] for _ in range(256)]
     for step in lines:
         split_p = max(step.find('='),step.find('-'))
-        label = step[:split_p]
-        id = step[split_p+1:]
-
+        label, id = step[:split_p], step[split_p+1:]
+        
         h = hash(label)
         ri = [i for i, x in enumerate(box[h]) if x[0] == label]
         if '-' in step: # remove lens from box
