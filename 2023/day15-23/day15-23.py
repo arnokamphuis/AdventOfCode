@@ -1,6 +1,7 @@
 
 # read command-line parameters and based on that read the input file
 from functools import reduce
+import re
 import sys
 runtype = sys.argv[1]
 runpart = int(sys.argv[2])
@@ -23,9 +24,7 @@ def part1():
 def part2():
     box = [[] for _ in range(256)]
     for step in lines:
-        split_p = max(step.find('='),step.find('-'))
-        label, id = step[:split_p], step[split_p+1:]
-        
+        label, id = re.split('-|=', step)
         h = hash(label)
         ri = [i for i, x in enumerate(box[h]) if x[0] == label]
         if '-' in step: # remove lens from box
