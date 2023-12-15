@@ -1,5 +1,6 @@
 
 # read command-line parameters and based on that read the input file
+from collections import defaultdict
 from functools import reduce
 import re
 import sys
@@ -22,23 +23,23 @@ def part1():
     return reduce(lambda x, y: x + y, [hash(line) for line in lines], 0)
 
 def part2():
-    box = [[] for _ in range(256)]
+    focal_lengths = {}
+    box = defaultdict(list)
     for step in lines:
         label, id = re.split('-|=', step)
-        h = hash(label)
-        ri = [i for i, x in enumerate(box[h]) if x[0] == label]
+        h = hash(label) + 1
         if '-' in step: # remove lens from box
-            if len(ri) > 0:
-                del box[h][ri[0]]
+            if h in box and label in box[h]:
+                if len(box[h]) <= 1:
+                    del box[h]
+                else:
+                    box[h].remove(label)
         else: # add lens to box
-            if len(ri) > 0:
-                box[h][ri[0]] = (label,int(id))
-            else:
-                box[h].append((label,int(id)))
+            if label not in box[h]:
+                box[h].append(label)
+            focal_lengths[label] = int(id)
 
-    filled_boxes =  [(i, b) for i, b in enumerate(box,1) if len(b) > 0]
-
-    return sum([fbn * sum([ sid*slot[1] for sid, slot in enumerate(b,1) ]) for fbn, b in filled_boxes])
+    return sum([fbn * sum([ sid*focal_lengths[label] for sid, label in enumerate(b,1) ]) for fbn, b in box.items()])
 
 if runpart == 1 or runpart == 0:
     for run in range(runs):
