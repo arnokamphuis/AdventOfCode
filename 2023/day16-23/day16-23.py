@@ -11,23 +11,15 @@ else:
 
 text_file = open("day16-{}.txt".format(runtype), "r")
 
-lines = [line.strip() for line in text_file.readlines()]
-lines = [[c for c in line] for line in lines]
-R = len(lines)
-C = len(lines[0])
+lines = [[c for c in line] for line in map(str.strip, text_file.readlines())]
+grid = {(r,c): lines[r][c] for r in range(len(lines)) for c in range(len(lines[0]))}
 
-grid = {}
-for r in range(R):
-    for c in range(C):
-        grid[(r,c)] = lines[r][c]
-
-def find_excited(grid, start):
+def find_excited(start):
+    global grid
     q = deque()
     visited = set()
 
-    current, dir = start
-
-    q.append((current, dir))
+    q.append(start)
     while q:
         current, dir = q.popleft()
         if (current,dir) in visited:
@@ -63,21 +55,29 @@ def find_excited(grid, start):
         if next_char == '/':
             q.append((next, (-dir[1], -dir[0])))  
 
-    return len(set([k[0] for k in visited])) - 1 # start pos outside is also counted
+    visited.remove(start)
+
+    return len(set([k[0] for k in visited]))
 
 def part1():
-    return find_excited(grid, ((0,-1), (0,1)))
+    return find_excited(((0,-1), (0,1)))
 
 def part2():
-    excited = set()
-    for r in range(R):
-        excited.add(find_excited(grid, (( r,-1), ( 0, 1))))
-        excited.add(find_excited(grid, (( r, C), ( 0,-1))))
-    for c in range(C):
-        excited.add(find_excited(grid, ((-1, c), ( 1, 0))))
-        excited.add(find_excited(grid, (( R, c), (-1, 0))))
+    res = 0
+    
+    R = len(lines)
+    C = len(lines[0])
 
-    return max(excited)
+    for r in range(R):
+        res = max(res, 
+                  find_excited(((r,-1), (0, 1))), 
+                  find_excited(((r, C), (0,-1))))
+    for c in range(C):
+        res = max(res, 
+                  find_excited(((-1, c), ( 1, 0))), 
+                  find_excited((( R, c), (-1, 0))))
+
+    return res
 
 if runpart == 1 or runpart == 0:
     for run in range(runs):
