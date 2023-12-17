@@ -36,7 +36,7 @@ def find_minimum_energyloss(energy_loss, part):
             continue
         visited[key] = energy
         
-        for dd in [-1, 0, 1] if cd != -1 else [1, 2, 3, 4]:
+        for dd in [-1, 0, 1] if cd != -1 else [2, 3]:
             nd = (cd + dd) % 4
             ddir = dirs[nd]
             nr, nc = cr + ddir[0], cc + ddir[1]
