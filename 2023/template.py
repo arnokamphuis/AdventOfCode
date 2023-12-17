@@ -8,7 +8,7 @@ if len(sys.argv) > 3:
 else:
     runs = 1
 
-text_file = open("dayxx-{}.txt".format(runtype), "r")
+text_file = open(f"dayxx-{runtype}.txt", "r")
 
 lines = [line.split() for line in text_file.readlines()]
 

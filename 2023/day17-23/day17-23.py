@@ -9,7 +9,7 @@ if len(sys.argv) > 3:
 else:
     runs = 1
 
-text_file = open("day17-{}.txt".format(runtype), "r")
+text_file = open(f"day17-{runtype}.txt", "r")
 
 energy_loss = [[int(c) for c in map(str.strip,line)] \
                for line in map(str.strip,text_file.readlines())]
