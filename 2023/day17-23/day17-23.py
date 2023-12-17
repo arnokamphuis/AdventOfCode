@@ -36,17 +36,17 @@ def find_minimum_energyloss(energy_loss, part):
             continue
         visited[key] = energy
         
-        for di, (dr, dc) in dirs.items():
-            nr, nc = cr + dr, cc + dc
-            nd = di
+        for dd in [-1, 0, 1] if cd != -1 else [1, 2, 3, 4]:
+            nd = (cd + dd) % 4
+            ddir = dirs[nd]
+            nr, nc = cr + ddir[0], cc + ddir[1]
             nlseq = (1 if nd != cd else lseq + 1)
-            going_back = abs(nd - cd) == 2 and cd != -1
 
             valid_steps = \
                 (part == 1 and (nlseq <= 3)) or \
                 (part == 2 and ((4 <= lseq <= 10) or (nd==cd and lseq <= 3) or lseq == -1))
 
-            if 0 <= nr < R and 0 <= nc < C and valid_steps and not going_back:
+            if 0 <= nr < R and 0 <= nc < C and valid_steps:
                 heapq.heappush(q, (energy + energy_loss[nr][nc], (nr, nc), nd, nlseq))
 
     # the endpoint might be visited in multiple directions, therefore we need to find the minimum
