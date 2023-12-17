@@ -33,7 +33,7 @@ def find_minimum_energyloss(energy_loss, part):
     while q:
         energy, (cr,cc), cd, lseq = heapq.heappop(q)
 
-        if (cr,cc) == (R-1,C-1):
+        if (cr,cc) == (R-1,C-1) and ( (part == 1) or (part == 2 and lseq >= 4)):
             res = energy
             break
         
