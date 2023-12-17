@@ -51,9 +51,6 @@ def find_minimum_energyloss(energy_loss, part):
             valid_steps = \
                 (part == 1 and (nlseq <= 3)) or \
                 (part == 2 and ((nd != cd and lseq >= 4) or (nd==cd and nlseq <= 10) or lseq == -1))
-            
-
-
 
             if 0 <= nr < R and 0 <= nc < C and valid_steps:
                 heapq.heappush(q, (energy + energy_loss[nr][nc], (nr, nc), nd, nlseq))
