@@ -16,6 +16,7 @@ energy_loss = [[int(c) for c in map(str.strip,line)] \
 
 
 def find_minimum_energyloss(energy_loss, part):
+    res = 0
     R, C = len(energy_loss), len(energy_loss[0])
     dirs = { 0: (-1,0), 1: (0,1), 2: (1,0), 3: (0,-1) }
 
@@ -31,11 +32,16 @@ def find_minimum_energyloss(energy_loss, part):
     visited = {}
     while q:
         energy, (cr,cc), cd, lseq = heapq.heappop(q)
+
+        if (cr,cc) == (R-1,C-1):
+            res = energy
+            break
+        
         key = ((cr,cc), cd, lseq)
         if key in visited:
             continue
         visited[key] = energy
-        
+
         for dd in [-1, 0, 1] if cd != -1 else [2, 3]:
             nd = (cd + dd) % 4
             ddir = dirs[nd]
@@ -49,8 +55,7 @@ def find_minimum_energyloss(energy_loss, part):
             if 0 <= nr < R and 0 <= nc < C and valid_steps:
                 heapq.heappush(q, (energy + energy_loss[nr][nc], (nr, nc), nd, nlseq))
 
-    # the endpoint might be visited in multiple directions, therefore we need to find the minimum
-    return min([v for k, v in visited.items() if k[0] == (R-1,C-1) ])
+    return res
 
 
 def part1():
