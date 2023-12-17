@@ -11,7 +11,8 @@ else:
 
 text_file = open("day17-{}.txt".format(runtype), "r")
 
-energy_loss = [[int(c) for c in map(str.strip,line)] for line in map(str.strip,text_file.readlines())]
+energy_loss = [[int(c) for c in map(str.strip,line)] \
+               for line in map(str.strip,text_file.readlines())]
 
 
 def find_minimum_energyloss(energy_loss, part):
