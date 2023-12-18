@@ -28,10 +28,10 @@ def find_minimum_energyloss(energy_loss, part):
     # start in the direction -1 with sequence length -1 making
     # sure that the first step is always valid
 
-    q = [(0, (0, 0), -1, -1)]
+    q = [(R+C-2, (0, 0), -1, -1, 0)]
     visited = {}
     while q:
-        energy, (cr,cc), cd, lseq = heapq.heappop(q)
+        _, (cr,cc), cd, lseq, energy = heapq.heappop(q)
 
         if (cr,cc) == (R-1,C-1) and ((part == 1) or (part == 2 and lseq >= 4)):
             res = energy
@@ -53,7 +53,9 @@ def find_minimum_energyloss(energy_loss, part):
                 (part == 2 and ((nd != cd and lseq >= 4) or (nd==cd and nlseq <= 10) or lseq == -1))
 
             if 0 <= nr < R and 0 <= nc < C and valid_steps:
-                heapq.heappush(q, (energy + energy_loss[nr][nc], (nr, nc), nd, nlseq))
+                ne = energy + energy_loss[nr][nc]
+                heur = ne + (R-1-nr) + (C-1-nc)
+                heapq.heappush(q, (heur, (nr, nc), nd, nlseq, ne))
 
     return res
 
