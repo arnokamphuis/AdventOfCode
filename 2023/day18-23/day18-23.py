@@ -47,10 +47,8 @@ def part1():
 def part2():
     points = [(0,0)]
     for _, _, code in lines:
-        hex, dir_index = str(code[:5]), int(code[5])
+        hex, (dr, dc) = str(code[:5]), get_dir(int(code[5]))
         steps = int(hex,16)
-
-        dr, dc = get_dir(dir_index)
         r,c = points[-1]
         points.append((r + dr * steps, c + dc * steps))
     return calculate_integer_area(points)
