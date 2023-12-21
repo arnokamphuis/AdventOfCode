@@ -1,5 +1,7 @@
 
 # read command-line parameters and based on that read the input file
+from collections import deque
+from math import floor
 import sys
 runtype = sys.argv[1]
 runpart = int(sys.argv[2])
@@ -18,35 +20,71 @@ def find_s(map):
             if map[r][c] == "S":
                 return r, c
             
-DP = {}
 def can_reach(map, sr, sc, steps):
-    if (sr, sc, steps) in DP:
-        return DP[(sr, sc, steps)]
-    
-    reachable = set([])
-    if steps == 0:
-        reachable.add((sr, sc))
-    else:
+    reachable = set()
+    visited = set()
+    visited.add((sr, sc))
+
+    q = deque([(sr, sc, steps)])
+    while q:
+        cr, cc, s = q.popleft()
+
+        if s%2 == 0:
+            reachable.add((cr, cc))
+        if s == 0:
+            continue
+
         dirs = [(0,1), (0,-1), (1,0), (-1,0)]
         for d in dirs:
-            r = sr+d[0]
-            c = sc+d[1]
-            if r < 0 or r >= len(map) or c < 0 or c >= len(map[r]):
+            r = cr+d[0]
+            c = cc+d[1]
+            if r < 0 or r >= len(map) or c < 0 or c >= len(map[r]) or map[r][c] == "#" or (r, c) in visited:
                 continue
-            if map[r][c] == "#":
-                continue
-            next_reachable = can_reach(map, r, c, steps-1)
-            reachable = reachable.union(next_reachable)
-    DP[(sr, sc, steps)] = reachable
-    return reachable
+            visited.add((r, c))
+            q.append((r, c, s-1))
+    return len(reachable)
 
 def part1():
     sr, sc = find_s(map)
-    reachable = can_reach(map, sr, sc, 64)
-    return len(reachable)
+    return can_reach(map, sr, sc, 64)
 
 def part2():
-    return 0
+    if runtype == "test":
+        return 0
+
+    sr, sc = find_s(map)
+
+    size = len(map)
+    steps = 26501365
+
+    grid_width = steps//size - 1
+    odd_grids = (grid_width // 2 * 2 + 1) ** 2
+    even_grids = ((grid_width+1) // 2 * 2) ** 2
+
+    odd_points = can_reach(map, sr, sc, size * 2 + 1)
+    even_points = can_reach(map, sr, sc, size * 2)
+
+    top_corner = can_reach(map, size - 1, sc, size - 1)
+    bottom_corner = can_reach(map, 0, sc, size - 1)
+    left_corner = can_reach(map, sr, size-1, size - 1)
+    right_corner = can_reach(map, sr, 0, size - 1)
+
+    small_top_right = can_reach(map, size-1, 0, size // 2 - 1)
+    small_bottom_right = can_reach(map, 0, 0, size // 2 - 1)
+    small_bottom_left = can_reach(map, 0, size-1, size // 2 - 1)
+    small_top_left = can_reach(map, size-1, size-1, size // 2 - 1)
+
+    large_top_right = can_reach(map, size-1, 0, (size * 3) // 2 - 1)
+    large_bottom_right = can_reach(map, 0, 0, (size * 3) // 2 - 1)
+    large_bottom_left = can_reach(map, 0, size-1, (size * 3) // 2 - 1)
+    large_top_left = can_reach(map, size-1, size-1, (size * 3) // 2 - 1)
+
+    res = odd_grids * odd_points + even_grids * even_points + \
+        top_corner + bottom_corner + left_corner + right_corner + \
+        (grid_width + 1) * (small_top_right + small_bottom_right + small_bottom_left + small_top_left) + \
+        grid_width * (large_top_right + large_bottom_right + large_bottom_left + large_top_left)
+    
+    return res
 
 if runpart == 1 or runpart == 0:
     for run in range(runs):
