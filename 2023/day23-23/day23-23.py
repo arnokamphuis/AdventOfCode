@@ -2,6 +2,7 @@
 # read command-line parameters and based on that read the input file
 from collections import defaultdict, deque
 from copy import deepcopy
+import math
 import sys
 runtype = sys.argv[1]
 runpart = int(sys.argv[2])
@@ -65,21 +66,22 @@ for node in nodes:
 def solve(distances):
     visited = {node: False for node in nodes}
 
-    res = 0
     def dfs(node, d):
-        nonlocal res
-        if visited[node]:
-            return
-        visited[node] = True
         if node == end:
-            res = max(d,res)
+            return d
+
+        res = -math.inf
+
+        if visited[node]:
+            return res
+        
+        visited[node] = True
         for opt, opt_d in distances[node].items():
-            dfs(opt, d+opt_d)
+            res = max(res, dfs(opt, d+opt_d))
         visited[node] = False
+        return res
 
-    dfs(start, 0)
-
-    return res
+    return dfs(start, 0)
 
 def part1():
     return solve(distances)
