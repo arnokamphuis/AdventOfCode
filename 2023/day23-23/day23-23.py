@@ -26,39 +26,41 @@ forces_steps = {
     '<': (0,-1)
 }
 
-options = defaultdict(set)
+def neighbours(node):
+    return [(node[0]+dr, node[1]+dc) for dr,dc in [(0,1),(0,-1),(1,0),(-1,0)] 
+            if (0<=node[0]+dr<R and 0<=node[1]+dc<C) and (grid[node[0]+dr][node[1]+dc] != '#') and (grid[node[0]][node[1]] != '#')]
 
-for r in range(R):
-    for c in range(C):
-        option = set()
-        if grid[r][c] != '#':
-            if grid[r][c] in forces_steps.keys():
-                option.add((r+forces_steps[grid[r][c]][0], c+forces_steps[grid[r][c]][1]))
-            else:
-                for dir in [(0,1),(0,-1),(1,0),(-1,0)]:
-                    rr = r+dir[0]
-                    rc = c+dir[1]
-                    if 0 <= rr < R and 0 <= rc < C and grid[rr][rc] != '#':
-                        option.add((rr,rc))
-            options[(r,c)] = option
+def count_neighbours(node):
+    return len(neighbours(node))
+
+nodes = [(r, c) for r in range(1,R-1) for c in range(1,C-1) if count_neighbours((r,c)) > 2] + [start, end]
 
 def trace_path(pos, ppos):
     count = 1
-    while len([opt for opt in options[pos] if opt != ppos]) == 1:
-        (next,) = [opt for opt in options[pos] if opt != ppos]
+    while pos not in nodes:
+        next = pos
+        ch = grid[pos[0]][pos[1]]
+        if ch in 'v^<>':
+            next = (pos[0]+forces_steps[ch][0], pos[1]+forces_steps[ch][1])
+            if next == ppos:
+                break
+        else:
+            for n in neighbours(pos):
+                if n != ppos:
+                    next = n
+                    break
         ppos = pos
         pos = next
         count += 1
     return count, pos
 
 distances = defaultdict(lambda: defaultdict(int))
-nodes = [opt for opt in options if len(options[opt]) > 2] + [start,end]
 for node in nodes:
-    for opt in options[node]:
-        if opt != node:
-            d, end_point = trace_path(opt, node)
-            if end_point in nodes:
-                distances[node][end_point] = d
+    nb = neighbours(node)
+    for next in nb:
+        d, end_point = trace_path(next, node)
+        if end_point in nodes:
+            distances[node][end_point] = d
 
 def solve(distances):
     visited = {node: False for node in nodes}
