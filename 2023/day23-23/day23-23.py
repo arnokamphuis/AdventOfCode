@@ -43,13 +43,13 @@ for r in range(R):
             options[(r,c)] = option
 
 def trace_path(pos, ppos):
-    path = [pos]
+    count = 1
     while len([opt for opt in options[pos] if opt != ppos]) == 1:
         (next,) = [opt for opt in options[pos] if opt != ppos]
         ppos = pos
         pos = next
-        path.append(pos)
-    return len(path), path[-1]
+        count += 1
+    return count, pos
 
 distances = defaultdict(lambda: defaultdict(int))
 nodes = [opt for opt in options if len(options[opt]) > 2] + [start,end]
