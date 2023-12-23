@@ -39,19 +39,12 @@ nodes = [(r, c) for r in range(1,R-1) for c in range(1,C-1) if count_neighbours(
 def trace_path(pos, ppos):
     count = 1
     while pos not in nodes:
-        next = pos
         ch = grid[pos[0]][pos[1]]
         if ch in 'v^<>':
-            next = (pos[0]+forces_steps[ch][0], pos[1]+forces_steps[ch][1])
-            if next == ppos:
+            if (pos[0]+forces_steps[ch][0], pos[1]+forces_steps[ch][1]) == ppos:
                 break
-        else:
-            for n in neighbours(pos):
-                if n != ppos:
-                    next = n
-                    break
-        ppos = pos
-        pos = next
+        (next,) = [n for n in neighbours(pos) if n != ppos]
+        pos, ppos = next, pos
         count += 1
     return count, pos
 
