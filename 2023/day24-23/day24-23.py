@@ -28,7 +28,7 @@ def path_intersect(t1, t2):
     b2 = -t2[1][0]
     c2 = a2 * t2[0][0] + b2 * t2[0][1]
 
-    # if both directional coefficients are equal, the lines are parallel
+    # if both directional coefficients are equal or opposite, the lines are parallel
     # v1y * -v2x == -v1x * v2y  ===>  v1x * v2y - v1y * v2x == 0 (cross product is 0)
     if a1 * b2 == b1 * a2:
         return False, None
@@ -67,6 +67,10 @@ def part2():
     # this requires 2n equations, where n is the number of trajectories
     # the equations are the determinant of the matrix
     # https://en.wikipedia.org/wiki/Line%E2%80%93line_intersection
+
+    # I use the relative velocities of the trajectories
+    # then I solve for (p1x−p2x) * v2y − (p1y−p2y) * v2x = 0
+    # and this for two of three planes of existence ;-)
 
     equations = []
     for i, t in enumerate(trajectories):
