@@ -24,11 +24,9 @@ def check_safe(line, skip_one = False):
     else:
         for s in range(len(line)):
             new_line = line[:s] + line[s+1:]
-            pairs = [(new_line[i], new_line[i + 1]) for i in range(len(new_line)-1)]
-            if len(set([sign(p1-p2) for p1, p2 in pairs])) == 1 and \
-                all([1 <= d and d <= 3 for d in [abs(p1-p2) for p1, p2 in pairs]]):
+            if check_safe(new_line):
                 return True
-    return False
+        return False
     
 def part1():
     ans = 0
