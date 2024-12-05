@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+</head>
+
+<body>
+    <div>
+        <script src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-svg.js"></script>
+        <script src="https://cdn.plot.ly/plotly-2.12.1.min.js"></script>
+        <div id="plotly-html-element" class="plotly-graph-div" style="height:100%; width:100%;"></div>
+
+        <script type="module">
+            const graph_div = document.getElementById("plotly-html-element");
+            await Plotly.newPlot(graph_div, {
+  "data": [
+    {
+      "type": "bar",
+      "x": [
+        "day 1",
+        "day 2"
+      ],
+      "y": [
+        1.4180759,
+        0.29612154
+      ],
+      "name": "Initialization",
+      "marker": {
+        "color": "red"
+      },
+      "error_y": {
+        "type": "data",
+        "array": [
+          0.16699145524914016,
+          0.055328819416542795
+        ]
+      }
+    },
+    {
+      "type": "bar",
+      "x": [
+        "day 1",
+        "day 2"
+      ],
+      "y": [
+        0.00016418,
+        0.00894798
+      ],
+      "name": "Part 1",
+      "marker": {
+        "color": "blue"
+      },
+      "error_y": {
+        "type": "data",
+        "array": [
+          0.0004414645258681628,
+          0.0025488420742761173
+        ]
+      }
+    },
+    {
+      "type": "bar",
+      "x": [
+        "day 1",
+        "day 2"
+      ],
+      "y": [
+        0.03648638,
+        0.32502675
+      ],
+      "name": "Part 2",
+      "marker": {
+        "color": "green"
+      },
+      "error_y": {
+        "type": "data",
+        "array": [
+          0.013769915486145876,
+          0.04411824913765728
+        ]
+      }
+    }
+  ],
+  "layout": {
+    "title": {
+      "text": "Runtimes in ms for Advent of Code 2022",
+      "font": {
+        "family": "Droid Serif",
+        "size": 24,
+        "color": "black"
+      }
+    },
+    "xaxis": {
+      "title": {
+        "text": "Day",
+        "font": {
+          "family": "Droid Serif",
+          "size": 12,
+          "color": "black"
+        }
+      }
+    },
+    "yaxis": {
+      "title": {
+        "text": "Runtime in ms",
+        "font": {
+          "family": "Droid Serif",
+          "size": 12,
+          "color": "black"
+        }
+      },
+      "type": "log"
+    },
+    "barmode": "group"
+  },
+  "config": {}
+});
+        </script>
+    </div>
+</body>
+
+</html>
