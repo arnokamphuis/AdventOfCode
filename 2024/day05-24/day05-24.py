@@ -17,21 +17,15 @@ page_ordering_rules = [list(map(int, line.split('|'))) for line in lines[:cut]]
 pages_to_produce = [list(map(int, line.split(','))) for line in lines[cut+1:]]
 
 def split_corret_incorrect(por, ptp):
-    correct_lst = []
-    incorrect_lst = []
-    correct = True
+    incorrect = []
     for page in ptp:
-        correct = True
         for rule in por:
             if rule[0] in page and rule[1] in page:
                 if page.index(rule[0]) > page.index(rule[1]):
-                    correct = False
-        if correct:
-            correct_lst.append(page)
-        else:
-            incorrect_lst.append(page)
-    
-    return correct_lst, incorrect_lst
+                    incorrect.append(page)
+                    break
+    correct = [page for page in ptp if page not in incorrect]
+    return correct, incorrect
 
 correct, incorrect = split_corret_incorrect(page_ordering_rules, pages_to_produce)    
 
