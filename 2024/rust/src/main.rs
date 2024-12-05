@@ -5,8 +5,8 @@ use std::io::Write;
 mod day01_24;
 mod day02_24;
 mod day03_24;
-// mod day04_24;
-// mod day05_24;
+mod day04_24;
+mod day05_24;
 // mod day06_24;
 // mod day07_24;
 // mod day08_24;
@@ -56,7 +56,7 @@ fn create_graph(data: &Vec<(usize, (f32,f32,f32))>, errors: &Vec<(usize, (f64,f6
         .error_y(ErrorData::new(ErrorType::Data).array(part2_error));
 
     let layout = Layout::new().bar_mode(BarMode::Group)
-        .title(Title::new("Runtimes in ms for Advent of Code 2022").font(Font::new().color(NamedColor::Black).size(24).family("Droid Serif")))
+        .title(Title::new("Runtimes in ms for Advent of Code 2024").font(Font::new().color(NamedColor::Black).size(24).family("Droid Serif")))
         .x_axis(Axis::new().title(Title::new("Day").font(Font::new().color(NamedColor::Black).size(12).family("Droid Serif"))))
         .y_axis(Axis::new().title(Title::new("Runtime in ms").font(Font::new().color(NamedColor::Black).size(12).family("Droid Serif"))).type_(AxisType::Log));
 
@@ -79,31 +79,31 @@ fn create_graph(data: &Vec<(usize, (f32,f32,f32))>, errors: &Vec<(usize, (f64,f6
 
 fn main() {
     let days: Vec<(&str, fn(bool, bool) -> (u128, u128, u128), usize)> = vec![
-        ("Day 01 of 2024", day01_24::run, 5000),
-        ("Day 02 of 2024", day02_24::run, 5000),
-        ("Day 03 of 2024", day03_24::run, 5000),
-        // ("Day 04 of 2024", day04_24::run, 5000),
-        // ("Day 05 of 2024", day05_24::run, 5000),
-        // ("Day 06 of 2024", day06_24::run, 5000),
-        // ("Day 07 of 2024", day07_24::run, 5000),
-        // ("Day 08 of 2024", day08_24::run, 5000),
-        // ("Day 09 of 2024", day09_24::run, 500),
-        // ("Day 10 of 2024", day10_24::run, 500),
-        // ("Day 11 of 2024", day11_24::run, 500),
-        // ("Day 12 of 2024", day12_24::run, 50),
-        // ("Day 13 of 2024", day13_24::run, 500),
-        // ("Day 14 of 2024", day14_24::run, 50),
-        // ("Day 15 of 2024", day15_24::run, 50),
-        // ("Day 16 of 2024", day16_24::run, 10),
-        // ("Day 17 of 2024", day17_24::run, 50),
-        // ("Day 18 of 2024", day18_24::run, 500),
-        // ("Day 19 of 2024", day19_24::run, 3),
-        // ("Day 20 of 2024", day20_24::run, 10),
-        // ("Day 21 of 2024", day21_24::run, 10),
-        // ("Day 22 of 2024", day22_24::run, 10),
-        // ("Day 23 of 2024", day23_24::run, 10),
-        // ("Day 24 of 2024", day24_24::run, 10),
-        // ("Day 25 of 2024", day25_24::run, 10),
+        ("Day 01 of 2024", day01_24::run, 1000),
+        ("Day 02 of 2024", day02_24::run, 1000),
+        ("Day 03 of 2024", day03_24::run, 1000),
+        ("Day 04 of 2024", day04_24::run, 1000),
+        ("Day 05 of 2024", day05_24::run, 1000),
+        // ("Day 06 of 2024", day06_24::run, 1000),
+        // ("Day 07 of 2024", day07_24::run, 1000),
+        // ("Day 08 of 2024", day08_24::run, 1000),
+        // ("Day 09 of 2024", day09_24::run, 1000),
+        // ("Day 10 of 2024", day10_24::run, 1000),
+        // ("Day 11 of 2024", day11_24::run, 1000),
+        // ("Day 12 of 2024", day12_24::run, 1000),
+        // ("Day 13 of 2024", day13_24::run, 1000),
+        // ("Day 14 of 2024", day14_24::run, 1000),
+        // ("Day 15 of 2024", day15_24::run, 1000),
+        // ("Day 16 of 2024", day16_24::run, 1000),
+        // ("Day 17 of 2024", day17_24::run, 1000),
+        // ("Day 18 of 2024", day18_24::run, 1000),
+        // ("Day 19 of 2024", day19_24::run, 1000),
+        // ("Day 20 of 2024", day20_24::run, 1000),
+        // ("Day 21 of 2024", day21_24::run, 1000),
+        // ("Day 22 of 2024", day22_24::run, 1000),
+        // ("Day 23 of 2024", day23_24::run, 1000),
+        // ("Day 24 of 2024", day24_24::run, 1000),
+        // ("Day 25 of 2024", day25_24::run, 1000),
     ];
 
     let args: Vec<String> = env::args().collect();
