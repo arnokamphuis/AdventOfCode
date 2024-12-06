@@ -70,29 +70,27 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
     let start2 = Instant::now();
 
     let mut res2 = 0;
-    for o_r in 0i32..(map.len() as i32) {
-        for o_c in 0i32..(map[0].len() as i32) {
-            if obstacles.contains(&(o_r, o_c)) || (o_r, o_c) == start_pos {
-                continue;
+    for &(o_r, o_c) in visited.iter() {
+        if obstacles.contains(&(o_r, o_c)) || (o_r, o_c) == start_pos {
+            continue;
+        }
+        let mut guard_pos = start_pos;
+        let mut guard_dir = start_dir;
+        let mut visited: HashSet<((i32, i32), i32)> = HashSet::new();
+        loop {
+            if visited.contains(&(guard_pos, guard_dir)) {
+                res2 += 1;
+                break;
             }
-            let mut guard_pos = start_pos;
-            let mut guard_dir = start_dir;
-            let mut visited: HashSet<((i32, i32), i32)> = HashSet::new();
-            loop {
-                if visited.contains(&(guard_pos, guard_dir)) {
-                    res2 += 1;
-                    break;
-                }
-                visited.insert((guard_pos, guard_dir));
-                let new_pos = (guard_pos.0 + dirs[&guard_dir].0, guard_pos.1 + dirs[&guard_dir].1);
-                if not_in_map(&new_pos, &map) {
-                    break;
-                }
-                if obstacles.contains(&new_pos) || new_pos == (o_r, o_c) {
-                    guard_dir = (guard_dir + 1) % 4;
-                } else {
-                    guard_pos = new_pos;
-                }
+            visited.insert((guard_pos, guard_dir));
+            let new_pos = (guard_pos.0 + dirs[&guard_dir].0, guard_pos.1 + dirs[&guard_dir].1);
+            if not_in_map(&new_pos, &map) {
+                break;
+            }
+            if obstacles.contains(&new_pos) || new_pos == (o_r, o_c) {
+                guard_dir = (guard_dir + 1) % 4;
+            } else {
+                guard_pos = new_pos;
             }
         }
     }
