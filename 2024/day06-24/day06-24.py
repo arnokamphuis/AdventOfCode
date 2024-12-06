@@ -63,19 +63,20 @@ def part2():
     res2 = 0
     for o_r in range(R):
         for o_c in range(C):
+            if (o_c, o_r) in obstacles or (o_c, o_r) == start:
+                continue
             guard_pos = start
             guard_dir = start_dir
-            visited = set()
             visited_including_dir = set()
             while True:
                 if (guard_pos + (guard_dir,)) in visited_including_dir:
                     res2 += 1
                     break
                 visited_including_dir.add(guard_pos + (guard_dir,))
-                visited.add(guard_pos)
                 newpos = (guard_pos[0] + pos_dirs[guard_dir][0], guard_pos[1] + pos_dirs[guard_dir][1])
                 if not in_range(newpos):
                     break
+                
                 if newpos in obstacles or newpos == (o_c, o_r):
                     guard_dir = (guard_dir + 1) % 4
                 else:
