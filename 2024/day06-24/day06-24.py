@@ -40,47 +40,45 @@ def find_turn_points():
     global guard_pos, guard_dir
     guard_pos = start
     guard_dir = start_dir
-    turn_points = []
     visited = set()
     while True:
         newpos = (guard_pos[0] + pos_dirs[guard_dir][0], guard_pos[1] + pos_dirs[guard_dir][1])
         if newpos in obstacles:
-            turn_points.append((guard_pos, pos_dirs[guard_dir]))
             guard_dir = (guard_dir + 1) % 4
         else:
             if not in_range(newpos):
                 break
             guard_pos = newpos
             visited.add(guard_pos)
-    return turn_points, visited
+    return visited
 
 
 def part1():
-    _, visited = find_turn_points()
+    visited = find_turn_points()
     return len(visited)
 
 def part2():
     res2 = 0
-    for o_r in range(R):
-        for o_c in range(C):
-            if (o_c, o_r) in obstacles or (o_c, o_r) == start:
-                continue
-            guard_pos = start
-            guard_dir = start_dir
-            visited_including_dir = set()
-            while True:
-                if (guard_pos + (guard_dir,)) in visited_including_dir:
-                    res2 += 1
-                    break
-                visited_including_dir.add(guard_pos + (guard_dir,))
-                newpos = (guard_pos[0] + pos_dirs[guard_dir][0], guard_pos[1] + pos_dirs[guard_dir][1])
-                if not in_range(newpos):
-                    break
-                
-                if newpos in obstacles or newpos == (o_c, o_r):
-                    guard_dir = (guard_dir + 1) % 4
-                else:
-                    guard_pos = newpos
+    visited = find_turn_points()
+    for o_c, o_r in visited:
+        if (o_c, o_r) in obstacles or (o_c, o_r) == start:
+            continue
+        guard_pos = start
+        guard_dir = start_dir
+        visited_including_dir = set()
+        while True:
+            if (guard_pos + (guard_dir,)) in visited_including_dir:
+                res2 += 1
+                break
+            visited_including_dir.add(guard_pos + (guard_dir,))
+            newpos = (guard_pos[0] + pos_dirs[guard_dir][0], guard_pos[1] + pos_dirs[guard_dir][1])
+            if not in_range(newpos):
+                break
+            
+            if newpos in obstacles or newpos == (o_c, o_r):
+                guard_dir = (guard_dir + 1) % 4
+            else:
+                guard_pos = newpos
     return res2
 
 if runpart == 1 or runpart == 0:
