@@ -1,6 +1,7 @@
 
 # read command-line parameters and based on that read the input file
 from itertools import product
+from math import ceil, log10
 import sys
 runtype = sys.argv[1]
 runpart = int(sys.argv[2])
@@ -27,7 +28,7 @@ def solve(res, nums, concat = False):
             elif op[i] == '*':
                 t *= nums[i+1]
             elif op[i] == '||':
-                t = int(str(t) + str(nums[i+1]))
+                t = pow(10,ceil(log10(nums[i+1])))*t + nums[i+1]
         if t == res:
             return True
     return False
