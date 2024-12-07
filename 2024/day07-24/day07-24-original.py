@@ -1,7 +1,7 @@
 
 # read command-line parameters and based on that read the input file
 from itertools import product
-from math import ceil, floor, log10
+from math import ceil, log10
 import sys
 runtype = sys.argv[1]
 runpart = int(sys.argv[2])
@@ -16,24 +16,21 @@ equations = [line.split() for line in text_file.readlines()]
 equations = [[int(eq[0][:-1]), list(map(int,eq[1::]))] for eq in equations]
 
 def solve(res, nums, concat = False):
-    if len(nums) == 1:
-        return res == nums[0]
-    
-    last = nums[-1]
-    nums = nums[:-1]
-    
-    if res % last == 0:
-        if solve(res // last, nums, concat):
-            return True
-    if res - last > 0:
-        if solve(res - last, nums, concat):
-            return True
+    ops = ['+', '*']
     if concat:
-        size = floor(log10(last)) + 1
-        remaining = res - (res // pow(10, size)) * pow(10, size)
-        if remaining == last:
-            if solve(res // pow(10, size), nums, concat):
-                return True
+        ops.append('||')
+    n = len(nums)-1
+    for op in list(product(ops, repeat=n)):
+        t = nums[0]
+        for i in range(0,n):
+            if op[i] == '+':
+                t += nums[i+1]
+            elif op[i] == '*':
+                t *= nums[i+1]
+            elif op[i] == '||':
+                t = pow(10,ceil(log10(nums[i+1])))*t + nums[i+1]
+        if t == res:
+            return True
     return False
 
 def part1():
