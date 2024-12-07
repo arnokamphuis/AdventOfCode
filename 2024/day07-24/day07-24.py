@@ -30,8 +30,7 @@ def solve(res, nums, concat = False):
             return True
     if concat:
         size = floor(log10(last)) + 1
-        remaining = res - (res // pow(10, size)) * pow(10, size)
-        if remaining == last:
+        if (res // pow(10, size)) * pow(10, size) + last == res:
             if solve(res // pow(10, size), nums, concat):
                 return True
     return False
