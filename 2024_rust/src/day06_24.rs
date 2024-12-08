@@ -2,6 +2,9 @@ use super::tools;
 use std::time::Instant;
 use std::collections::{HashSet,HashMap};
 
+#[cfg(feature = "make_movie")]
+use crate::tools::Image;
+
 fn not_in_map(pos: &(i32, i32), map: &Vec<Vec<char>>) -> bool {
     pos.0 < 0 || pos.1 < 0 || pos.0 >= map[0].len() as i32 || pos.1 >= map.len() as i32
 }
@@ -45,19 +48,45 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
 
     let start1 = Instant::now();
 
+    #[cfg(feature = "make_movie")]
+    let mut img: Image = Image::new(input.len(), input[0].len(), 4);
+    #[cfg(feature = "make_movie")]
+    let mut img_count = 0;
+    #[cfg(feature = "make_movie")]
+    img.clear((0, 0, 0, 255));
+
     let mut visited: HashSet<(i32, i32)> = HashSet::new();
     let mut guard_pos = start_pos;
     let mut guard_dir = start_dir;
+
+    #[cfg(feature = "make_movie")]
+    {
+        img.set_pixel(guard_pos.0 as usize, guard_pos.1 as usize, (255, 255, 255, 255));
+        img.save_png(&format!("images/day06_24_{:06}.png", img_count));
+    }
+
     loop {
         let new_pos = (guard_pos.0 + dirs[&guard_dir].0, guard_pos.1 + dirs[&guard_dir].1);
         if obstacles.contains(&new_pos) {
             guard_dir = (guard_dir + 1) % 4;
+            #[cfg(feature = "make_movie")]
+            {
+                img_count += 1;
+                img.set_pixel(new_pos.0 as usize, new_pos.1 as usize, (255, 0, 0, 255));
+                img.save_png(&format!("images/day06_24_{:06}.png", img_count));
+            }
         } else {
             if not_in_map(&new_pos, &map) {
                 break;
             }
             guard_pos = new_pos;
             visited.insert(guard_pos);
+            #[cfg(feature = "make_movie")]
+            {
+                img_count += 1;
+                img.set_pixel(guard_pos.0 as usize, guard_pos.1 as usize, (255, 255, 255, 255));
+                img.save_png(&format!("images/day06_24_{:06}.png", img_count));
+            }
         }
     }
     let res1 = visited.len();
@@ -79,6 +108,11 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
         let mut visited: HashSet<((i32, i32), i32)> = HashSet::new();
         loop {
             if visited.contains(&(guard_pos, guard_dir)) {
+                #[cfg(feature = "make_movie")]
+                {
+                    img.set_pixel(o_r as usize, o_c as usize, (0, 0, 255, 255));
+                    (0..10).for_each(|_| { img_count += 1; img.save_png(&format!("images/day06_24_{:06}.png", img_count)); });
+                }
                 res2 += 1;
                 break;
             }
