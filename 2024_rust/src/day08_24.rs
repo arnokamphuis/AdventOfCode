@@ -9,7 +9,7 @@ fn in_bounds(a: (i32,i32), max_r: i32, max_c: i32) -> bool {
 
 fn find_antinodes_harmonics(a: &(i32,i32), b: &(i32,i32), max_r: i32, max_c: i32, harmonics: bool) -> HashSet<(i32,i32)> {
     let mut antinodes: HashSet<(i32,i32)> = HashSet::from_iter( (if harmonics { vec![*a] } else { vec![] }).into_iter() );
-    
+
     let d = (a.0 - b.0, a.1 - b.1);
     let mut antinode = (a.0 + d.0, a.1 + d.1);
 
@@ -25,6 +25,22 @@ fn find_antinodes_harmonics(a: &(i32,i32), b: &(i32,i32), max_r: i32, max_c: i32
     }
 
     return antinodes;
+}
+
+fn count_antinodes(map: &HashMap<u8, Vec<(i32,i32)>>, r: i32, c: i32, harmonics: bool) -> usize {
+    return map
+        .iter()
+        .fold(HashSet::<(i32,i32)>::new(), | acc, (_, antennas)| {
+            antennas.iter().combinations(2).fold(acc, |cur_set, v| {
+                cur_set
+                    .union(&find_antinodes_harmonics(v[0], v[1], r, c, harmonics))
+                    .cloned()
+                    .collect::<HashSet<(i32,i32)>>()
+                    .union(&find_antinodes_harmonics(v[1], v[0], r, c, harmonics))
+                    .cloned()
+                    .collect::<HashSet<(i32,i32)>>()
+            })
+        }).len();
 }
 
 #[allow(dead_code)]
@@ -53,19 +69,7 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
 
     let start1 = Instant::now();
 
-    let res1 =  map
-        .iter()
-        .fold(HashSet::<(i32,i32)>::new(), | acc, (_, antennas)| {
-            antennas.iter().combinations(2).fold(acc, |cur_set, v| {
-                cur_set
-                    .union(&find_antinodes_harmonics(v[0], v[1], r, c, false))
-                    .cloned()
-                    .collect::<HashSet<(i32,i32)>>()
-                    .union(&find_antinodes_harmonics(v[1], v[0], r, c, false))
-                    .cloned()
-                    .collect::<HashSet<(i32,i32)>>()
-            })
-        }).len();
+    let res1 = count_antinodes(&map, r, c, false);
 
     let after1 = Instant::now();
     if print_result {
@@ -74,19 +78,7 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
 
     let start2 = Instant::now();
 
-    let res2 =  map
-        .iter()
-        .fold(HashSet::<(i32,i32)>::new(), | acc, (_, antennas)| {
-            antennas.iter().combinations(2).fold(acc, |cur_set, v| {
-                cur_set
-                    .union(&find_antinodes_harmonics(v[0], v[1], r, c, true))
-                    .cloned()
-                    .collect::<HashSet<(i32,i32)>>()
-                    .union(&find_antinodes_harmonics(v[1], v[0], r, c, true))
-                    .cloned()
-                    .collect::<HashSet<(i32,i32)>>()
-            })
-        }).len();
+    let res2 = count_antinodes(&map, r, c, true);
 
     let after2 = Instant::now();
     if print_result {
