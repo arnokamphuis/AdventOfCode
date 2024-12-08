@@ -1,35 +1,27 @@
 use super::tools;
 use std::time::Instant;
 use std::collections::{HashMap, HashSet};
+use itertools::Itertools;
 
 fn in_bounds(a: (i32,i32), max_r: i32, max_c: i32) -> bool {
     return a.0 >= 0 && a.0 < max_c && a.1 >= 0 && a.1 < max_r;
 }
 
-fn find_antinodes_harmonics(a: &(i32,i32), b: &(i32,i32), max_r: i32, max_c: i32, harmonics: bool) -> Vec<(i32,i32)> {
-    let mut antinodes: Vec<(i32,i32)> = vec![];
+fn find_antinodes_harmonics(a: &(i32,i32), b: &(i32,i32), max_r: i32, max_c: i32, harmonics: bool) -> HashSet<(i32,i32)> {
+    let mut antinodes: HashSet<(i32,i32)> = HashSet::from_iter( (if harmonics { vec![*a] } else { vec![] }).into_iter() );
+    
+    let d = (a.0 - b.0, a.1 - b.1);
+    let mut antinode = (a.0 + d.0, a.1 + d.1);
 
-    let dr = a.0 - b.0;
-    let dc = a.1 - b.1;
-
-    let mut l = 1;
-    let mut antinode = (a.0 + l*dr, a.1 + l*dc);
+    let mut step = 1;
     while in_bounds(antinode, max_r, max_c) {
-        if !harmonics && antinode == *b {
+        antinodes.insert(antinode);
+        if harmonics {
+            step += 1;
+            antinode = (a.0 + step * d.0, a.1 + step * d.1);
+        } else {
             break;
         }
-
-        antinodes.push(antinode);
-
-        if !harmonics {
-            break;
-        }
-        l += 1;
-        antinode = (a.0 + l*dr, a.1 + l*dc);
-    }
-
-    if harmonics {
-        antinodes.push(*a);
     }
 
     return antinodes;
@@ -61,21 +53,19 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
 
     let start1 = Instant::now();
 
-    let mut all_antinodes: HashSet<(i32,i32)> = HashSet::new();
-    for freq in map.keys() {
-        let antennas: &Vec<(i32,i32)> = map.get(freq).unwrap();
-        for a in antennas.iter() {
-            for b in antennas.iter() {
-                if a != b {
-                    all_antinodes.extend(
-                        find_antinodes_harmonics(a, b, r, c, false));
-                    all_antinodes.extend(
-                        find_antinodes_harmonics(b, a, r, c, false));
-                }
-            }
-        }
-    }
-    let res1 = all_antinodes.len();
+    let res1 =  map
+        .iter()
+        .fold(HashSet::<(i32,i32)>::new(), | acc, (_, antennas)| {
+            antennas.iter().combinations(2).fold(acc, |cur_set, v| {
+                cur_set
+                    .union(&find_antinodes_harmonics(v[0], v[1], r, c, false))
+                    .cloned()
+                    .collect::<HashSet<(i32,i32)>>()
+                    .union(&find_antinodes_harmonics(v[1], v[0], r, c, false))
+                    .cloned()
+                    .collect::<HashSet<(i32,i32)>>()
+            })
+        }).len();
 
     let after1 = Instant::now();
     if print_result {
@@ -84,21 +74,19 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
 
     let start2 = Instant::now();
 
-    let mut all_antinodes: HashSet<(i32,i32)> = HashSet::new();
-    for freq in map.keys() {
-        let antennas: &Vec<(i32,i32)> = map.get(freq).unwrap();
-        for a in antennas.iter() {
-            for b in antennas.iter() {
-                if a != b {
-                    all_antinodes.extend(
-                        find_antinodes_harmonics(a, b, r, c, true));
-                    all_antinodes.extend(
-                        find_antinodes_harmonics(b, a, r, c, true));
-                }
-            }
-        }
-    }
-    let res2 = all_antinodes.len();
+    let res2 =  map
+        .iter()
+        .fold(HashSet::<(i32,i32)>::new(), | acc, (_, antennas)| {
+            antennas.iter().combinations(2).fold(acc, |cur_set, v| {
+                cur_set
+                    .union(&find_antinodes_harmonics(v[0], v[1], r, c, true))
+                    .cloned()
+                    .collect::<HashSet<(i32,i32)>>()
+                    .union(&find_antinodes_harmonics(v[1], v[0], r, c, true))
+                    .cloned()
+                    .collect::<HashSet<(i32,i32)>>()
+            })
+        }).len();
 
     let after2 = Instant::now();
     if print_result {
