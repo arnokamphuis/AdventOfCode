@@ -27,20 +27,7 @@ def in_bounds(pos):
     r, c = pos
     return r >= 0 and r < R and c >= 0 and c < C
 
-def find_antinodes(a, b):
-    dr = a[0] - b[0]
-    dc = a[1] - b[1]
-    
-    antinodes = []
-    antinode = (a[0] + dr, a[1] + dc)
-    if in_bounds(antinode) and antinode != b:
-        antinodes.append(antinode)
-    antinode = (b[0] - dr, b[1] - dc)
-    if in_bounds(antinode) and antinode != a:
-        antinodes.append(antinode)
-    return antinodes
-
-def find_antinodes_harmonics(a, b):
+def find_antinodes_harmonics(a, b, harmonics=False):
     dr = a[0] - b[0]
     dc = a[1] - b[1]
     
@@ -48,16 +35,17 @@ def find_antinodes_harmonics(a, b):
     l = 1
     antinode = (a[0] + l*dr, a[1] + l*dc)
     while in_bounds(antinode):
+        if not harmonics and antinode == b: break
+
         antinodes.append(antinode)
+
+        if not harmonics: break
+
         l += 1
         antinode = (a[0] + l*dr, a[1] + l*dc)
-    l = 1
-    antinode = (b[0] - l*dr, b[1] - l*dc)
-    while in_bounds(antinode):
-        antinodes.append(antinode)
-        l += 1
-        antinode = (b[0] - l*dr, b[1] - l*dc)
-    return [*antinodes, a, b]
+
+    if not harmonics: return antinodes        
+    return [*antinodes, a]
 
 def part1():
     all_antinodes = set()
@@ -66,7 +54,8 @@ def part1():
         for a in antenna:
             for b in antenna:
                 if a == b: continue
-                antinodes = find_antinodes(a, b)
+                antinodes = [*find_antinodes_harmonics(a, b), 
+                             *find_antinodes_harmonics(b, a)]
                 all_antinodes.update(antinodes)
     return len(all_antinodes)
 
@@ -77,7 +66,8 @@ def part2():
         for a in antenna:
             for b in antenna:
                 if a == b: continue
-                antinodes = find_antinodes_harmonics(a, b)
+                antinodes = [*find_antinodes_harmonics(a, b, True), 
+                             *find_antinodes_harmonics(b, a, True)]
                 all_antinodes.update(antinodes)
     return len(all_antinodes)
 
