@@ -16,26 +16,6 @@ chart = [list(line.strip()) for line in text_file.readlines()]
 R, C = len(chart), len(chart[0])
 map = { (c, r): int(chart[r][c]) for r in range(R) for c in range(C) if chart[r][c] != '.' }
 
-def print_map(m):
-    print('-'*40)
-    for r in range(R):
-        for c in range(C):
-            if (c, r) in m:
-                print(m[(c,r)], end="")
-            else:
-                print(".", end="")
-        print()
-    print('-'*40)
-    
-def print_fill(m, f):
-    for r in range(R):
-        for c in range(C):
-            if (c, r) in f:
-                print(m[(c,r)], end="")
-            else:
-                print(".", end="")
-        print()
-
 def flood_fill(m, f, c, r, val, single):
     if single and (c,r) in f and val in f[(c,r)] and f[(c,r)][val] > 0:
         return
