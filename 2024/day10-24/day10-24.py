@@ -36,49 +36,33 @@ def print_fill(m, f):
                 print(".", end="")
         print()
 
-def in_bounds(c, r):
-    return c >= 0 and c < C and r >= 0 and r < R
-
-def flood_fill(m, f, c, r, val):
-    if (c, r) in f and val in f[(c, r)]:
+def flood_fill(m, f, c, r, val, single):
+    if single and (c,r) in f and val in f[(c,r)] and f[(c,r)][val] > 0:
         return
-    
-    f[(c, r)].append(val)
-    
-    for dc, dr in [(-1, 0), (1, 0), (0, -1), (0, 1)]:
-        next = (c+dc, r+dr)
-        if next in m and m[next]-m[(c, r)] == 1:
-            flood_fill(m, f, c+dc, r+dr, val)
-
-def flood_fill_2(m, f, c, r, val):
     f[(c, r)][val] += 1
     
     for dc, dr in [(-1, 0), (1, 0), (0, -1), (0, 1)]:
         next = (c+dc, r+dr)
         if next in m and m[next]-m[(c, r)] == 1:
-            flood_fill_2(m, f, c+dc, r+dr, val)
+            flood_fill(m, f, c+dc, r+dr, val, single)
 
-def part1():
-    fill = defaultdict(list)
-    trailheads = [ p for p in map if map[p] == 0]
-    nines = [ p for p in map if map[p] == 9]
-
-    for i, th in enumerate(trailheads):
-        flood_fill(map, fill, th[0], th[1], i)
-
-    return sum([len(fill[(c, r)]) for c, r in nines])
-
-def part2():
+def solve(part):
     fill = { (c,r): defaultdict(int) for r in range(R) for c in range(C) }
     trailheads = [ p for p in map if map[p] == 0]
     nines = [ p for p in map if map[p] == 9]
     for i, th in enumerate(trailheads):
-        flood_fill_2(map, fill, th[0], th[1], i)      
+        flood_fill(map, fill, th[0], th[1], i, part==1)      
     trail_counter = defaultdict(int)
     for (c,r) in nines:
         for i, c in fill[(c,r)].items():
             trail_counter[i] += c
     return sum(trail_counter.values())
+
+def part1():
+    return solve(1)
+
+def part2():
+    return solve(2)
 
 if runpart == 1 or runpart == 0:
     for run in range(runs):
