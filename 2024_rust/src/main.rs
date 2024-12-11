@@ -12,7 +12,7 @@ mod day07_24;
 mod day08_24;
 mod day09_24;
 mod day10_24;
-// mod day11_24;
+mod day11_24;
 // mod day12_24;
 // mod day13_24;
 // mod day14_24;
@@ -89,7 +89,7 @@ fn main() {
         ("Day 08 of 2024", day08_24::run, 1000),
         ("Day 09 of 2024", day09_24::run, 1000),
         ("Day 10 of 2024", day10_24::run, 1000),
-        // ("Day 11 of 2024", day11_24::run, 1000),
+        ("Day 11 of 2024", day11_24::run, 1000),
         // ("Day 12 of 2024", day12_24::run, 1000),
         // ("Day 13 of 2024", day13_24::run, 1000),
         // ("Day 14 of 2024", day14_24::run, 1000),
