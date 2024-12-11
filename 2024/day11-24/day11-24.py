@@ -1,7 +1,6 @@
 
 # read command-line parameters and based on that read the input file
 import sys
-sys.setrecursionlimit(10**6)
 
 runtype = sys.argv[1]
 runpart = int(sys.argv[2])
@@ -18,7 +17,6 @@ original_numbers = numbers.copy()
 
 DP = {}
 def count_number_of_numbers(n, t):
-    res = None
     key = (n, t)
     if key in DP:
         return DP[key]
