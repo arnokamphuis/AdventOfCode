@@ -15,19 +15,11 @@ fn count(num:u64, t: u32, cache: &mut HashMap<(u64, u32), u64>) -> u64 {
     } else if num.to_string().len()%2 == 0 {
         let sn = num.to_string();
         let half = sn.len()/2;
-        res = count(sn[..half].parse::<u64>().unwrap(), t-1, cache) +count(sn[half..].parse::<u64>().unwrap(), t-1, cache);
+        res = count(sn[..half].parse::<u64>().unwrap(), t-1, cache) + count(sn[half..].parse::<u64>().unwrap(), t-1, cache);
     } else {
         res = count(num*2024, t-1, cache);
     }
     cache.insert((num, t), res);
-    res
-}
-
-fn count_all(nums: &Vec<u64>, t: u32, cache: &mut HashMap<(u64, u32), u64>) -> u64 {
-    let mut res = 0;
-    for num in nums {
-        res += count(*num, t, cache);
-    }
     res
 }
 
@@ -48,7 +40,7 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
 
     let start1 = Instant::now();
 
-    let res1 = count_all(&numbers, 25, &mut cache);
+    let res1: u64 = numbers.iter().map(|num| count(*num, 25, &mut cache)).sum();
 
     let after1 = Instant::now();
     if print_result {
@@ -57,7 +49,7 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
 
     let start2 = Instant::now();
 
-    let res2 = count_all(&numbers, 75, &mut cache);
+    let res2: u64 = numbers.iter().map(|num| count(*num, 75, &mut cache)).sum();
 
     let after2 = Instant::now();
     if print_result {
