@@ -2,6 +2,8 @@ use super::tools;
 use std::time::Instant;
 use std::collections::{HashMap, HashSet};
 use std::collections::VecDeque;
+#[cfg(feature = "make_movie")]
+use crate::tools::Image;
 
 fn find_perimeter(map: &HashSet::<(i32,i32)>) -> HashMap::<(i32,i32), HashSet::<(i32,i32)>> {
     let mut perimeter: HashMap::<(i32,i32), HashSet::<(i32,i32)>> = HashMap::new();
@@ -41,12 +43,36 @@ fn remove_connected(map: &HashSet::<(i32,i32)>, (sc, sr): (i32,i32)) -> HashSet:
 fn find_connected(map: &HashMap<String, HashSet::<(i32,i32)>>) -> HashMap<String, Vec<HashSet::<(i32,i32)>>> {
     let mut connected: HashMap<String, Vec<HashSet::<(i32,i32)>>> = HashMap::new();
 
-    map.iter().for_each(|(plant, coords)| {
+    #[cfg(feature = "make_movie")]
+    let (C, R) = (140, 140);
+    #[cfg(feature = "make_movie")]
+    let mut img: Image = Image::new(C as usize, R as usize, 8);
+    #[cfg(feature = "make_movie")]
+    img.clear((0, 0, 0, 255));
+    #[cfg(feature = "make_movie")]
+    let plant_count = map.len();
+    #[cfg(feature = "make_movie")]
+    let colors: Vec<(u8, u8, u8, u8)> = (1..(plant_count + 1))
+        .map(|i| (105_usize + 150 * i / plant_count, 105_usize + 150 * i / plant_count, 105_usize + 150 * i / plant_count, 255_usize))
+        .map(|(r, g, b, a)| (r as u8, g as u8, b as u8, a as u8))
+        .collect();
+    #[cfg(feature = "make_movie")]
+    let mut img_count = 0;
+
+    map.iter().enumerate().for_each(|(_i, (plant, coords))| {
         connected.insert(plant.to_string(), vec![]);
         let mut remaining = coords.clone();
         while remaining.len() > 0 {
             let (sc, sr) = remaining.iter().next().unwrap();
             let cc = remove_connected(&remaining, (*sc, *sr));
+            #[cfg(feature = "make_movie")]
+            cc.iter().for_each(|(c, r)| {
+                img.set_pixel(*c as usize, *r as usize, colors[i]);
+            });
+            #[cfg(feature = "make_movie")]
+            img.save_png(&format!("images/day12_24_{:06}.png", { let tmp = img_count; img_count += 1; tmp}));
+            // #[cfg(feature = "make_movie")]
+            // img_count += 1;
             connected.get_mut(plant).unwrap().push(cc.clone());
             cc.iter().for_each(|(c, r)| {
                 remaining.remove(&(*c, *r));
@@ -99,8 +125,6 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
             maps.entry(ch.to_string()).or_insert(HashSet::<(i32,i32)>::new()).insert((r as i32, c as i32));
         });
     });
-
-    // println!("{:?}", maps);
 
     let after0 = Instant::now();
 
