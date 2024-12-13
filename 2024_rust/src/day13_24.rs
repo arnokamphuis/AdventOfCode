@@ -3,8 +3,9 @@ use std::time::Instant;
 use itertools::Itertools;
 use regex::Regex;
 
-fn solve(game: Vec<usize>, part2: bool) -> usize {
-    let (a,b,c,d,mut e,mut f): (f64,f64,f64,f64,f64,f64) = game.iter().map(|v| *v as f64).collect_tuple().unwrap();
+fn solve(game: Vec<f64>, part2: bool) -> usize {
+    let (&a,&b,&c,&d,&te,&tf) = game.iter().collect_tuple().unwrap();
+    let (mut e, mut f) = (te, tf);
     if part2 {
         e += 10000000000000.0;
         f += 10000000000000.0;
@@ -35,7 +36,7 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
         .into_iter()
         .map(|c| {
             re.find_iter(&c.join(" "))
-                .map(|m| m.as_str().parse::<usize>().unwrap())
+                .map(|m| m.as_str().parse::<f64>().unwrap())
                 .into_iter()
                 .collect_vec()
         })
