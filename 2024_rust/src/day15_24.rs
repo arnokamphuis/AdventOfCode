@@ -2,6 +2,8 @@ use super::tools;
 use std::time::Instant;
 use std::collections::{HashSet, HashMap};
 use itertools::Itertools;
+#[cfg(feature = "make_movie")]
+use crate::tools::Image;
 
 fn get_object_ids_at_position(objects: &Vec<Vec<(i32, i32)>>, positions: &HashSet<(i32, i32)>) -> HashSet<usize> {
     positions.iter().fold(HashSet::<usize>::new(), |mut set, pos| {
@@ -53,6 +55,7 @@ fn do_operations(map: HashSet<(i32, i32)>, mut objects: Vec<Vec<(i32, i32)>>, st
         .into_iter()
         .collect::<HashMap<char, (i32, i32)>>();
 
+    let mut frame_count = 0;
     let mut robot = start;
     operations.iter().for_each(|op| {
         let dir = dirs.get(op).unwrap_or(&(0, 0));
@@ -66,9 +69,47 @@ fn do_operations(map: HashSet<(i32, i32)>, mut objects: Vec<Vec<(i32, i32)>>, st
             });
             robot = (robot.0 + dir.0, robot.1 + dir.1);
         }
+        #[cfg(feature = "make_movie")]
+        make_frame(&map, &objects, robot, frame_count);
+        frame_count += 1;
     });
 
     objects.iter().fold(0, |acc, obj| acc + obj[0].0 as usize + obj[0].1 as usize * 100)
+}
+
+#[cfg(feature = "make_movie")]
+fn make_frame(map: &HashSet<(i32, i32)>, objects: &Vec<Vec<(i32, i32)>>, robot: (i32, i32), frame_count: usize) {
+
+    let (min_x, max_x, min_y, max_y) = map.iter().fold((0, 0, 0, 0), |(min_x, max_x, min_y, max_y), pos| {
+        (min_x.min(pos.0), max_x.max(pos.0), min_y.min(pos.1), max_y.max(pos.1))
+    });
+
+    let size = (max_x + min_x + 2, max_y + min_y + 2);
+
+    let colors: HashMap<usize, (u8, u8, u8, u8)> = objects
+        .iter()
+        .enumerate()
+        .fold(HashMap::new(),  |mut hm, (i, _)| { 
+            hm.insert( i, (100 + ((155.0 * i as f32) / (objects.len() as f32)) as u8, 0_u8, 0_u8, 255_u8)); hm  
+        });
+
+    let mut img: Image = Image::new(size.0 as usize, size.1 as usize, 8);
+    img.clear((255_u8, 255_u8, 255_u8, 255_u8));
+
+    map.iter().for_each(|(x, y)| {
+        img.set_pixel(*x as usize, *y as usize, (0_u8, 0_u8, 0_u8, 255_u8));
+    });
+
+    objects.iter().enumerate().for_each(|(i, obj)| {
+        obj.iter().for_each(|(x, y)| {
+            img.set_pixel(*x as usize, *y as usize, colors[&i]);
+        });
+    });
+
+    let part = if objects[0].len() > 1 {2} else {1};
+
+    img.set_pixel(robot.0 as usize, robot.1 as usize, (0_u8, 0_u8, 255_u8, 255_u8));
+    img.save_png(&format!("images/day15_24_part_{}_{:06}.png", part, frame_count));
 }
 
 #[allow(dead_code)]

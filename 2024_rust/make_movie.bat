@@ -23,3 +23,7 @@ ffmpeg -framerate 400 -i day06_24_%04d.png -s:v 720x720 -c:v libx264 -profile:v 
 ffmpeg -framerate 30 -i day12_24_%06d.png -s:v 720x720 -c:v libx264 -profile:v high -crf 20 -pix_fmt yuv420p day12-30fps.mp4
 
 ffmpeg -i day12-30fps.mp4 -vf "fps=30,scale=720:-1:flags=lanczos,split[s0][s1];[s0]palettegen[p];[s1][p]paletteuse" -loop 0 day12-30fps.gif
+
+
+ffmpeg -framerate 200 -i day15_24_part_1_%06d.png -s:v 720x720 -c:v libx264 -profile:v high -crf 20 -pix_fmt yuv420p day15-part1-200fps.mp4
+ffmpeg -framerate 200 -i day15_24_part_2_%06d.png -s:v 720x720 -c:v libx264 -profile:v high -crf 20 -pix_fmt yuv420p day15-part2-200fps.mp4

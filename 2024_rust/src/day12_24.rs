@@ -44,6 +44,7 @@ fn find_connected(map: &HashMap<String, HashSet::<(i32,i32)>>) -> HashMap<String
     let mut connected: HashMap<String, Vec<HashSet::<(i32,i32)>>> = HashMap::new();
 
     #[cfg(feature = "make_movie")]
+    #[allow(non_snake_case)]
     let (C, R) = (140, 140);
     #[cfg(feature = "make_movie")]
     let mut img: Image = Image::new(C as usize, R as usize, 8);
@@ -59,7 +60,8 @@ fn find_connected(map: &HashMap<String, HashSet::<(i32,i32)>>) -> HashMap<String
     #[cfg(feature = "make_movie")]
     let mut img_count = 0;
 
-    map.iter().enumerate().for_each(|(_i, (plant, coords))| {
+    #[allow(unused_variables)]
+    map.iter().enumerate().for_each(|(i, (plant, coords))| {
         connected.insert(plant.to_string(), vec![]);
         let mut remaining = coords.clone();
         while remaining.len() > 0 {
