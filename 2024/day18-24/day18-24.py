@@ -26,6 +26,11 @@ def map_after_ns(time, byte_locations, size):
         byte_map.remove((x, y))
     return byte_map
 
+def map_update(map, time, byte_locations):
+    x, y = byte_locations[time-1]
+    map.remove((x, y))
+    return map
+
 def find_path(byte_map, start, end):
     backtrack = {}
     dist = defaultdict(lambda: float('inf'))
@@ -78,13 +83,20 @@ def part1():
 
 def part2():
     t = 1
+    map = map_after_ns(t, byte_locations, size)
+    start = (0,0)
+    end = (size[0]-1, size[1]-1)
+
+    path = list(find_path(map, start, end));
     while True:
+        if byte_locations[t] in path:
+            path = find_path(map, start, end)
+            if path == None:
+                break
+            else:
+                path = list(path)
         t += 1
-        map = map_after_ns(t, byte_locations, size)
-        start = (0,0)
-        end = (size[0]-1, size[1]-1)
-        if not find_path(map, start, end):
-            break
+        map = map_update(map, t, byte_locations)
     return byte_locations[t-1]
 
 if runpart == 1 or runpart == 0:
