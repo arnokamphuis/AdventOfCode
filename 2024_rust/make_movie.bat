@@ -27,3 +27,6 @@ ffmpeg -i day12-30fps.mp4 -vf "fps=30,scale=720:-1:flags=lanczos,split[s0][s1];[
 
 ffmpeg -framerate 200 -i day15_24_part_1_%06d.png -s:v 720x720 -c:v libx264 -profile:v high -crf 20 -pix_fmt yuv420p day15-part1-200fps.mp4
 ffmpeg -framerate 200 -i day15_24_part_2_%06d.png -s:v 1440x720 -c:v libx264 -profile:v high -crf 20 -pix_fmt yuv420p day15-part2-200fps.mp4
+
+
+ffmpeg -framerate 100 -i day18_24_%06d.png -s:v 720x720 -c:v libx264 -profile:v high -crf 20 -pix_fmt yuv420p day18-100fps.mp4
