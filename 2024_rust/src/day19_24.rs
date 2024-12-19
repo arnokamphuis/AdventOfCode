@@ -14,7 +14,7 @@ macro_rules! mult5 {
     };
 }
 
-fn count(design: U320, target: &U320, designs: &Vec<U320>, patterns: &Vec<U320>, cache: &mut HashMap<U320, usize>) -> usize {
+fn count(design: U320, target: &U320, designs: &Vec<U320>, patterns: &Vec<U320>, cache: &mut HashMap<U320, usize>, part: u8) -> usize {
     let key = design;
     if cache.contains_key(&key) {
         return cache[&key];
@@ -41,7 +41,9 @@ fn count(design: U320, target: &U320, designs: &Vec<U320>, patterns: &Vec<U320>,
         })
         .filter(|new_design| new_design <= target)
         .fold(0, |acc, new_design| {
-            acc + count(new_design, target, designs, patterns, cache)
+            if part == 1 && acc > 0 { acc } else {
+                acc + count(new_design, target, designs, patterns, cache, part)
+            }
         });
 
     cache.insert(key, count);
@@ -51,7 +53,7 @@ fn count(design: U320, target: &U320, designs: &Vec<U320>, patterns: &Vec<U320>,
 fn count_all(designs: &Vec<U320>, patterns: &Vec<U320>, part: u8) -> usize {
     designs
         .iter()
-        .map(|design| { count(U320::from(0), &design, designs, patterns, &mut HashMap::new()) })
+        .map(|design| { count(U320::from(0), &design, designs, patterns, &mut HashMap::new(), part) })
         .map(|count| if part == 1 { if count > 0 { 1 } else { 0 } } else { count })
         .sum()
 }
