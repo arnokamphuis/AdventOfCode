@@ -1,27 +1,21 @@
 use super::tools;
 use std::time::Instant;
 use std::collections::HashMap;
-use std::hash::{Hash, Hasher};
+use super::construct_uint;
 
-#[derive(Debug, Clone)]
-struct VecKey(Vec<u8>);
-
-impl Hash for VecKey {
-    fn hash<H: Hasher>(&self, state: &mut H) {
-        self.0.as_slice().hash(state);
-    }
+construct_uint! {
+    /// 320-bit unsigned integer.
+    pub struct U320(5);
 }
 
-impl PartialEq for VecKey {
-    fn eq(&self, other: &Self) -> bool {
-        self.0 == other.0
-    }
+macro_rules! mult5 {
+    ($x:expr) => {
+        (($x + 4) / 5) * 5
+    };
 }
 
-impl Eq for VecKey {}
-
-fn count(design: Vec<u8>, target: &Vec<u8>, designs: &Vec<Vec<u8>>, patterns: &Vec<Vec<u8>>, cache: &mut HashMap<VecKey, usize>) -> usize {
-    let key = VecKey(design.clone());
+fn count(design: U320, target: &U320, designs: &Vec<U320>, patterns: &Vec<U320>, cache: &mut HashMap<U320, usize>) -> usize {
+    let key = design;
     if cache.contains_key(&key) {
         return cache[&key];
     }
@@ -30,15 +24,22 @@ fn count(design: Vec<u8>, target: &Vec<u8>, designs: &Vec<Vec<u8>>, patterns: &V
         return 1;
     }
 
-    if design.len() > target.len() {
+    if design > *target {
         return 0;
     }
 
     let count = patterns
         .iter()
-        .map(|pattern| { pattern.iter().fold(design.clone(), |mut acc, e| { acc.push(*e); acc })})
-        .filter(|new_design| new_design.len() <= target.len())
-        .filter(|new_design| *new_design == target[..new_design.len()])
+        .map(|pattern| { 
+            (design << mult5!(pattern.bits())) | *pattern 
+        })
+        .filter(|new_design| {
+            let target_bits = mult5!(target.bits());
+            let new_design_bits = mult5!(new_design.bits());
+            let diff_bits = target_bits - new_design_bits;
+            *new_design == (target >> diff_bits)
+        })
+        .filter(|new_design| new_design <= target)
         .fold(0, |acc, new_design| {
             acc + count(new_design, target, designs, patterns, cache)
         });
@@ -47,10 +48,10 @@ fn count(design: Vec<u8>, target: &Vec<u8>, designs: &Vec<Vec<u8>>, patterns: &V
     count
 }
 
-fn count_all(designs: &Vec<Vec<u8>>, patterns: &Vec<Vec<u8>>, part: u8) -> usize {
+fn count_all(designs: &Vec<U320>, patterns: &Vec<U320>, part: u8) -> usize {
     designs
         .iter()
-        .map(|design| { count(vec![], &design, designs, patterns, &mut HashMap::new()) })
+        .map(|design| { count(U320::from(0), &design, designs, patterns, &mut HashMap::new()) })
         .map(|count| if part == 1 { if count > 0 { 1 } else { 0 } } else { count })
         .sum()
 }
@@ -65,18 +66,22 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
         "./input/day19-real.txt"
     };
     let input = tools::get_input(String::from(input_file));
-    let patterns = input[0]
+
+    let patterns: Vec<U320> = input[0]
         .split(", ")
         .map(|s| s
             .chars()
-            .map(|ch| ch as u8)
-            .collect::<Vec<u8>>())
-        .collect::<Vec<Vec<u8>>>();
+            .map(|ch| ch as u8 - 'a' as u8)
+            .fold(U320::from(0), |acc, e| { (acc << 5) | U320::from(e) }))
+        .collect::<Vec<U320>>();
 
     let designs = input[2..]
         .iter()
-        .map(|s| s.chars().map(|ch| ch as u8).collect::<Vec<u8>>())
-        .collect::<Vec<Vec<u8>>>();
+        .map(|s| s
+            .chars()
+            .map(|ch| ch as u8 - 'a' as u8 )
+            .fold(U320::from(0), |acc, e| { (acc << 5) | U320::from(e) }))
+        .collect::<Vec<U320>>();
 
     let after0 = Instant::now();
 

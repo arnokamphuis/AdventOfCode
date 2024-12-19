@@ -1,6 +1,7 @@
 use std::env;
 use std::fs::File;
 use std::io::Write;
+use uint::construct_uint;
 
 mod day01_24;
 mod day02_24;
