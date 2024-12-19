@@ -97,7 +97,7 @@ fn main() {
         ("Day 16 of 2024", day16_24::run, 20),
         ("Day 17 of 2024", day17_24::run, 200),
         ("Day 18 of 2024", day18_24::run, 200),
-        ("Day 19 of 2024", day19_24::run, 200),
+        ("Day 19 of 2024", day19_24::run, 20),
         // ("Day 20 of 2024", day20_24::run, 200),
         // ("Day 21 of 2024", day21_24::run, 200),
         // ("Day 22 of 2024", day22_24::run, 200),
