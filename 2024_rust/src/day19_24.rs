@@ -29,7 +29,6 @@ fn check(design: U320, patterns: &Vec<U320>) -> bool {
         })
 }
 
-#[allow(dead_code)]
 fn count_fast(design: U320, patterns: &Vec<U320>, cache: &mut HashMap<U320, usize>) -> usize {
     if design == U320::from(0) { return 1; }
 
@@ -41,9 +40,10 @@ fn count_fast(design: U320, patterns: &Vec<U320>, cache: &mut HashMap<U320, usiz
         .iter()
         .map(|pattern| {
             let shift_size = mult5!(pattern.bits());
-            let mask = U320::from((1 << shift_size)-1);
+            let mask = (U320::from(1) << shift_size) - 1;
             if design & mask == *pattern {
-                count_fast(design >> shift_size, patterns, cache)
+                let c = count_fast(design >> shift_size, patterns, cache);
+                c
             } else {
                 0
             }
@@ -60,53 +60,10 @@ fn check_all(designs: &Vec<U320>, patterns: &Vec<U320>) -> usize {
         .sum()
 }
 
-#[allow(dead_code)]
-fn count(design: U320, target: &U320, designs: &Vec<U320>, patterns: &Vec<U320>, cache: &mut HashMap<U320, usize>, part: u8) -> usize {
-    let key = design;
-    if cache.contains_key(&key) {
-        return cache[&key];
-    }
-    
-    if design == *target {
-        return 1;
-    }
-
-    if design > *target {
-        return 0;
-    }
-
-    let count = patterns
-        .iter()
-        .map(|pattern| { 
-            (design << mult5!(pattern.bits())) | *pattern 
-        })
-        .filter(|new_design| {
-            let target_bits = mult5!(target.bits());
-            let new_design_bits = mult5!(new_design.bits());
-            let diff_bits = target_bits - new_design_bits;
-            *new_design == (target >> diff_bits)
-        })
-        .filter(|new_design| new_design <= target)
-        .fold(0, |acc, new_design| {
-            if part == 1 && acc > 0 { acc } else {
-                acc + count(new_design, target, designs, patterns, cache, part)
-            }
-        });
-
-    cache.insert(key, count);
-    count
-}
-
-fn count_all(designs: &Vec<U320>, patterns: &Vec<U320>, part: u8) -> usize {
-    // designs
-    //     .iter()
-    //     .map(|design| { count_fast(*design, patterns, &mut HashMap::new()) })
-    //     .map(|count| if part == 1 { if count > 0 { 1 } else { 0 } } else { count })
-    //     .sum()
+fn count_all(designs: &Vec<U320>, patterns: &Vec<U320>) -> usize {
     designs
         .iter()
-        .map(|design| { count(U320::from(0), &design, designs, patterns, &mut HashMap::new(), part) })
-        .map(|count| if part == 1 { if count > 0 { 1 } else { 0 } } else { count })
+        .map(|design| { count_fast(*design, patterns, &mut HashMap::new()) })
         .sum()
 }
 
@@ -152,8 +109,7 @@ pub fn run(real: bool, print_result: bool) -> (u128, u128, u128) {
 
     let start2 = Instant::now();
 
-    let res2 = count_all(&designs, &patterns, 2);
-    // let res2 = 0;
+    let res2 = count_all(&designs, &patterns);
 
     let after2 = Instant::now();
     if print_result {
