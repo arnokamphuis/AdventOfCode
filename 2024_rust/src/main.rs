@@ -23,8 +23,8 @@ mod day17_24;
 mod day18_24;
 mod day19_24;
 mod day20_24;
-// mod day21_24;
-// mod day22_24;
+mod day21_24;
+mod day22_24;
 // mod day23_24;
 // mod day24_24;
 // mod day25_24;
@@ -100,8 +100,8 @@ fn main() {
         ("Day 18 of 2024", day18_24::run, 200),
         ("Day 19 of 2024", day19_24::run, 20),
         ("Day 20 of 2024", day20_24::run, 20),
-        // ("Day 21 of 2024", day21_24::run, 200),
-        // ("Day 22 of 2024", day22_24::run, 200),
+        ("Day 21 of 2024", day21_24::run, 200),
+        ("Day 22 of 2024", day22_24::run, 20),
         // ("Day 23 of 2024", day23_24::run, 200),
         // ("Day 24 of 2024", day24_24::run, 200),
         // ("Day 25 of 2024", day25_24::run, 200),
