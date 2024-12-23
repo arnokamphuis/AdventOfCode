@@ -25,24 +25,7 @@ for line in lines:
 
 computers = list(computers)
 
-def part1():
-    
-    all_triples = set()
-    
-    for i in range(len(computers)):
-        for j in range(i+1, len(computers)):
-            if computers[j] in connections[computers[i]]:
-                c1 = computers[i]
-                c2 = computers[j]
-                if c1[0] == 't' or c2[0] == 't':                
-                    targets = set(connections[c1]).intersection(connections[c2]).difference([c1, c2])
-                    for t in targets:
-                        all_triples.add(tuple(sorted([t, c1, c2])))
-    # print(all_triples)
-    return len( all_triples )
-
-
-def extend_set(comps, connections):
+def create_strongly_cc(comps, connections):
     sets = []
     for comp in comps:
         sets.append(set(tuple(connections[comp])))
@@ -53,26 +36,45 @@ def extend_set(comps, connections):
     
     for t in targets:
         new_set = comps.union([t])
-        result = extend_set(new_set, connections)
+        result = create_strongly_cc(new_set, connections)
         if result:
             return result
     
     return None
 
-def part2():
-    largest_size = 0
-    largest_set = None
+def find_all_strongly_cc(comps, connections):
+    ccs = []
     for c1 in computers:
         for c2 in connections[c1]:
             if c2 == c1:
                 continue
             test = set([c1,c2])
-            result = extend_set(test, connections)
+            result = create_strongly_cc(test, connections)
             if result:
-                if len(result) > largest_size:
-                    largest_size = len(result)
-                    largest_set = result
-    return ",".join(sorted(list(largest_set)))
+                res = sorted(list(result))
+                if res not in ccs:
+                    ccs.append(res)
+    return ccs
+
+connected_components = find_all_strongly_cc(computers, connections)
+
+def part1():    
+    all_triples = set()
+    for i in range(len(computers)):
+        for j in range(i+1, len(computers)):
+            if computers[j] in connections[computers[i]]:
+                c1 = computers[i]
+                c2 = computers[j]
+                if c1[0] == 't' or c2[0] == 't':                
+                    targets = set(connections[c1]).intersection(connections[c2]).difference([c1, c2])
+                    for t in targets:
+                        all_triples.add(tuple(sorted([t, c1, c2])))
+    return len(all_triples)
+
+def part2():
+    max_size = max([len(cc) for cc in connected_components])
+    largest = [cc for cc in connected_components if len(cc) == max_size]
+    return ",".join(sorted(list(largest[0])))
 
 if runpart == 1 or runpart == 0:
     for run in range(runs):
