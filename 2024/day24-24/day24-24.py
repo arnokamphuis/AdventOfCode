@@ -25,7 +25,7 @@ for line in lines[empty+1:]:
     i1 = f[0:3]
     op = f[4:7]
     i2 = f[8:11]
-    gates[t] = [i1, op, i2]
+    gates[t] = (i1, op, i2)
 
 
 def process(wires):
@@ -77,97 +77,51 @@ def part1():
     z_values = process_until_target_are_set(inputs, z_gates.keys())
     res1 = get_decimal_value(z_values)
     return res1
-    return 0
 
-def check_recarry(wire, i):
+# Just reconstruct the full adder from the resulting bit gate
+# All cases that are wrong will return the output wire that is wrong
+def check_back(bit):
     global gates
-    if wire not in gates: return False
-    parent_gate = gates[wire]
+    gate_name = f"z{bit:02d}"
+    if gate_name not in gates: return False, gate_name, "not in gates"
+    xor_gate = gates[gate_name]
+    if xor_gate[1] != "XOR": return False, gate_name, "not XOR"
     
-    if parent_gate[1] != "AND": return False
-    return check_inter_xor(parent_gate[0], i) and check_carry_bit(parent_gate[2], i) or \
-        check_inter_xor(parent_gate[2], i) and check_carry_bit(parent_gate[0], i)
+    in_wires = {xor_gate[0], xor_gate[2]}
+    in_gates = {gn:gates[gn] for gn in in_wires}
 
-def check_direct_carry(wire, i):
-    global gates
-    if wire not in gates: return False
-    parent_gate = gates[wire]
+    xor_gate_name = {gn for gn, gate in in_gates.items() if gate[1] == "XOR"}
+    if len(xor_gate_name) == 0: 
+        if bit == 1:
+            return False, {gn for gn, gate in in_gates.items() if gate[1] != "AND"}.pop(), "initial bit and is wrong"
+        else:
+            return False, {gn for gn, gate in in_gates.items() if gate[1] != "OR "}.pop(), "carry is wrong"
     
-    if parent_gate[1] != "AND": return False
+    x_wire = f"x{bit:02d}"
+    y_wire = f"y{bit:02d}"
     
-    return sorted([parent_gate[0], parent_gate[2]]) == [f"x{i:02d}", f"y{i:02d}"]
+    xor_gate_inputs = {(gate[0], gate[2]) for gn, gate in in_gates.items() if gate[1] == "XOR"}
+    if len(xor_gate_inputs) != 1:
+        incorrect_in_wires = [xgi for xgi in xor_gate_inputs if {xgi[0], xgi[1]} != {x_wire, y_wire}].pop()
+        incorrect_in_wires = {incorrect_in_wires[0], incorrect_in_wires[1]}
+        return False, [n for n, g in gates.items() if {g[0], g[2]} == incorrect_in_wires].pop(), "carry is wrong"
 
-def check_carry_bit(wire, i):
-    global gates
-    if wire not in gates: return False
-    parent_gate = gates[wire]
-    
-    if i == 1:
-        if parent_gate[1] != "AND": return False
-        return sorted([parent_gate[0], parent_gate[2]]) == ["x00", "y00"]
-    
-    if parent_gate[1] != "OR ": return False
-    
-    return (check_direct_carry(parent_gate[0], i - 1) and check_recarry(parent_gate[2], i - 1) ) or \
-        check_direct_carry(parent_gate[2], i - 1) and check_recarry(parent_gate[0], i - 1)
+    if bit == 1:
+        and_gate = {gate for gate in in_gates.values() if gate[1] == "AND"}.pop()
+        if {and_gate[0], and_gate[2]} != {f"x00", f"y00"}:
+            return False, {gn for gn, gate in in_gates.items() if gate[1] != "AND"}.pop(), "initial carry is wrong"
+    else:
+        or_gate = {gate for _, gate in in_gates.items() if gate[1] == "OR "}.pop()
+        
+        in_or_gate =  {(or_gate[0], gates[or_gate[0]]), (or_gate[2],gates[or_gate[2]])}
+        in_or_gate_not_and = {n for (n,g) in in_or_gate if g[1] != "AND"}
+        if len(in_or_gate_not_and) != 0:
+            return False, in_or_gate_not_and.pop(), "and before carry is wrong"
+    return True, None, "all good"
 
-def check_inter_xor(wire, i):
-    global gates
-    if wire not in gates: return False
-    parent_gate = gates[wire]
-    
-    if parent_gate[1] != "XOR": return False
-    
-    return sorted([parent_gate[0], parent_gate[2]]) == [f"x{i:02d}", f"y{i:02d}"]
-
-def check_back_track(wire, i):
-    global gates
-    if wire not in gates: return False
-    parent_gate = gates[wire]
-    
-    if parent_gate[1] != "XOR": return False
-    
-    if i==0: return sorted([parent_gate[0], parent_gate[2]]) == ['x00', 'y00']
-    
-    return (check_inter_xor(parent_gate[0], i) and check_carry_bit(parent_gate[2], i)) or \
-        (check_inter_xor(parent_gate[2], i) and check_carry_bit(parent_gate[0], i))
-
-def check(i):
-    return check_back_track(f"z{i:02d}", i)
-
-def where_okay():
-    i = 0
-    while True:
-        if not check(i): break
-        i += 1
-    return i
-
-def swap_gates(x, y):
-    global gates
-    gates[x], gates[y] = gates[y], gates[x]
 
 def part2():
-    global gates
-    swaps = []
-    for _ in range(4):
-        print("progress")
-        progress = where_okay()
-        print(progress)
-        for g1 in gates:
-            for g2 in gates:
-                if g1 == g2: continue
-                # print(g1, g2)
-                swap_gates(g1, g2)
-                if where_okay() > progress:
-                    print(f"Swapping {g1} with {g2}")
-                    break
-                swap_gates(g1, g2)
-            else:
-                continue
-            break
-        swaps.extend([g1, g2])
-    print(swaps)
-    return ",".join(sorted(swaps))
+    return ",".join(sorted(list({out for (_,out,_) in [check_back(i) for i in range(1, 45)]} - {None})))
 
 if runpart == 1 or runpart == 0:
     for run in range(runs):
