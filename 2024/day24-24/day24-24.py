@@ -95,7 +95,7 @@ def check_back(bit):
         if bit == 1:
             return False, {gn for gn, gate in in_gates.items() if gate[1] != "AND"}.pop(), "initial bit and is wrong"
         else:
-            return False, {gn for gn, gate in in_gates.items() if gate[1] != "OR "}.pop(), "carry is wrong"
+            return False, {gn for gn, gate in in_gates.items() if gate[1] != "OR "}.pop(), "non-initial bit, carry is wrong"
     
     x_wire = f"x{bit:02d}"
     y_wire = f"y{bit:02d}"
