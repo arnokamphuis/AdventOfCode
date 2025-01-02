@@ -1,0 +1,30 @@
+[package]
+name = "aoc2024"
+version = "0.1.0"
+authors = ["Arno Kamphuis <arno.kamphuis@hu.nl>"]
+edition = "2021"
+
+[features]
+make_movie = []
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+order-stat = "0.1.3"
+md5 = "0.7"
+hex = "0.4.3"
+permutohedron = "0.2.4"
+queues = "1.1.0"
+num = "0.4.0"
+png = "0.17.7"
+regex = "1.7.0"
+itertools = "0.10.5"
+petgraph = "0.6.2"
+modinverse = "^0.1.1"
+plotly = "0.8.3"
+font8x8 = "0.3.1"
+advent-of-code-ocr = "0.1.1"
+priority-queue = "1.3.0"
+rand = "0.8.5"
+counter = "0.6.0"
+uint = "0.10.0"
