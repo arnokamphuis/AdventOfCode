@@ -18,12 +18,8 @@ def part1():
     count = 0
     dial = 50
     max_dial = 100
-    for move in moves:
-        direction, steps = move
-        if direction == 'R':
-            dial = (dial + steps) % max_dial
-        elif direction == 'L':
-            dial = (dial - steps) % max_dial
+    for direction, steps in moves:
+        dial = (dial + (steps if direction == 'R' else -steps)) % max_dial
         if dial == 0: count += 1
     return count
 
@@ -31,8 +27,7 @@ def part2():
     count = 0
     dial = 50
     max_dial = 100
-    for move in moves:
-        direction, steps = move
+    for direction, steps in moves:
         extra = steps // max_dial
         steps = steps % max_dial
 
