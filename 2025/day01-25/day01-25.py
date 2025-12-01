@@ -34,13 +34,11 @@ def part2():
         new_dial = dial + (steps if direction == 'R' else -steps)
         if new_dial >= max_dial:
             count += extra + 1
-            new_dial -= max_dial
-        elif new_dial < 0:
+        elif new_dial <= 0:
             count += extra + (1 if not dial == 0 else 0)
-            new_dial += max_dial
         else:
-            count += extra + (1 if new_dial == 0 else 0)
-        dial = new_dial
+            count += extra
+        dial = new_dial % max_dial
     return count
 
 if runpart == 1 or runpart == 0:
